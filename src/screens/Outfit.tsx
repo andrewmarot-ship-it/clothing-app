@@ -1,4 +1,4 @@
-import { CaretLeft, CaretRight, Sparkle } from '@phosphor-icons/react'
+import { CaretLeft, CaretRight, Check, Sparkle } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Garment, Line } from '../components/Garment'
 import { itemMatch } from '../components/match'
@@ -57,15 +57,12 @@ function Strip({ label, list, current, onSelect }: { label: string; list: RatedI
   )
 }
 
-export function Outfit() {
-  const { go, set, tops, bots, top, bot, userTone, isSaved, toggleSaved, openItem } = useApp()
-  const [date] = useState(() => {
-    const now = new Date()
-    return `${now.toLocaleDateString('en-GB', { weekday: 'short' })} ${now.getDate()}`
-  })
+function Fitting({ top, bot }: { top: RatedItem; bot: RatedItem }) {
+  const { set, tops, bots, isSaved, toggleSaved, openItem, wornToday, toggleWorn } = useApp()
   const dl = Math.abs(top.L - bot.L)
   const fit = toneFit(top, bot)
   const saved = isSaved(top.id, bot.id)
+  const worn = wornToday(top.id, bot.id)
 
   const shuffle = () => {
     const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)]
@@ -79,20 +76,6 @@ export function Outfit() {
 
   return (
     <>
-      <header className="outfit-head">
-        <div className="col">
-          <h1 className="display">{date}</h1>
-          <span className="sub">17° overcast · {TONES[userTone].name}</span>
-        </div>
-        <button type="button" className="btn btn-primary btn-tall glow" onClick={() => go('occasion')}>
-          <Sparkle size={16} />
-          Match me
-        </button>
-      </header>
-
-      <Strip label="Tops" list={tops} current={top} onSelect={(id) => set({ topId: id })} />
-      <Strip label="Bottoms" list={bots} current={bot} onSelect={(id) => set({ botId: id })} />
-
       <section className="fitting pad">
         <div className="fitting-figure">
           <Garment item={top} className="fitting-top" />
@@ -145,6 +128,89 @@ export function Outfit() {
           {saved ? 'Saved ♥' : 'Save look'}
         </button>
       </div>
+      <div className="pad top-3">
+        <button
+          type="button"
+          className={`btn btn-block btn-tall ${worn ? 'btn-secondary worn' : 'btn-primary'}`}
+          aria-pressed={worn}
+          onClick={() => toggleWorn(top.id, bot.id)}
+        >
+          {worn ? (
+            <>
+              <Check size={16} />
+              Worn today · tap to undo
+            </>
+          ) : (
+            'I wore this today'
+          )}
+        </button>
+      </div>
+    </>
+  )
+}
+
+/** First-run checklist: a tone, then at least one top and one bottom. */
+function Setup() {
+  const { go, hasTone, tops, bots } = useApp()
+  const steps = [
+    { done: hasTone, label: 'Find your colour tone', hint: 'Three quick questions', on: () => go('quiz', { quizStep: 0, quiz: [null, null, null] }) },
+    { done: tops.length > 0, label: 'Add a top', hint: 'Lay it flat and take a photo', on: () => go('add') },
+    { done: bots.length > 0, label: 'Add a bottom', hint: 'Jeans, trousers, a skirt…', on: () => go('add') },
+  ]
+  const fresh = !steps.some((st) => st.done)
+  return (
+    <section className="pad top-6">
+      <div className="card setup">
+        <span className="card-kicker">{fresh ? 'Welcome to Clothesline' : 'Almost there'}</span>
+        <span className="setup-title">{fresh ? 'Set up your line in three steps' : 'Finish setting up to start matching'}</span>
+        <ol className="setup-steps">
+          {steps.map((st) => (
+            <li key={st.label}>
+              <button type="button" className={`setup-step ${st.done ? 'is-done' : ''}`} onClick={st.on} disabled={st.done}>
+                <span className="setup-check" aria-hidden="true">
+                  {st.done && <Check size={12} weight="bold" />}
+                </span>
+                <span className="col gap-2px">
+                  <span className="setup-label">{st.label}</span>
+                  <span className="meta">{st.done ? 'Done' : st.hint}</span>
+                </span>
+                {!st.done && <CaretRight size={14} className="muted" />}
+              </button>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )
+}
+
+export function Outfit() {
+  const { go, set, tops, bots, top, bot, userTone, hasTone } = useApp()
+  const [date] = useState(() => {
+    const now = new Date()
+    return `${now.toLocaleDateString('en-GB', { weekday: 'short' })} ${now.getDate()}`
+  })
+  const ready = hasTone && !!top && !!bot
+
+  return (
+    <>
+      <header className="outfit-head">
+        <div className="col">
+          <h1 className="display">{date}</h1>
+          <span className="sub">17° overcast · {hasTone ? TONES[userTone].name : 'Tone not set'}</span>
+        </div>
+        {top && bot && (
+          <button type="button" className="btn btn-primary btn-tall glow" onClick={() => go('occasion')}>
+            <Sparkle size={16} />
+            Match me
+          </button>
+        )}
+      </header>
+
+      {!ready && <Setup />}
+      {top && <Strip label="Tops" list={tops} current={top} onSelect={(id) => set({ topId: id })} />}
+      {bot && <Strip label="Bottoms" list={bots} current={bot} onSelect={(id) => set({ botId: id })} />}
+      {top && bot && <Fitting top={top} bot={bot} />}
     </>
   )
 }

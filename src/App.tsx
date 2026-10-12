@@ -2,6 +2,7 @@ import type { JSX } from 'react'
 import { TabBar } from './components/Chrome'
 import { SvgDefs } from './components/Garment'
 import { AddPiece } from './screens/AddPiece'
+import { EditItem } from './screens/EditItem'
 import { ItemDetail } from './screens/ItemDetail'
 import { Looks } from './screens/Looks'
 import { Match } from './screens/Match'
@@ -23,6 +24,7 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
   occasion: Occasion,
   match: Match,
   item: ItemDetail,
+  edit: EditItem,
   quiz: Quiz,
   tones: Tones,
 }

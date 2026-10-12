@@ -41,7 +41,7 @@ export function TabBar() {
             aria-label={label}
             aria-current={active ? 'page' : undefined}
             className={`tab ${k === 'add' ? 'tab--add' : ''} ${active ? 'is-active' : ''}`}
-            onClick={() => go(k)}
+            onClick={() => go(k, k === 'add' ? { retakeId: null } : {})}
           >
             <span className="tab-icon">
               <TabIcon size={20} />

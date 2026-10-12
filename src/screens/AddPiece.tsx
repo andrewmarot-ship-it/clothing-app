@@ -1,19 +1,19 @@
 import { Camera, CoatHanger, Image as ImageIcon } from '@phosphor-icons/react'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { BackRow } from '../components/Chrome'
+import { DetailsForm, type Details } from '../components/DetailsForm'
 import { Garment } from '../components/Garment'
 import { matchInfo } from '../components/match'
 import { useObjectUrl } from '../components/useObjectUrl'
 import { classifyHex, colourName } from '../domain/color'
-import { CODES } from '../domain/occasions'
 import { PhotoError, analysePhoto, preparePhoto, type AnalysedPhoto, type PreparedPhoto, type Stage, type Warning } from '../domain/photo'
 import type { QualityIssue } from '../domain/pixels'
-import { KINDS, KIND_LABELS, defaultKind } from '../domain/tags'
+import { KINDS, defaultKind } from '../domain/tags'
 import { TONES, matchOf } from '../domain/tones'
-import type { Category, Item, Kind } from '../domain/types'
+import type { Category, Item } from '../domain/types'
 import { useApp } from '../state/context'
 
 const STEPS = ['Finding the garment', 'Removing the background', 'Reading its colour', 'Placing it in a TCI tone']
-const DEMO_STEP_MS = 750
 /** Keep the steps on screen long enough to read, even when the network is fast. */
 const MIN_SCAN_MS = 1400
 
@@ -32,27 +32,16 @@ const WARNINGS: Record<Warning, string> = {
 
 type Step = 'idle' | 'check' | 'scan' | 'done'
 
-interface Details {
-  name: string
-  cat: Category
-  kind: Kind
-  fabric: string
-  f: number
-  w: number
-}
-
-const DEMO: Details = { name: 'Crew tee', cat: 'top', kind: 'tee', fabric: 'Cotton', f: 1, w: 1 }
-
 export function AddPiece() {
-  const { go, userTone, addItem } = useApp()
+  const { state, go, userTone, addItem, updateItem, byId } = useApp()
+  const retaking = byId(state.retakeId)
   const [step, setStep] = useState<Step>('idle')
   const [scanI, setScanI] = useState(0)
   const [notice, setNotice] = useState<string | null>(null)
   const [prepared, setPrepared] = useState<PreparedPhoto | null>(null)
   const [result, setResult] = useState<AnalysedPhoto | null>(null)
-  const [demo, setDemo] = useState(false)
-  const [color, setColor] = useState('#ef7a5f')
-  const [details, setDetails] = useState<Details>(DEMO)
+  const [color, setColor] = useState('#b8946a')
+  const [details, setDetails] = useState<Details>({ name: 'New piece', cat: 'top', kind: 'tee', fabric: 'Cotton', f: 1, w: 1 })
   const camRef = useRef<HTMLInputElement>(null)
   const upRef = useRef<HTMLInputElement>(null)
   const abortRef = useRef<AbortController | null>(null)
@@ -62,19 +51,11 @@ export function AddPiece() {
 
   useEffect(() => () => abortRef.current?.abort(), [])
 
-  // Sample-photo demo: tick through the steps on a timer.
-  useEffect(() => {
-    if (!demo || step !== 'scan') return
-    const timer = setTimeout(() => (scanI >= STEPS.length - 1 ? setStep('done') : setScanI(scanI + 1)), DEMO_STEP_MS)
-    return () => clearTimeout(timer)
-  }, [demo, step, scanI])
-
   const reset = (message: string | null = null) => {
     abortRef.current?.abort()
     setStep('idle')
     setPrepared(null)
     setResult(null)
-    setDemo(false)
     setNotice(message)
   }
 
@@ -89,17 +70,22 @@ export function AddPiece() {
       await new Promise((ok) => setTimeout(ok, Math.max(0, MIN_SCAN_MS - (Date.now() - started))))
       if (ctrl.signal.aborted) return
       const t = r.tags
-      const cat: Category = t?.category === 'bottom' ? 'bottom' : 'top'
       setResult(r)
       setColor(r.color)
-      setDetails({
-        name: t?.name ?? 'New piece',
-        cat,
-        kind: t && KINDS[cat].includes(t.kind) ? t.kind : defaultKind(cat),
-        fabric: t?.fabric ?? 'Cotton',
-        f: t?.formality ?? 1,
-        w: t?.warmth ?? 1,
-      })
+      if (retaking) {
+        // A retake keeps what the user already set; only the photo and colour change.
+        setDetails({ name: retaking.name, cat: retaking.cat, kind: retaking.kind, fabric: retaking.fabric, f: retaking.f, w: retaking.w })
+      } else {
+        const cat: Category = t?.category === 'bottom' ? 'bottom' : 'top'
+        setDetails({
+          name: t?.name ?? 'New piece',
+          cat,
+          kind: t && KINDS[cat].includes(t.kind) ? t.kind : defaultKind(cat),
+          fabric: t?.fabric ?? 'Cotton',
+          f: t?.formality ?? 1,
+          w: t?.warmth ?? 1,
+        })
+      }
       setStep('done')
     } catch (e) {
       if (ctrl.signal.aborted) return
@@ -116,7 +102,6 @@ export function AddPiece() {
     e.target.value = ''
     if (!file) return
     setNotice(null)
-    setDemo(false)
     try {
       const p = await preparePhoto(file)
       setPrepared(p)
@@ -127,37 +112,29 @@ export function AddPiece() {
     }
   }
 
-  const startDemo = () => {
-    reset()
-    setDemo(true)
-    setColor('#ef7a5f')
-    setDetails(DEMO)
-    setScanI(0)
-    setStep('scan')
-  }
-
   const toneI = classifyHex(color)
   const m = matchInfo(matchOf(toneI, userTone), TONES[toneI].name)
-  const patch = (p: Partial<Details>) => setDetails((d) => ({ ...d, ...p }))
-  const setCat = (cat: Category) => patch({ cat, kind: KINDS[cat].includes(details.kind) ? details.kind : defaultKind(cat) })
-
   const hang = () => {
-    const item: Item = {
-      id: `n${Date.now()}`,
-      cat: details.cat,
-      name: details.name.trim() || 'New piece',
-      kind: details.kind,
+    const fromPhoto = {
       color,
       colorName: result?.tags?.colourName || colourName(color),
-      fabric: details.fabric.trim() || 'Cotton',
       tone: toneI,
-      f: details.f,
-      w: details.w,
-      wears: 0,
-      ...(result?.color2 ? { color2: result.color2 } : {}),
-      ...(result?.pattern ? { pattern: true } : {}),
+      color2: result?.color2 ?? undefined,
+      pattern: result?.pattern || undefined,
     }
-    addItem(item, { photo: result?.photo, original: result?.original })
+    const images = { photo: result?.photo, original: result?.original }
+    if (retaking) {
+      updateItem(retaking.id, { ...fromPhoto, ...cleanDetails(details) }, images)
+      go('item', { itemId: retaking.id, retakeId: null })
+      return
+    }
+    const item: Item = {
+      id: `n${Date.now()}`,
+      ...cleanDetails(details),
+      ...fromPhoto,
+      wears: 0,
+    }
+    addItem(item, images)
     go('outfit')
   }
 
@@ -167,8 +144,9 @@ export function AddPiece() {
 
   return (
     <>
-      <header className="pad top-8 col">
-        <h1 className="display">Add a piece</h1>
+      {retaking && <BackRow label={retaking.name} onBack={() => go('item', { itemId: retaking.id, retakeId: null })} right="New photo" />}
+      <header className={`pad col ${retaking ? 'top-4' : 'top-8'}`}>
+        <h1 className="display">{retaking ? 'Retake photo' : 'Add a piece'}</h1>
         <span className="sub pretty">Lay it flat on a plain, light surface and shoot from directly above in daylight. We cut it out, tag it and place its colour in a tone.</span>
       </header>
       <div className="pad top-6">
@@ -222,9 +200,6 @@ export function AddPiece() {
                 Upload
               </button>
             </div>
-            <button type="button" className="btn btn-ghost btn-block btn-quiet" onClick={startDemo}>
-              Try with a sample photo
-            </button>
           </>
         )}
 
@@ -265,52 +240,7 @@ export function AddPiece() {
                 {WARNINGS[w]}
               </p>
             ))}
-            <div className="field stack-2">
-              <label htmlFor="new-name" className="kicker">
-                Name
-              </label>
-              <input id="new-name" className="input input-lg" value={details.name} onChange={(e) => patch({ name: e.target.value })} />
-            </div>
-            <div className="actions-2 gap-2" role="radiogroup" aria-label="Category">
-              {(['top', 'bottom'] as Category[]).map((c) => (
-                <button key={c} type="button" role="radio" aria-checked={details.cat === c} className={`btn ${details.cat === c ? 'btn-primary' : 'btn-ghost'}`} style={{ minHeight: 40 }} onClick={() => setCat(c)}>
-                  {c === 'top' ? 'Top' : 'Bottom'}
-                </button>
-              ))}
-            </div>
-            <div className="chips" role="radiogroup" aria-label="Type">
-              {KINDS[details.cat].map((k) => (
-                <button key={k} type="button" role="radio" aria-checked={details.kind === k} className={`chip ${details.kind === k ? 'is-active' : ''}`} onClick={() => patch({ kind: k })}>
-                  {KIND_LABELS[k]}
-                </button>
-              ))}
-            </div>
-            <div className="field stack-2">
-              <label htmlFor="new-fabric" className="kicker">
-                Fabric
-              </label>
-              <input id="new-fabric" className="input input-lg" value={details.fabric} onChange={(e) => patch({ fabric: e.target.value })} />
-            </div>
-            <div className="stack-2">
-              <span className="kicker">Formality</span>
-              <div className="seg-grid" role="radiogroup" aria-label="Formality">
-                {CODES.map((label, i) => (
-                  <button key={label} type="button" role="radio" aria-checked={details.f === i + 1} className={`btn ${details.f === i + 1 ? 'btn-primary' : 'btn-ghost'}`} onClick={() => patch({ f: i + 1 })}>
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="stack-2">
-              <span className="kicker">Warmth</span>
-              <div className="seg-grid seg-grid--3" role="radiogroup" aria-label="Warmth">
-                {['Light', 'Mid', 'Warm'].map((label, i) => (
-                  <button key={label} type="button" role="radio" aria-checked={details.w === i + 1} className={`btn ${details.w === i + 1 ? 'btn-primary' : 'btn-ghost'}`} onClick={() => patch({ w: i + 1 })}>
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <DetailsForm value={details} onChange={setDetails} />
             <div className="row gap-3 body-13">
               <span className="swatch" style={{ background: color }} />
               {result?.color2 && <span className="swatch" style={{ background: result.color2 }} title="Second colour" />}
@@ -322,7 +252,7 @@ export function AddPiece() {
                 Retake
               </button>
               <button type="button" className="btn btn-primary btn-tall" onClick={hang}>
-                Hang it on the line
+                {retaking ? 'Save new photo' : 'Hang it on the line'}
               </button>
             </div>
           </div>
@@ -334,3 +264,5 @@ export function AddPiece() {
     </>
   )
 }
+
+const cleanDetails = (d: Details) => ({ ...d, name: d.name.trim() || 'New piece', fabric: d.fabric.trim() || 'Cotton' })

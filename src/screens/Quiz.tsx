@@ -18,15 +18,17 @@ export function Quiz() {
     next[step] = value
     set({ quiz: next })
   }
-  const back = () => (step > 0 ? set({ quizStep: step - 1 }) : go('profile'))
+  // Opened from the first-run checklist on Outfit, or from Profile.
+  const home = state.from === 'outfit' ? 'outfit' : 'profile'
+  const back = () => (step > 0 ? set({ quizStep: step - 1 }) : go(home))
   const next = () => {
-    if (!asking) go('profile', { tone: best })
+    if (!asking) go(home, { tone: best })
     else if (!blocked) set({ quizStep: step + 1 })
   }
 
   return (
     <>
-      <BackRow label="Profile" onBack={back} right={asking ? `${step + 1} of 3` : 'Result'} />
+      <BackRow label={home === 'outfit' ? 'Outfit' : 'Profile'} onBack={back} right={asking ? `${step + 1} of 3` : 'Result'} />
       <div className="pad top-4 quiz-bars" aria-hidden="true">
         {QUIZ.map((_, i) => (
           <span key={i} className={i < step || (i === step && answers[i] != null) || !asking ? 'is-on' : ''} />

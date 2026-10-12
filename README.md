@@ -20,7 +20,13 @@ The dev server also serves the `api/` functions, so photo capture works locally.
 | `ANTHROPIC_API_KEY` | Garment tagging with Claude |
 | `TAG_MODEL` | Optional tagging-model override (default `claude-haiku-5-5`) |
 
-Deploy on Vercel: it serves the Vite build plus `api/` as serverless functions. Set the same variables under Project → Settings → Environment Variables.
+### Deploying
+
+1. In [Vercel](https://vercel.com/new), import `andrewmarot-ship-it/clothing-app`. It detects Vite: no build settings to change.
+2. Add the variables above under Project → Settings → Environment Variables.
+3. Every PR then gets a preview link, and `main` deploys to production.
+
+GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests and the build on every PR.
 
 | Script | What it does |
 |---|---|
@@ -34,13 +40,15 @@ Deploy on Vercel: it serves the Vite build plus `api/` as serverless functions. 
 
 | Tab | Screen |
 |---|---|
-| **Outfit** (home) | Two clotheslines, a fitting panel with contrast and tone-fit meters, Shuffle and Save look |
+| **Outfit** (home) | A first-run checklist (find your tone, add a top, add a bottom), then two clotheslines, a fitting panel with contrast and tone-fit meters, Shuffle, Save look and "I wore this today" |
 | **Wardrobe** | Every piece, filterable by tops, bottoms or "in my tone" |
 | **Add** | Take or upload a photo; the app reads its colour, places it in a tone and hangs it on the line |
 | **Looks** | Saved outfits |
-| **Profile** | Your tone, its palette, and how much of your wardrobe fits it |
+| **Profile** | Your tone, its palette, how much of your wardrobe fits it, and your most-worn and waiting-to-be-worn pieces |
 
-Pushed screens: **Occasion** → **Match** (Match me results), **Item** detail, the 3-question **Quiz** to find your tone, and **All 12 tones**.
+Pushed screens: **Occasion** → **Match** (Match me results), **Item** detail → **Edit** (details, or retake the photo), the 3-question **Quiz** to find your tone, and **All 12 tones**.
+
+The app starts empty: there's no demo wardrobe.
 
 ## Project layout
 

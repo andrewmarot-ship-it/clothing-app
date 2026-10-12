@@ -3,11 +3,11 @@ import { classifyHex, colourName, oklch } from './color'
 import { PRESETS, occasionFor, parseOccasion } from './occasions'
 import { quizResult, shortlist } from './quiz'
 import { bestPartners, contrastLabel, describe, lookTitle, rankLooks, rate, scoreLook, toneFit } from './scoring'
-import { SEED_ITEMS } from './seed'
+import { FIXTURE_ITEMS } from './fixtures'
 import { TONES, matchOf, nearestTone, rankTones, toneDesc, toneIndex } from './tones'
 
 const SOFT_AUTUMN = toneIndex('Soft Autumn')
-const rated = rate(SEED_ITEMS, SOFT_AUTUMN)
+const rated = rate(FIXTURE_ITEMS, SOFT_AUTUMN)
 const byId = (id: string) => rated.find((i) => i.id === id)!
 
 suite('tones', () => {
