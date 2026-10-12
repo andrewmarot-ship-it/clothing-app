@@ -1,13 +1,34 @@
-import { oklch } from './color'
+import { colourDistance, oklch } from './color'
 import type { Occasion } from './occasions'
 import { TONES, matchOf } from './tones'
-import type { Item, Match, RatedItem } from './types'
+import type { Item, Match, MatchSource, RatedItem } from './types'
 
 const FIT: Record<Match, number> = { in: 100, near: 72, out: 38 }
 const MATCH_SCORE: Record<Match, number> = { in: 2, near: 1, out: 0 }
 
-export function rate(items: Item[], userTone: number): RatedItem[] {
-  return items.map((it) => ({ ...it, match: matchOf(it.tone, userTone), L: oklch(it.color).L }))
+/** How close a colour must be to one of the user's own colours to count as in tone. */
+export const PALETTE_MATCH_DISTANCE = 0.07
+
+/**
+ * Score each piece against the user. Their own call on a piece wins, then a
+ * colour they've added to their palette, then the tone classifier.
+ */
+export function rate(items: Item[], userTone: number, myColours: string[] = []): RatedItem[] {
+  return items.map((it) => {
+    let match: Match
+    let matchSource: MatchSource
+    if (it.matchOverride) {
+      match = it.matchOverride
+      matchSource = 'you'
+    } else if (myColours.some((c) => colourDistance(c, it.color) < PALETTE_MATCH_DISTANCE)) {
+      match = 'in'
+      matchSource = 'palette'
+    } else {
+      match = matchOf(it.tone, userTone)
+      matchSource = 'tone'
+    }
+    return { ...it, match, matchSource, L: oklch(it.color).L }
+  })
 }
 
 /** Tone fit, 0–100. The top weighs more because it sits near the face. */
@@ -100,7 +121,9 @@ export function describe(t: RatedItem, b: RatedItem, occ: Occasion, code: number
     const o = a === t ? b : t
     toneTxt =
       o.match === 'near'
-        ? `${a.colorName} is core ${T.name}; ${o.colorName.toLowerCase()} borrows from ${TONES[o.tone].name} next door, so it still flatters. ${conTxt}`
+        ? o.matchSource === 'tone'
+          ? `${a.colorName} is core ${T.name}; ${o.colorName.toLowerCase()} borrows from ${TONES[o.tone].name} next door, so it still flatters. ${conTxt}`
+          : `${a.colorName} is core ${T.name}, and you rate ${o.colorName.toLowerCase()} close enough to work. ${conTxt}`
         : `${a.colorName} is in your tone. ${o.colorName} sits outside it, so keep it ${o === t ? 'under a layer' : 'away from your face'}. ${conTxt}`
   } else if (t.match === 'near' || b.match === 'near') {
     toneTxt = `Close to ${T.name} rather than in it. Add an in-tone accessory near your face. ${conTxt}`

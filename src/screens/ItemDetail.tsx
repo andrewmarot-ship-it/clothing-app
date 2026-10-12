@@ -2,7 +2,7 @@ import { PencilSimple } from '@phosphor-icons/react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { BackRow, Dots, Kicker } from '../components/Chrome'
 import { Garment, Line, Pins } from '../components/Garment'
-import { itemMatch } from '../components/match'
+import { ToneOverride } from '../components/ToneOverride'
 import { CODES, PRESETS } from '../domain/occasions'
 import { bestPartners, toneFit } from '../domain/scoring'
 import { TONES } from '../domain/tones'
@@ -35,7 +35,6 @@ export function ItemDetail() {
     )
   }
 
-  const m = itemMatch(item)
   const partners = bestPartners(item, rated, PRESETS.today)
   const lastWorn = state.wearLog
     .filter((w) => w.topId === item.id || w.botId === item.id)
@@ -72,10 +71,7 @@ export function ItemDetail() {
       <div className="pad top-4 stack-2">
         <Kicker>{item.cat === 'top' ? 'Top' : 'Bottom'}</Kicker>
         <h1 className="title">{item.name}</h1>
-        <div className="match-row" style={{ color: m.color }}>
-          <span className={`dot7 match-dot--${item.match}`} />
-          {m.label}
-        </div>
+        <ToneOverride item={item} />
       </div>
       <div className="pad top-6 col">
         {attrs.map((a) => (

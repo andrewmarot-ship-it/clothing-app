@@ -1,19 +1,33 @@
 import { CaretLeft, CaretRight, Check, Sparkle } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Garment, Line } from '../components/Garment'
 import { itemMatch } from '../components/match'
-import { useSwipe } from '../components/useSwipe'
 import { contrastLabel, toneFit } from '../domain/scoring'
 import { TONES } from '../domain/tones'
-import type { RatedItem } from '../domain/types'
+import type { Category, RatedItem } from '../domain/types'
 import { useApp } from '../state/context'
 
-function Strip({ label, list, current, onSelect }: { label: string; list: RatedItem[]; current: RatedItem; onSelect: (id: string) => void }) {
+/** Piece sizes on the line. Bottoms get taller boxes because trousers are tall. */
+const SIZES: Record<Category, { w: number; h: number; selW: number; selH: number }> = {
+  top: { w: 64, h: 64, selW: 104, selH: 104 },
+  bottom: { w: 52, h: 72, selW: 84, selH: 120 },
+}
+const GAP = 14
+
+function Strip({ label, cat, list, current, onSelect }: { label: string; cat: Category; list: RatedItem[]; current: RatedItem; onSelect: (id: string) => void }) {
   const n = list.length
   const idx = Math.max(0, list.findIndex((i) => i.id === current.id))
-  const step = n > 1 ? 86 / (n - 1) : 0
+  const size = SIZES[cat]
   const select = (i: number) => onSelect(list[(i + n) % n].id)
-  const swipe = useSwipe((dir) => select(idx + dir))
+  const scroller = useRef<HTMLDivElement>(null)
+  const first = useRef(true)
+
+  // Keep the selected piece centred. The track is padded by half the view on each
+  // side, so piece i is centred exactly when the line is scrolled by i pitches.
+  useEffect(() => {
+    scroller.current?.scrollTo({ left: idx * (size.w + GAP), behavior: first.current ? 'auto' : 'smooth' })
+    first.current = false
+  }, [idx, size.w])
 
   return (
     <section className="strip">
@@ -22,36 +36,36 @@ function Strip({ label, list, current, onSelect }: { label: string; list: RatedI
           {label} · {idx + 1} / {n}
         </span>
         <div className="strip-nav">
-          <button type="button" className="btn btn-ghost btn-icon" aria-label={`Previous ${label.toLowerCase()}`} onClick={() => select(idx - 1)}>
-            <CaretLeft size={16} />
+          <button type="button" className="btn btn-ghost btn-icon" aria-label={`Previous ${label.toLowerCase()}`} onClick={() => select(idx - 1)} disabled={n < 2}>
+            <CaretLeft size={18} />
           </button>
-          <button type="button" className="btn btn-ghost btn-icon" aria-label={`Next ${label.toLowerCase()}`} onClick={() => select(idx + 1)}>
-            <CaretRight size={16} />
+          <button type="button" className="btn btn-ghost btn-icon" aria-label={`Next ${label.toLowerCase()}`} onClick={() => select(idx + 1)} disabled={n < 2}>
+            <CaretRight size={18} />
           </button>
         </div>
       </div>
-      <div className="strip-line" {...swipe}>
-        <Line style={{ top: 6 }} />
-        {list.map((it, i) => {
-          const sel = i === idx
-          const w = sel ? 58 : 30
-          const y = 12 + Math.sin(Math.PI * (n > 1 ? i / (n - 1) : 0.5)) * 5
-          return (
-            <button
-              key={it.id}
-              type="button"
-              aria-label={it.name}
-              aria-pressed={sel}
-              className="hanging"
-              onClick={() => select(i)}
-              style={{ left: `${7 + i * step}%`, top: y, width: w, height: w, marginLeft: -w / 2, opacity: sel ? 1 : 0.55 }}
-            >
-              <span className="hanging-pin" style={{ background: sel ? 'var(--color-accent)' : 'var(--color-neutral-500)' }} />
-              <Garment item={it} stroke={1.2} className="fill" />
-              <span className={`hanging-dot match-dot--${it.match}`} />
-            </button>
-          )
-        })}
+      <div className="strip-scroll" ref={scroller} style={{ height: size.selH + 36 }}>
+        <div className="strip-track" style={{ gap: GAP, paddingInline: `calc(50% - ${size.selW / 2}px)` }}>
+          <Line sag={10} style={{ top: 4 }} />
+          {list.map((it, i) => {
+            const sel = i === idx
+            return (
+              <button
+                key={it.id}
+                type="button"
+                aria-label={it.name}
+                aria-pressed={sel}
+                className={`hanging ${sel ? 'is-selected' : ''}`}
+                onClick={() => select(i)}
+                style={{ width: sel ? size.selW : size.w, height: sel ? size.selH : size.h }}
+              >
+                <span className="hanging-pin" />
+                <Garment item={it} stroke={1.2} className="fill" />
+                <span className={`hanging-dot match-dot--${it.match}`} />
+              </button>
+            )
+          })}
+        </div>
       </div>
     </section>
   )
@@ -208,8 +222,8 @@ export function Outfit() {
       </header>
 
       {!ready && <Setup />}
-      {top && <Strip label="Tops" list={tops} current={top} onSelect={(id) => set({ topId: id })} />}
-      {bot && <Strip label="Bottoms" list={bots} current={bot} onSelect={(id) => set({ botId: id })} />}
+      {top && <Strip label="Tops" cat="top" list={tops} current={top} onSelect={(id) => set({ topId: id })} />}
+      {bot && <Strip label="Bottoms" cat="bottom" list={bots} current={bot} onSelect={(id) => set({ botId: id })} />}
       {top && bot && <Fitting top={top} bot={bot} />}
     </>
   )

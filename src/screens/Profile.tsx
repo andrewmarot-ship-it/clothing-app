@@ -1,4 +1,4 @@
-import { CaretRight } from '@phosphor-icons/react'
+import { CaretRight, X } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Kicker } from '../components/Chrome'
 import { Garment } from '../components/Garment'
@@ -9,7 +9,7 @@ import { useApp } from '../state/context'
 const pos = (x: number) => `${Math.round(x * 84 + 8)}%`
 
 export function Profile() {
-  const { state, go, userTone, hasTone, rated } = useApp()
+  const { state, set, go, userTone, hasTone, rated } = useApp()
   const T = TONES[userTone]
   const [cutoff] = useState(() => new Date(Date.now() - 30 * 864e5).toLocaleDateString('en-CA'))
 
@@ -40,6 +40,22 @@ export function Profile() {
       </header>
       {hasTone && <ToneDetail tone={T} />}
       {hasTone && rated.length > 0 && <WardrobeFit nIn={nIn} nNear={nNear} nOut={nOut} />}
+      {state.myColours.length > 0 && (
+        <section className="pad top-6 stack-3">
+          <div className="spread kicker">
+            <span>Your colours</span>
+            <span>{state.myColours.length}</span>
+          </div>
+          <span className="meta">Pieces close to these count as in your tone. Tap one to remove it.</span>
+          <div className="my-colours">
+            {state.myColours.map((c) => (
+              <button key={c} type="button" className="my-colour" style={{ background: c }} aria-label={`Remove ${c} from your colours`} onClick={() => set((s) => ({ myColours: s.myColours.filter((x) => x !== c) }))}>
+                <X size={12} weight="bold" />
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
       {mostWorn.length > 0 && <WearList title="Most worn" items={mostWorn} detail={(i) => `${i.wears}×`} onOpen={(id) => go('item', { itemId: id })} />}
       {waiting.length > 0 && state.wearLog.length > 0 && (
         <WearList

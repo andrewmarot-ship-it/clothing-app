@@ -174,22 +174,38 @@ h1 { margin: 0; }
   padding: 0 var(--space-4) 0 var(--space-6);
 }
 .strip-nav { display: flex; }
-.strip-line { position: relative; height: 84px; touch-action: pan-y; user-select: none; }
+.strip-scroll {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  /* The line fades out at the screen edges (Nocturne: rules fade, they don't stop). */
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.strip-scroll::-webkit-scrollbar { display: none; }
+.strip-track { position: relative; display: flex; align-items: flex-start; width: max-content; min-width: 100%; padding-top: 14px; box-sizing: border-box; }
 .line { position: absolute; left: 0; width: 100%; height: 30px; pointer-events: none; }
 .hanging {
-  position: absolute;
+  position: relative;
+  flex: none;
   padding: 0;
   border: 0;
   background: none;
   cursor: pointer;
+  opacity: 0.72;
   transition:
     width 0.35s cubic-bezier(0.34, 1.5, 0.5, 1),
     height 0.35s cubic-bezier(0.34, 1.5, 0.5, 1),
-    margin 0.35s cubic-bezier(0.34, 1.5, 0.5, 1),
     opacity 0.3s;
 }
-.hanging-pin { position: absolute; left: 46%; top: -6%; width: 8%; height: 14%; border-radius: 1px; z-index: 2; }
-.hanging-dot { position: absolute; left: 50%; bottom: -10px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; }
+.hanging:hover { opacity: 0.9; }
+.hanging.is-selected { opacity: 1; }
+.hanging .fill { filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.35)); }
+.hanging.is-selected .fill { filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.5)); }
+.hanging-pin { position: absolute; left: 50%; top: -5px; width: 5px; height: 11px; margin-left: -2.5px; border-radius: 1.5px; z-index: 2; background: var(--color-neutral-500); transition: background 0.3s; }
+.hanging.is-selected .hanging-pin { background: var(--color-accent); width: 6px; height: 14px; margin-left: -3px; top: -7px; }
+.hanging-dot { position: absolute; left: 50%; bottom: -14px; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; }
 .match-dot--in { background: var(--color-accent); }
 .match-dot--near { background: var(--color-neutral-400); }
 .match-dot--out { background: transparent; box-shadow: inset 0 0 0 1px var(--color-neutral-600); }
@@ -520,3 +536,16 @@ h1 { margin: 0; }
 .back-edit { min-height: 44px; gap: var(--space-2); font-size: 13px; }
 .back-row .back-right:has(.back-edit) { padding-right: 0; }
 .btn-danger { color: var(--color-accent-200); background: color-mix(in srgb, var(--color-accent) 14%, transparent); }
+
+/* — tone override — */
+.match-toggle { width: 100%; background: none; border: 0; padding: 4px 0; cursor: pointer; text-align: left; min-height: 32px; }
+.match-change { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--color-accent-300); }
+.match-change svg { transition: transform 0.2s; }
+.override-panel { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); margin-top: var(--space-2); border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--shadow-sm); }
+.override-panel .seg-grid .btn { font-size: 12px; min-height: 40px; }
+.palette-toggle { display: flex; align-items: center; gap: var(--space-3); background: none; border: 0; padding: 0; min-height: 36px; font-size: 13px; cursor: pointer; text-align: left; }
+.palette-check { width: 16px; height: 16px; flex: none; border-radius: 4px; box-shadow: inset 0 0 0 1.5px var(--color-neutral-600); display: flex; align-items: center; justify-content: center; }
+.palette-toggle.is-on .palette-check { background: var(--color-accent); box-shadow: none; color: var(--color-bg); }
+.my-colours { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.my-colour { width: 44px; height: 44px; border: 0; border-radius: var(--radius-md); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25); cursor: pointer; display: flex; align-items: center; justify-content: center; color: transparent; }
+.my-colour:hover, .my-colour:focus-visible { color: var(--color-text); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25), inset 0 0 0 44px rgba(0, 0, 0, 0.35); }
