@@ -3,13 +3,14 @@ import { BackRow, Kicker } from '../components/Chrome'
 import { Garment, Line, Pins } from '../components/Garment'
 import { itemMatch } from '../components/match'
 import { useSwipe } from '../components/useSwipe'
-import { CODES, occasionFor } from '../domain/occasions'
+import { CODES } from '../domain/occasions'
+import { useOccasion } from '../state/useOccasion'
 import { describe, lookTitle, rankLooks, toneFit } from '../domain/scoring'
 import { useApp } from '../state/context'
 
 export function Match() {
   const { state, set, go, rated, userTone, isSaved, toggleSaved } = useApp()
-  const occ = occasionFor(state.occKey, state.occText)
+  const { occ } = useOccasion()
   const code = state.code ?? occ.code
   const looks = rankLooks(rated, occ, code)
   const n = looks.length
@@ -31,7 +32,8 @@ export function Match() {
   const tm = itemMatch(t)
   const bm = itemMatch(b)
   const saved = isSaved(t.id, b.id)
-  const tags = [CODES[code - 1], occ.when.split(' · ').pop(), occ.setting.split(',')[0]]
+  const cap = (x = '') => x.charAt(0).toUpperCase() + x.slice(1)
+  const tags = [CODES[code - 1], cap(occ.when.split(' · ').pop()), occ.setting.split(',')[0]]
 
   return (
     <>

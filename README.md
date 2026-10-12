@@ -18,7 +18,7 @@ The dev server also serves the API routes in `server/`, so photo capture works l
 |---|---|
 | `BG_REMOVAL_API_KEY` | Background removal ([remove.bg](https://www.remove.bg/api)) |
 | `ANTHROPIC_API_KEY` | Garment tagging with Claude |
-| `TAG_MODEL` | Optional tagging-model override (default `claude-haiku-5-5`) |
+| `TAG_MODEL`, `OCCASION_MODEL` | Optional model overrides for tagging and occasion reading (default `claude-haiku-5-5`) |
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | Sign-in and sync. Public values, baked into the client at build time and read by the server to verify sign-ins |
 | `PHOTO_LIMIT_PER_HOUR`, `PHOTO_LIMIT_PER_DAY` | Optional spend guard on photo processing (defaults 30 per client per hour, 300 per day overall) |
 
@@ -91,14 +91,17 @@ Sign-in is passwordless: Supabase emails a magic link. Signed out, the app works
 
 Supabase setup (once): under Authentication → URL Configuration, set the Site URL to the deployed URL and add `http://localhost:5173/**` to Redirect URLs. The built-in email sender only delivers to the project's team members, a few emails an hour; configure custom SMTP (for example Resend) before inviting other people.
 
+## Match me: occasions and weather
+
+- **Occasions:** type anything ("work holiday party friday"). Keywords give an instant reading, and once you pause, signed-in users get Claude's reading from `POST /api/occasion`. It returns the dress code, date (relative dates resolved), time of day, setting, indoor or outdoor, contrast and accessories, which are normalised defensively in `occasionFromAi`. Readings are cached per text. Signed out, offline or on any error, the keyword reading stays.
+- **Weather:** live from [Open-Meteo](https://open-meteo.com), no key, called from the browser. Location is asked only when you tap "Add your location", rounded to about 1km and kept on this device. The forecast for the occasion's day sets the weather line and the warmth target (`src/domain/weather.ts`). The Outfit header shows current conditions. Open-Meteo's free tier is non-commercial; `src/state/weather.ts` is the one file to swap for a paid provider.
+
 ## What's real and what's simulated
 
-- **Occasions:** they're parsed by keyword. Weather is fixed placeholder text.
 - **Tone palettes:** they're placeholders. Commercial use needs TCI's licensed tone data and branding approval.
 - **Photo limits:** an in-memory limit caps processing at 30 photos per account per hour and 300 per day overall. It resets on redeploy.
 
 ## Next steps
 
-- LLM occasion parsing, e.g. the Claude API returning `{label, code, when, setting, warmth, contrastPref, finish[]}`, plus a forecast API for weather
 - More lines: outerwear, shoes, accessories
 - PWA offline support (service worker); the web manifest is already in place
