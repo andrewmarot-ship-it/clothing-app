@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-78b96776-4c0a-4959-9ca4-14cad27b0afc/styles.css">
+<script src="_ds/nocturne-78b96776-4c0a-4959-9ca4-14cad27b0afc/_ds_bundle.js"></script>
+<style>
+body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
+a{color:var(--color-accent-300)}a:hover{color:var(--color-accent-200)}
+@keyframes scan{0%{top:6%}50%{top:92%}100%{top:6%}}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <linearGradient id="shade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.25"></stop><stop offset="1" stop-color="#000" stop-opacity="0.6"></stop></linearGradient>
+  <linearGradient id="fade" x1="0" x2="1"><stop offset="0" stop-color="var(--color-neutral-400)" stop-opacity="0"></stop><stop offset="0.15" stop-color="var(--color-neutral-400)" stop-opacity="0.9"></stop><stop offset="0.85" stop-color="var(--color-neutral-400)" stop-opacity="0.9"></stop><stop offset="1" stop-color="var(--color-neutral-400)" stop-opacity="0"></stop></linearGradient>
+</defs></svg>
+<div style="min-height:100vh;display:flex;justify-content:center;background:var(--color-bg)">
+<div style="width:100%;max-width:430px;min-height:100vh;position:relative;padding-bottom:104px;box-sizing:border-box;background:linear-gradient(180deg, var(--color-surface) 0px, var(--color-bg) 320px)">
+
+<sc-if value="{{ hasBack }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-6) var(--space-4) 0 var(--space-3);font-size:13px">
+    <button onClick="{{ back }}" class="btn btn-ghost" style="display:flex;align-items:center;gap:var(--space-2);min-height:44px;color:var(--color-neutral-300)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>{{ backLabel }}</button>
+    <span style="color:var(--color-neutral-500);padding-right:var(--space-2)">{{ backRight }}</span>
+  </div>
+</sc-if>
+
+<!-- OUTFIT -->
+<sc-if value="{{ isOutfit }}" hint-placeholder-val="{{ true }}">
+  <div style="padding:var(--space-8) var(--space-6) 0;display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-4)">
+    <div style="display:flex;flex-direction:column">
+      <span style="font-size:48px;font-weight:500;letter-spacing:-0.04em;line-height:0.95">{{ dateBig }}</span>
+      <span style="font-size:13px;color:var(--color-neutral-400);margin-top:var(--space-2)">17° overcast · {{ toneName }}</span>
+    </div>
+    <button class="btn btn-primary" onClick="{{ openOccasion }}" style="display:flex;align-items:center;gap:var(--space-2);min-height:44px;box-shadow:0 0 20px var(--color-accent-800)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"></path></svg>Match me</button>
+  </div>
+  <sc-for list="{{ strips }}" as="st" hint-placeholder-count="2">
+    <div style="margin-top:var(--space-6)">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0 var(--space-4) 0 var(--space-6);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">
+        <span>{{ st.label }} · {{ st.pos }}</span>
+        <div style="display:flex">
+          <button class="btn btn-ghost btn-icon" aria-label="Previous" onClick="{{ st.prev }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></button>
+          <button class="btn btn-ghost btn-icon" aria-label="Next" onClick="{{ st.next }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg></button>
+        </div>
+      </div>
+      <div onPointerDown="{{ st.down }}" onPointerUp="{{ st.up }}" style="position:relative;height:84px;touch-action:pan-y;user-select:none">
+        <svg viewBox="0 0 390 30" preserveAspectRatio="none" style="position:absolute;left:0;top:6px;width:100%;height:30px"><path d="M0 4 Q195 18 390 4" fill="none" stroke="url(#fade)" stroke-width="1"></path></svg>
+        <sc-for list="{{ st.items }}" as="g" hint-placeholder-count="7">
+          <div onClick="{{ g.pick }}" style="position:absolute;left:{{ g.x }};top:{{ g.y }}px;width:{{ g.w }}px;height:{{ g.w }}px;margin-left:{{ g.ml }}px;opacity:{{ g.op }};cursor:pointer;transition:width .35s cubic-bezier(.34,1.5,.5,1), height .35s cubic-bezier(.34,1.5,.5,1), margin .35s cubic-bezier(.34,1.5,.5,1), opacity .3s">
+            <div style="position:absolute;left:46%;top:-6%;width:8%;height:14%;border-radius:1px;background:{{ g.pin }};z-index:2"></div>
+            <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMin meet" style="width:100%;height:100%"><path d="{{ g.d }}" fill="{{ g.color }}" stroke="var(--color-neutral-700)" stroke-width="1.2" stroke-linejoin="round"></path><path d="{{ g.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+            <div style="position:absolute;left:50%;bottom:-10px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:{{ g.mDot }}"></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-for>
+  <div style="margin:var(--space-6) var(--space-6) 0;display:grid;grid-template-columns:136px minmax(0,1fr);gap:var(--space-4)">
+    <div style="position:relative;height:196px;border-radius:var(--radius-lg);background:radial-gradient(80% 60% at 50% 40%, var(--color-accent-900), var(--color-bg));box-shadow:var(--shadow-sm)">
+      <svg viewBox="0 0 100 100" style="position:absolute;left:22px;top:10px;width:92px;height:92px;z-index:2;filter:drop-shadow(0 8px 10px rgba(0,0,0,0.45))"><path d="{{ top.d }}" fill="{{ top.color }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ top.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+      <svg viewBox="0 0 100 100" style="position:absolute;left:26px;top:88px;width:84px;height:100px"><path d="{{ bot.d }}" fill="{{ bot.color }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ bot.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:var(--space-4);min-width:0">
+      <sc-for list="{{ pieces }}" as="p" hint-placeholder-count="2">
+        <button onClick="{{ p.open }}" style="display:grid;grid-template-columns:22px minmax(0,1fr);gap:var(--space-3);align-items:start;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer">
+          <div style="width:22px;height:22px;border-radius:var(--radius-sm);background:{{ p.color }};box-shadow:inset 0 0 0 1px rgba(0,0,0,0.3)"></div>
+          <div style="display:flex;flex-direction:column;gap:2px;font-size:12px;min-width:0"><span style="font-weight:500">{{ p.name }}</span><span style="color:var(--color-neutral-500)">{{ p.tone }}</span><span style="color:{{ p.mColor }}">{{ p.mShort }}</span></div>
+        </button>
+      </sc-for>
+      <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-neutral-500)"><span>Contrast</span><span style="color:var(--color-neutral-300)">{{ conLabel }}</span></div>
+        <div style="position:relative;height:4px;border-radius:2px;background:linear-gradient(90deg, var(--color-neutral-800), var(--color-neutral-500))"><div style="position:absolute;left:{{ conPos }};top:-4px;width:2px;height:12px;border-radius:1px;background:var(--color-accent);transition:left .4s"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-neutral-500);margin-top:var(--space-2)"><span>Tone fit</span><span style="color:var(--color-neutral-300)">{{ fit }}</span></div>
+        <div style="position:relative;height:4px;border-radius:2px;background:var(--color-neutral-800)"><div style="width:{{ fitW }};height:100%;border-radius:2px;background:linear-gradient(90deg, var(--color-accent-700), var(--color-accent));transition:width .4s"></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin:var(--space-6) var(--space-6) 0">
+    <button class="btn btn-secondary" onClick="{{ shuffle }}" style="min-height:44px">Shuffle</button>
+    <button class="btn btn-secondary" onClick="{{ toggleSave }}" style="min-height:44px;color:{{ saveColor }}">{{ saveLabel }}</button>
+  </div>
+</sc-if>
+
+<!-- OCCASION -->
+<sc-if value="{{ isOccasion }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-2)">
+    <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Occasion</span>
+    <span style="font-size:34px;font-weight:500;letter-spacing:-0.03em;line-height:1.05">What’s it for?</span>
+  </div>
+  <div style="padding:var(--space-6) var(--space-6) 0">
+    <textarea class="input" value="{{ occText }}" onChange="{{ onOccInput }}" placeholder="e.g. Work holiday party, Friday evening" rows="3" style="width:100%;box-sizing:border-box;resize:none;font:inherit;font-size:16px;line-height:1.4;padding:var(--space-4);border-radius:var(--radius-md)"></textarea>
+  </div>
+  <div style="padding:var(--space-4) var(--space-6) 0;display:flex;flex-wrap:wrap;gap:var(--space-2)">
+    <sc-for list="{{ occChips }}" as="c" hint-placeholder-count="6">
+      <button onClick="{{ c.on }}" style="font:inherit;font-size:12px;padding:6px 10px;min-height:32px;border:0;border-radius:999px;cursor:pointer;color:{{ c.color }};box-shadow:inset 0 0 0 1px {{ c.ring }};background:{{ c.bg }}">{{ c.label }}</button>
+    </sc-for>
+  </div>
+  <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column">
+    <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500);padding-bottom:var(--space-2)">What we picked up · {{ occLabel }}</span>
+    <sc-for list="{{ occDetails }}" as="d" hint-placeholder-count="3">
+      <div style="display:grid;grid-template-columns:84px minmax(0,1fr);gap:var(--space-3);align-items:center;min-height:44px;box-shadow:0 1px 0 var(--color-neutral-800);font-size:13px">
+        <span style="color:var(--color-neutral-500);font-size:12px">{{ d.k }}</span><span>{{ d.v }}</span>
+      </div>
+    </sc-for>
+  </div>
+  <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-3)">
+    <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Dress code</span>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-2)">
+      <sc-for list="{{ codes }}" as="c" hint-placeholder-count="4"><button class="{{ c.cls }}" onClick="{{ c.on }}" style="font-size:12px;min-height:40px">{{ c.label }}</button></sc-for>
+    </div>
+  </div>
+  <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-3)">
+    <button class="btn btn-primary btn-block" onClick="{{ findOutfit }}" style="min-height:44px;display:flex;align-items:center;justify-content:center;gap:var(--space-2);box-shadow:0 0 20px var(--color-accent-800)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"></path></svg>Find my outfit</button>
+    <span style="font-size:11px;color:var(--color-neutral-500);text-align:center">Uses your {{ toneName }} profile and the {{ itemCount }} pieces you own</span>
+  </div>
+</sc-if>
+
+<!-- MATCH -->
+<sc-if value="{{ isMatch }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:var(--space-4) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-2)">
+    <div style="display:flex;gap:4px"><sc-for list="{{ pips }}" as="p" hint-placeholder-count="3"><div style="width:{{ p.w }}px;height:3px;border-radius:2px;background:{{ p.c }};transition:width .3s"></div></sc-for></div>
+    <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500);margin-top:var(--space-3)">For · {{ occLabel }}</span>
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-4)">
+      <span style="font-size:34px;font-weight:500;letter-spacing:-0.03em;line-height:1.05">{{ look.title }}</span>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;flex:none"><span style="font-size:28px;font-weight:500;letter-spacing:-0.03em;line-height:1">{{ look.fit }}</span><span style="font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--color-neutral-500)">Tone fit</span></div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-1)">
+      <sc-for list="{{ look.tags }}" as="t" hint-placeholder-count="3"><span class="tag tag-neutral">{{ t }}</span></sc-for>
+    </div>
+  </div>
+  <div onPointerDown="{{ lookDown }}" onPointerUp="{{ lookUp }}" style="position:relative;height:270px;margin-top:var(--space-4);touch-action:pan-y;user-select:none">
+    <div style="position:absolute;left:50%;top:-20px;width:320px;height:320px;margin-left:-160px;background:radial-gradient(closest-side, var(--color-accent-800), transparent);opacity:0.75;pointer-events:none"></div>
+    <svg viewBox="0 0 390 30" preserveAspectRatio="none" style="position:absolute;left:0;top:0;width:100%;height:30px"><path d="M0 4 Q195 22 390 4" fill="none" stroke="url(#fade)" stroke-width="1.2"></path></svg>
+    <div style="position:absolute;left:50%;top:12px;width:128px;height:128px;margin-left:-64px;z-index:2;filter:drop-shadow(0 12px 16px rgba(0,0,0,0.5))">
+      <div style="position:absolute;left:28%;top:-4%;width:4%;height:10%;border-radius:2px;background:var(--color-accent);z-index:2"></div>
+      <div style="position:absolute;right:28%;top:-4%;width:4%;height:10%;border-radius:2px;background:var(--color-accent);z-index:2"></div>
+      <svg viewBox="0 0 100 100" style="width:100%;height:100%"><path d="{{ look.t.d }}" fill="{{ look.t.color }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ look.t.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+    </div>
+    <svg viewBox="0 0 100 100" style="position:absolute;left:50%;top:116px;width:136px;height:150px;margin-left:-68px;filter:drop-shadow(0 12px 16px rgba(0,0,0,0.5))"><path d="{{ look.b.d }}" fill="{{ look.b.color }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ look.b.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+    <div style="position:absolute;left:calc(50% + 74px);top:56px;display:flex;align-items:flex-start;gap:var(--space-2)">
+      <div style="width:14px;height:1px;margin-top:7px;background:var(--color-accent)"></div>
+      <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;line-height:1.3;max-width:96px"><span style="font-weight:500">{{ look.t.name }}</span><span style="color:{{ look.t.mColor }}">{{ look.t.mShort }}</span></div>
+    </div>
+    <div style="position:absolute;right:calc(50% + 76px);top:186px;display:flex;align-items:flex-start;gap:var(--space-2);flex-direction:row-reverse;text-align:right">
+      <div style="width:14px;height:1px;margin-top:7px;background:var(--color-accent)"></div>
+      <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;line-height:1.3;max-width:96px"><span style="font-weight:500">{{ look.b.name }}</span><span style="color:{{ look.b.mColor }}">{{ look.b.mShort }}</span></div>
+    </div>
+  </div>
+  <div style="padding:var(--space-4) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-3)">
+    <sc-for list="{{ look.why }}" as="w" hint-placeholder-count="3">
+      <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:var(--space-3);font-size:12px">
+        <span style="color:var(--color-neutral-500);letter-spacing:0.06em;text-transform:uppercase;font-size:10.5px;padding-top:1px">{{ w.k }}</span>
+        <span style="color:var(--color-neutral-200);text-wrap:pretty">{{ w.v }}</span>
+      </div>
+    </sc-for>
+  </div>
+  <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-2)">
+    <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Finish it with</span>
+    <div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">
+      <sc-for list="{{ finish }}" as="f" hint-placeholder-count="3"><span style="font-size:12px;padding:5px 10px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--color-neutral-700);display:flex;align-items:center;gap:var(--space-2)"><div style="width:8px;height:8px;border-radius:50%;background:{{ f.c }}"></div>{{ f.n }}</span></sc-for>
+    </div>
+  </div>
+  <div style="padding:var(--space-8) var(--space-6) 0;display:grid;grid-template-columns:44px 1fr 1.4fr;gap:var(--space-3)">
+    <button class="btn btn-secondary btn-icon" aria-label="Save look" onClick="{{ saveLook }}" style="height:44px;color:{{ lookSaveColor }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="{{ lookSaveFill }}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10A4.2 4.2 0 0 1 12 7.6 4.2 4.2 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"></path></svg></button>
+    <button class="btn btn-secondary" onClick="{{ nextLook }}" style="min-height:44px">Another look</button>
+    <button class="btn btn-primary" onClick="{{ hangLook }}" style="min-height:44px">Hang this look</button>
+  </div>
+</sc-if>
+
+<!-- WARDROBE -->
+<sc-if value="{{ isWardrobe }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column">
+    <span style="font-size:48px;font-weight:500;letter-spacing:-0.04em;line-height:0.95">Wardrobe</span>
+    <span style="font-size:13px;color:var(--color-neutral-400);margin-top:var(--space-2)">{{ wCount }}</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);padding:var(--space-6) var(--space-6) 0">
+    <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4"><button class="{{ f.cls }}" onClick="{{ f.on }}" style="font-size:12px">{{ f.label }}</button></sc-for>
+  </div>
+  <sc-for list="{{ wGroups }}" as="gr" hint-placeholder-count="2">
+    <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column">
+      <div style="display:flex;justify-content:space-between;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500);padding-bottom:var(--space-2)"><span>{{ gr.label }}</span><span>{{ gr.count }}</span></div>
+      <sc-for list="{{ gr.rows }}" as="r" hint-placeholder-count="4">
+        <button onClick="{{ r.open }}" style="display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:var(--space-4);align-items:center;min-height:56px;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;box-shadow:0 1px 0 var(--color-neutral-900)">
+          <div style="width:40px;height:40px;border-radius:var(--radius-md);background:var(--color-bg);display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 100 100" style="width:30px;height:30px"><path d="{{ r.d }}" fill="{{ r.color }}" stroke="var(--color-neutral-700)" stroke-width="2"></path></svg></div>
+          <div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:13px;font-weight:500">{{ r.name }}</span><span style="font-size:11px;color:var(--color-neutral-500)">{{ r.sub }}</span></div>
+          <div style="width:7px;height:7px;border-radius:50%;background:{{ r.mDot }};box-shadow:inset 0 0 0 1px var(--color-neutral-600)"></div>
+        </button>
+      </sc-for>
+    </div>
+  </sc-for>
+  <sc-if value="{{ hiddenNote }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:var(--space-4) var(--space-6) 0;font-size:12px;color:var(--color-neutral-500);display:flex;align-items:center;gap:var(--space-2)">{{ hiddenNote }}<button class="btn btn-ghost" onClick="{{ showAll }}" style="font-size:12px;color:var(--color-accent-300)">Show</button></div>
+  </sc-if>
+</sc-if>
+
+<!-- ITEM -->
+<sc-if value="{{ isItem }}" hint-placeholder-val="{{ false }}">
+  <div style="position:relative;height:250px;margin-top:var(--space-2)">
+    <div style="position:absolute;left:50%;top:-30px;width:300px;height:300px;margin-left:-150px;background:radial-gradient(closest-side, var(--color-accent-800), transparent);opacity:0.7"></div>
+    <svg viewBox="0 0 390 30" preserveAspectRatio="none" style="position:absolute;left:0;top:8px;width:100%;height:30px"><path d="M0 4 Q195 22 390 4" fill="none" stroke="url(#fade)" stroke-width="1.2"></path></svg>
+    <div style="position:absolute;left:50%;top:22px;width:210px;height:210px;margin-left:-105px;filter:drop-shadow(0 14px 18px rgba(0,0,0,0.5))">
+      <div style="position:absolute;left:28%;top:-3%;width:3.5%;height:9%;border-radius:2px;background:var(--color-accent);z-index:2"></div>
+      <div style="position:absolute;right:28%;top:-3%;width:3.5%;height:9%;border-radius:2px;background:var(--color-accent);z-index:2"></div>
+      <sc-if value="{{ item.photo }}" hint-placeholder-val="{{ false }}"><div class="lighten" style="width:100%;height:100%"><div role="img" aria-label="{{ item.name }}" style="width:100%;height:100%;background-image:url({{ item.photo }});background-size:contain;background-repeat:no-repeat;background-position:top center"></div></div></sc-if>
+      <sc-if value="{{ item.noPhoto }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMin meet" style="width:100%;height:100%"><path d="{{ item.d }}" fill="{{ item.color }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ item.d }}" fill="url(#shade)" opacity="0.35"></path></svg></sc-if>
+    </div>
+  </div>
+  <div style="padding:var(--space-4) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-2)">
+    <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">{{ item.catLabel }}</span>
+    <span style="font-size:34px;font-weight:500;letter-spacing:-0.03em;line-height:1.05">{{ item.name }}</span>
+    <div style="display:flex;align-items:center;gap:var(--space-2);font-size:13px;color:{{ item.mColor }}"><div style="width:7px;height:7px;border-radius:50%;background:{{ item.mDot }};box-shadow:inset 0 0 0 1px var(--color-neutral-600)"></div>{{ item.mLabel }}</div>
+  </div>
+  <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column">
+    <sc-for list="{{ itemAttrs }}" as="a" hint-placeholder-count="5">
+      <div style="display:grid;grid-template-columns:96px minmax(0,1fr);gap:var(--space-3);align-items:center;min-height:44px;box-shadow:0 1px 0 var(--color-neutral-800);font-size:13px">
+        <span style="color:var(--color-neutral-500);font-size:12px">{{ a.k }}</span>
+        <div style="display:flex;align-items:center;gap:var(--space-3)">
+          <sc-if value="{{ a.swatch }}" hint-placeholder-val="{{ false }}"><div style="width:14px;height:14px;border-radius:3px;background:{{ a.swatch }}"></div></sc-if>
+          <span>{{ a.v }}</span>
+          <sc-if value="{{ a.dots }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:3px"><sc-for list="{{ a.dots }}" as="d" hint-placeholder-count="4"><div style="width:6px;height:6px;border-radius:50%;background:{{ d }}"></div></sc-for></div></sc-if>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-3)">
+    <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Goes with</span>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-2)">
+      <sc-for list="{{ partners }}" as="p" hint-placeholder-count="3">
+        <button onClick="{{ p.hang }}" class="card" style="display:flex;flex-direction:column;align-items:center;gap:var(--space-2);padding:var(--space-3);border:0;font:inherit;color:inherit;cursor:pointer">
+          <svg viewBox="0 0 100 100" style="width:52px;height:52px"><path d="{{ p.d }}" fill="{{ p.color }}" stroke="var(--color-neutral-700)" stroke-width="1.5"></path></svg>
+          <span style="font-size:11px;text-align:center">{{ p.name }}</span>
+          <span style="font-size:10.5px;color:var(--color-neutral-500)">Fit {{ p.fit }}</span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+  <div style="padding:var(--space-6) var(--space-6) 0;display:grid;grid-template-columns:1fr 1.6fr;gap:var(--space-3)">
+    <button class="btn btn-ghost" onClick="{{ removeItem }}" style="min-height:44px;color:var(--color-neutral-400)">Remove</button>
+    <button class="btn btn-primary" onClick="{{ hangItem }}" style="min-height:44px">Put on the line</button>
+  </div>
+</sc-if>
+
+<!-- ADD -->
+<sc-if value="{{ isAdd }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column">
+    <span style="font-size:48px;font-weight:500;letter-spacing:-0.04em;line-height:0.95">Add a piece</span>
+    <span style="font-size:13px;color:var(--color-neutral-400);margin-top:var(--space-2);text-wrap:pretty">Shoot it flat or on a hanger in daylight. We cut it out, tag it and place its colour in a tone.</span>
+  </div>
+  <div style="padding:var(--space-6) var(--space-6) 0">
+    <div style="position:relative;aspect-ratio:1;border-radius:var(--radius-lg);background:var(--color-bg);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;align-items:center;justify-content:center">
+      <div style="position:absolute;left:14px;top:14px;width:22px;height:22px;border-left:1.5px solid var(--color-accent);border-top:1.5px solid var(--color-accent);border-top-left-radius:6px"></div>
+      <div style="position:absolute;right:14px;top:14px;width:22px;height:22px;border-right:1.5px solid var(--color-accent);border-top:1.5px solid var(--color-accent);border-top-right-radius:6px"></div>
+      <div style="position:absolute;left:14px;bottom:14px;width:22px;height:22px;border-left:1.5px solid var(--color-accent);border-bottom:1.5px solid var(--color-accent);border-bottom-left-radius:6px"></div>
+      <div style="position:absolute;right:14px;bottom:14px;width:22px;height:22px;border-right:1.5px solid var(--color-accent);border-bottom:1.5px solid var(--color-accent);border-bottom-right-radius:6px"></div>
+      <sc-if value="{{ showPreviewPhoto }}" hint-placeholder-val="{{ false }}">
+        <div class="lighten" style="position:absolute;inset:12%"><div role="img" aria-label="Your photo" style="width:100%;height:100%;background-image:url({{ photo }});background-size:contain;background-repeat:no-repeat;background-position:center"></div></div>
+      </sc-if>
+      <sc-if value="{{ showDemo }}" hint-placeholder-val="{{ false }}">
+        <svg viewBox="0 0 100 100" style="width:58%;height:58%;opacity:{{ demoOp }};transition:opacity .4s;filter:drop-shadow(0 12px 18px rgba(0,0,0,0.5))"><path d="{{ demoD }}" fill="{{ newColor }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ demoD }}" fill="url(#shade)" opacity="0.35"></path></svg>
+      </sc-if>
+      <sc-if value="{{ isIdle }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:var(--space-3);color:var(--color-neutral-500);font-size:13px">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.5a2 2 0 1 1 2.6 1.9c-.4.1-.6.5-.6.9V9l9 6.5c.6.4.3 1.5-.5 1.5H3.5c-.8 0-1.1-1.1-.5-1.5L12 9"></path></svg>
+          <span>One item per photo works best</span>
+        </div>
+      </sc-if>
+      {{ scanLine }}
+    </div>
+    <sc-if value="{{ isIdle }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-top:var(--space-6)">
+        <button class="btn btn-primary" onClick="{{ openCamera }}" style="display:flex;align-items:center;justify-content:center;gap:var(--space-2);min-height:44px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M4 8h3l1.6-2.4h6.8L17 8h3v11H4z"></path><circle cx="12" cy="13" r="3.4"></circle></svg>Take photo</button>
+        <button class="btn btn-secondary" onClick="{{ openUpload }}" style="display:flex;align-items:center;justify-content:center;gap:var(--space-2);min-height:44px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2"></rect><path d="M3.5 16l5-5 4 4 2.5-2.5 5.5 5.5"></path><circle cx="15.5" cy="9" r="1.4"></circle></svg>Upload</button>
+      </div>
+      <button class="btn btn-ghost btn-block" onClick="{{ demoScan }}" style="margin-top:var(--space-3);font-size:13px;color:var(--color-neutral-400)">Try with a sample photo</button>
+    </sc-if>
+    <sc-if value="{{ isScan }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-top:var(--space-6);font-size:13px">
+        <sc-for list="{{ scanSteps }}" as="s" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:var(--space-3);color:{{ s.color }};transition:color .3s"><div style="width:6px;height:6px;border-radius:50%;background:{{ s.dot }}"></div>{{ s.label }}</div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4);animation:pop .35s ease both">
+        <div class="field" style="display:flex;flex-direction:column;gap:var(--space-2)">
+          <label style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Name</label>
+          <input class="input" value="{{ newName }}" onChange="{{ onNewName }}" style="font:inherit;font-size:15px;min-height:44px;box-sizing:border-box">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2)">
+          <sc-for list="{{ catOpts }}" as="c" hint-placeholder-count="2"><button class="{{ c.cls }}" onClick="{{ c.on }}" style="min-height:40px">{{ c.label }}</button></sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--space-3);font-size:13px">
+          <div style="width:22px;height:22px;border-radius:var(--radius-sm);background:{{ newColor }}"></div>
+          <span>{{ newTone }}</span>
+          <span style="color:{{ newMColor }}">· {{ newMShort }}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:var(--space-3)">
+          <button class="btn btn-ghost" onClick="{{ resetAdd }}" style="min-height:44px">Retake</button>
+          <button class="btn btn-primary" onClick="{{ addItem }}" style="min-height:44px">Hang it on the line</button>
+        </div>
+      </div>
+    </sc-if>
+    <input ref="{{ camRef }}" type="file" accept="image/*" capture="environment" onChange="{{ onFile }}" style="display:none">
+    <input ref="{{ upRef }}" type="file" accept="image/*" onChange="{{ onFile }}" style="display:none">
+  </div>
+</sc-if>
+
+<!-- LOOKS -->
+<sc-if value="{{ isLooks }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column">
+    <span style="font-size:48px;font-weight:500;letter-spacing:-0.04em;line-height:0.95">Looks</span>
+    <span style="font-size:13px;color:var(--color-neutral-400);margin-top:var(--space-2)">{{ looksCount }}</span>
+  </div>
+  <sc-if value="{{ noLooks }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:var(--space-8) var(--space-6) 0;font-size:13px;color:var(--color-neutral-500);text-wrap:pretty">Save a look from Outfit or Match me and it lands here.</div>
+  </sc-if>
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-4);padding:var(--space-6) var(--space-6) 0">
+    <sc-for list="{{ savedLooks }}" as="l" hint-placeholder-count="2">
+      <div class="card" style="display:flex;flex-direction:column;gap:var(--space-3);animation:pop .3s ease both">
+        <div style="position:relative;height:132px;border-radius:var(--radius-md);background:radial-gradient(80% 60% at 50% 40%, var(--color-accent-900), var(--color-bg))">
+          <svg viewBox="0 0 100 100" style="position:absolute;left:50%;top:6px;width:70px;height:70px;margin-left:-35px;z-index:2"><path d="{{ l.td }}" fill="{{ l.tc }}" stroke="var(--color-neutral-700)" stroke-width="1"></path><path d="{{ l.td }}" fill="url(#shade)" opacity="0.35"></path></svg>
+          <svg viewBox="0 0 100 100" style="position:absolute;left:50%;top:60px;width:64px;height:68px;margin-left:-32px"><path d="{{ l.bd }}" fill="{{ l.bc }}" stroke="var(--color-neutral-700)" stroke-width="1"></path><path d="{{ l.bd }}" fill="url(#shade)" opacity="0.35"></path></svg>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <span style="font-size:13px;font-weight:500">{{ l.title }}</span>
+          <span style="font-size:11px;color:var(--color-neutral-500)">{{ l.occ }} · Fit {{ l.fit }}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:var(--space-2)">
+          <button class="btn btn-secondary" onClick="{{ l.hang }}" style="font-size:12px">Wear</button>
+          <button class="btn btn-ghost btn-icon" aria-label="Remove look" onClick="{{ l.remove }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</sc-if>
+
+<!-- PROFILE -->
+<sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column">
+    <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Colour profile · TCI 12 Tones</span>
+    <span style="font-size:44px;font-weight:500;letter-spacing:-0.04em;line-height:1;margin-top:var(--space-3)">{{ toneName }}</span>
+    <span style="font-size:13px;color:var(--color-neutral-400);margin-top:var(--space-2)">{{ toneDesc }}</span>
+  </div>
+  <div style="padding:var(--space-6) var(--space-6) 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-2)">
+    <sc-for list="{{ palette }}" as="c" hint-placeholder-count="8"><div style="aspect-ratio:1.3;border-radius:var(--radius-md);background:{{ c }};box-shadow:inset 0 0 0 1px rgba(0,0,0,0.25)"></div></sc-for>
+  </div>
+  <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-4)">
+    <sc-for list="{{ dims }}" as="d" hint-placeholder-count="3">
+      <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+        <div style="display:flex;justify-content:space-between;font-size:12px"><span>{{ d.k }}</span><span style="color:var(--color-neutral-400)">{{ d.v }}</span></div>
+        <div style="position:relative;height:4px;border-radius:2px;background:{{ d.track }}"><div style="position:absolute;left:{{ d.pos }};top:-4px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--color-bg);box-shadow:0 0 0 2px var(--color-accent);transition:left .4s"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--color-neutral-600)"><span>{{ d.a }}</span><span>{{ d.b }}</span></div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-3)">
+    <div style="display:flex;justify-content:space-between;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)"><span>Wardrobe fit</span><span>{{ itemCount }} pieces</span></div>
+    <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;gap:2px">
+      <div style="flex:{{ nIn }};background:var(--color-accent);transition:flex .4s"></div><div style="flex:{{ nNear }};background:var(--color-neutral-500);transition:flex .4s"></div><div style="flex:{{ nOut }};background:var(--color-neutral-800);transition:flex .4s"></div>
+    </div>
+    <div style="display:flex;gap:var(--space-6);font-size:12px;color:var(--color-neutral-400)"><span><span style="color:var(--color-text)">{{ nIn }}</span> in tone</span><span><span style="color:var(--color-text)">{{ nNear }}</span> near</span><span><span style="color:var(--color-text)">{{ nOut }}</span> outside</span></div>
+  </div>
+  <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column">
+    <button onClick="{{ goQuiz }}" style="display:flex;justify-content:space-between;align-items:center;min-height:48px;background:none;border:0;padding:0;font:inherit;font-size:13px;color:inherit;cursor:pointer;box-shadow:0 1px 0 var(--color-neutral-800)"><span>Find your tone in 3 questions</span><span style="color:var(--color-neutral-500)">›</span></button>
+    <button onClick="{{ goTones }}" style="display:flex;justify-content:space-between;align-items:center;min-height:48px;background:none;border:0;padding:0;font:inherit;font-size:13px;color:inherit;cursor:pointer"><span>Choose from all 12 tones</span><span style="color:var(--color-neutral-500)">›</span></button>
+  </div>
+</sc-if>
+
+<!-- QUIZ -->
+<sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:var(--space-4) var(--space-6) 0">
+    <sc-for list="{{ quizBars }}" as="b" hint-placeholder-count="3"><div style="height:3px;border-radius:2px;background:{{ b }};transition:background .3s"></div></sc-for>
+  </div>
+  <sc-if value="{{ quizAsking }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-2)">
+      <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">{{ q.dim }}</span>
+      <span style="font-size:30px;font-weight:500;letter-spacing:-0.03em;line-height:1.1;text-wrap:pretty">{{ q.q }}</span>
+      <span style="font-size:13px;color:var(--color-neutral-400);text-wrap:pretty">{{ q.help }}</span>
+    </div>
+    <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-3)">
+      <sc-for list="{{ q.opts }}" as="o" hint-placeholder-count="3">
+        <button onClick="{{ o.on }}" style="display:grid;grid-template-columns:96px minmax(0,1fr) 18px;gap:var(--space-4);align-items:center;padding:var(--space-3);border:0;border-radius:var(--radius-md);background:var(--color-surface);box-shadow:{{ o.ring }};min-height:44px;font:inherit;color:inherit;text-align:left;cursor:pointer;transition:box-shadow .2s">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);height:40px;border-radius:var(--radius-sm);overflow:hidden"><sc-for list="{{ o.sw }}" as="c" hint-placeholder-count="4"><div style="background:{{ c }}"></div></sc-for></div>
+          <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:500">{{ o.label }}</span><span style="font-size:12px;color:var(--color-neutral-500)">{{ o.sub }}</span></div>
+          <div style="width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 1.5px {{ o.radio }};display:flex;align-items:center;justify-content:center"><div style="width:8px;height:8px;border-radius:50%;background:{{ o.dot }}"></div></div>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+  <sc-if value="{{ quizResult }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-2);animation:pop .35s ease both">
+      <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Your closest tone</span>
+      <span style="font-size:44px;font-weight:500;letter-spacing:-0.04em;line-height:1">{{ quizTone }}</span>
+      <span style="font-size:13px;color:var(--color-neutral-400)">{{ quizDesc }}</span>
+      <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin-top:var(--space-4)"><sc-for list="{{ quizPal }}" as="c" hint-placeholder-count="8"><div style="aspect-ratio:1;border-radius:3px;background:{{ c }}"></div></sc-for></div>
+    </div>
+  </sc-if>
+  <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-3)">
+    <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">{{ narrowLabel }}</span>
+    <div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">
+      <sc-for list="{{ narrow }}" as="t" hint-placeholder-count="12"><span style="font-size:11px;padding:3px 8px;border-radius:999px;color:{{ t.color }};box-shadow:inset 0 0 0 1px {{ t.ring }};transition:color .3s, box-shadow .3s">{{ t.n }}</span></sc-for>
+    </div>
+  </div>
+  <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-3)">
+    <button class="btn btn-primary btn-block" onClick="{{ quizNext }}" disabled="{{ quizBlocked }}" style="min-height:44px">{{ quizCta }}</button>
+    <span style="font-size:11px;color:var(--color-neutral-500);text-align:center">A starting point. A certified TCI analysis confirms your tone.</span>
+  </div>
+</sc-if>
+
+<!-- TONES -->
+<sc-if value="{{ isTones }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-2)">
+    <span style="font-size:34px;font-weight:500;letter-spacing:-0.03em;line-height:1.05">All 12 tones</span>
+    <span style="font-size:13px;color:var(--color-neutral-400)">Neighbouring tones share colours, so “near” pieces still work.</span>
+  </div>
+  <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-6)">
+    <sc-for list="{{ seasons }}" as="se" hint-placeholder-count="4">
+      <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+        <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">{{ se.label }}</span>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-2)">
+          <sc-for list="{{ se.tones }}" as="t" hint-placeholder-count="3">
+            <button onClick="{{ t.pick }}" style="display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-3);border:0;border-radius:var(--radius-md);background:var(--color-surface);box-shadow:{{ t.ring }};color:var(--color-text);font:inherit;font-size:12px;text-align:left;cursor:pointer;min-height:44px">
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);height:16px;border-radius:3px;overflow:hidden"><sc-for list="{{ t.sw }}" as="c" hint-placeholder-count="4"><div style="background:{{ c }}"></div></sc-for></div>
+              <span>{{ t.name }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</sc-if>
+
+<sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:76px;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;background:var(--color-bg);box-shadow:0 -1px 0 var(--color-neutral-800);z-index:20;box-sizing:border-box">
+    <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
+      <button onClick="{{ n.on }}" aria-label="{{ n.label }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:52px;background:none;border:0;font:inherit;font-size:11px;color:{{ n.color }};cursor:pointer">
+        <div style="width:{{ n.box }}px;height:{{ n.box }}px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:{{ n.ring }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{ n.d }}"></path></svg></div>
+        <span style="display:{{ n.labelDisplay }}">{{ n.label }}</span>
+      </button>
+    </sc-for>
+  </nav>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;startTone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Light Spring&quot;,&quot;True Spring&quot;,&quot;Bright Spring&quot;,&quot;Bright Winter&quot;,&quot;True Winter&quot;,&quot;Dark Winter&quot;,&quot;Dark Autumn&quot;,&quot;True Autumn&quot;,&quot;Soft Autumn&quot;,&quot;Soft Summer&quot;,&quot;True Summer&quot;,&quot;Light Summer&quot;],&quot;default&quot;:&quot;Soft Autumn&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Profile&quot;}}">
+const P = {
+  shirt: "M32 6 L43 3 Q50 10 57 3 L68 6 L84 20 L95 80 L84 84 L72 40 L72 97 L28 97 L28 40 L16 84 L5 80 L16 20 Z",
+  tee: "M30 7 L42 3 Q50 11 58 3 L70 7 L93 24 L83 40 L72 34 L72 97 L28 97 L28 34 L17 40 L7 24 Z",
+  tank: "M34 3 L42 3 Q50 22 58 3 L66 3 L68 28 L75 40 L75 97 L25 97 L25 40 L32 28 Z",
+  jeans: "M27 3 L73 3 L80 97 L56 97 L50 34 L44 97 L20 97 Z",
+  shorts: "M24 3 L76 3 L85 58 L56 62 L50 30 L44 62 L15 58 Z",
+  skirt: "M32 3 L68 3 L86 78 Q50 88 14 78 Z",
+};
+// TCI natural order: adjacent = neighbouring tones.
+const TONES = [
+  { name: "Light Spring", s: "Spring", t: .5, v: .15, c: .55, sw: ["#f7dcc0","#f5b7a1","#f3d27a","#b5dcc7","#9fd0de","#c7b6e6","#f29e8e","#e8cfa8"] },
+  { name: "True Spring", s: "Spring", t: 1, v: .35, c: .75, sw: ["#f2a23c","#ef6f4f","#f4c430","#7cbf5a","#2fb5a3","#e88a5a","#c98a3b","#f6e1b3"] },
+  { name: "Bright Spring", s: "Spring", t: .5, v: .4, c: 1, sw: ["#ff6f61","#ffb000","#00b3a6","#3fa7f5","#e8418c","#7dd35b","#ff8c42","#f4f1e8"] },
+  { name: "Bright Winter", s: "Winter", t: -.5, v: .5, c: 1, sw: ["#e0115f","#0067c6","#00a693","#7b2cbf","#ffd300","#e6e8ef","#1b1d2a","#ff3e6c"] },
+  { name: "True Winter", s: "Winter", t: -1, v: .6, c: .8, sw: ["#c2185b","#1e3a8a","#0f766e","#6d28d9","#e5e7eb","#111827","#b91c1c","#94a3b8"] },
+  { name: "Dark Winter", s: "Winter", t: -.5, v: .85, c: .55, sw: ["#5b1a2e","#1f3a5f","#14532d","#3b1f5c","#7a1e3a","#2a2d3a","#0f4c5c","#c8ccd6"] },
+  { name: "Dark Autumn", s: "Autumn", t: .5, v: .85, c: .45, sw: ["#6b2d1a","#5a4a1e","#7a3e14","#2f4a3a","#8a5a2b","#3e2b22","#9b3d24","#c49a5a"] },
+  { name: "True Autumn", s: "Autumn", t: 1, v: .55, c: .5, sw: ["#c46a2b","#a0522d","#b8860b","#6b7a2a","#8b4513","#d4a056","#2e6b5e","#d27d46"] },
+  { name: "Soft Autumn", s: "Autumn", t: .5, v: .45, c: .2, sw: ["#c9a27e","#a67b5b","#8f9a6e","#b5735a","#d8bf9a","#7d8c74","#9c6b5a","#e3d3b8"] },
+  { name: "Soft Summer", s: "Summer", t: -.5, v: .5, c: .15, sw: ["#8a9bb0","#9c8fa6","#7f9c96","#b0909c","#6e7b8b","#a8a39a","#5f7a83","#c8c2c6"] },
+  { name: "True Summer", s: "Summer", t: -1, v: .4, c: .35, sw: ["#5b7fb3","#9a6fa8","#d16b8c","#4f8a9e","#7a8fb8","#b3c1d6","#8a6d8f","#6a7f99"] },
+  { name: "Light Summer", s: "Summer", t: -.5, v: .15, c: .35, sw: ["#b8cde8","#d9b8d4","#f2b8c6","#a8d5d1","#c6c0e8","#e7e2ea","#9fb4d6","#e4a5b8"] },
+];
+const SEASONS = ["Spring", "Summer", "Autumn", "Winter"];
+const ti = n => TONES.findIndex(t => t.name === n);
+// f = formality 1 casual … 4 formal, w = warmth 1 light … 3 warm
+const SEED = [
+  { id: "t1", cat: "top", name: "Linen shirt", kind: "shirt", color: "#e6dcc6", colorName: "Cream", fabric: "Linen", tone: "Soft Autumn", f: 2, w: 1, wears: 11 },
+  { id: "t2", cat: "top", name: "Crew tee", kind: "tee", color: "#34446b", colorName: "Navy", fabric: "Cotton", tone: "Dark Winter", f: 1, w: 1, wears: 24 },
+  { id: "t3", cat: "top", name: "Rib tank", kind: "tank", color: "#9aab8c", colorName: "Sage", fabric: "Rib knit", tone: "Soft Autumn", f: 1, w: 1, wears: 9 },
+  { id: "t4", cat: "top", name: "Fisherman knit", kind: "shirt", color: "#b4643c", colorName: "Rust", fabric: "Wool", tone: "True Autumn", f: 2, w: 3, wears: 6 },
+  { id: "t5", cat: "top", name: "Silk blouse", kind: "shirt", color: "#c2185b", colorName: "Fuchsia", fabric: "Silk", tone: "True Winter", f: 3, w: 1, wears: 2 },
+  { id: "t6", cat: "top", name: "Overshirt", kind: "shirt", color: "#4d4f58", colorName: "Charcoal", fabric: "Twill", tone: "Soft Summer", f: 2, w: 2, wears: 14 },
+  { id: "t7", cat: "top", name: "Boxy tee", kind: "tee", color: "#b8cde8", colorName: "Powder blue", fabric: "Cotton", tone: "Light Summer", f: 1, w: 1, wears: 5 },
+  { id: "b1", cat: "bottom", name: "Straight jeans", kind: "jeans", color: "#3e5180", colorName: "Indigo", fabric: "Denim", tone: "True Summer", f: 1, w: 2, wears: 31 },
+  { id: "b2", cat: "bottom", name: "Wide jeans", kind: "jeans", color: "#d6cab0", colorName: "Ecru", fabric: "Denim", tone: "Soft Autumn", f: 2, w: 2, wears: 12 },
+  { id: "b3", cat: "bottom", name: "Utility shorts", kind: "shorts", color: "#6f7448", colorName: "Olive", fabric: "Cotton", tone: "Soft Autumn", f: 1, w: 1, wears: 7 },
+  { id: "b4", cat: "bottom", name: "Midi skirt", kind: "skirt", color: "#5a5c66", colorName: "Slate", fabric: "Satin", tone: "Soft Summer", f: 3, w: 1, wears: 3 },
+  { id: "b5", cat: "bottom", name: "Chinos", kind: "jeans", color: "#b8946a", colorName: "Camel", fabric: "Twill", tone: "Soft Autumn", f: 2, w: 2, wears: 15 },
+  { id: "b6", cat: "bottom", name: "Cords", kind: "jeans", color: "#5c3a26", colorName: "Chocolate", fabric: "Corduroy", tone: "Dark Autumn", f: 2, w: 3, wears: 4 },
+];
+const PRESETS = {
+  today: { label: "Today", code: 1, when: "Today · daytime", setting: "Out and about", weather: "17° overcast", warmth: 2, line: "An easy everyday look.", finish: [["White trainers", "#e3d3b8"], ["Canvas tote", "#c9a27e"]] },
+  holiday: { label: "Holiday party", code: 3, when: "Evening", setting: "Indoors, standing, then a bar", weather: "4° out, warm inside", warmth: 2, line: "Dressed up enough for a party, relaxed enough for a work crowd.", finish: [["Gold hoops", "#c9a24a"], ["Tan ankle boots", "#a67b5b"], ["Bronze lip", "#9c5a44"]] },
+  thanksgiving: { label: "Thanksgiving", code: 2, when: "Afternoon into evening", setting: "Indoors, long sit-down meal", weather: "6° out, cosy inside", warmth: 3, line: "Smart-casual for a long table: comfortable, warm and photo-ready.", finish: [["Suede loafers", "#8a5a3b"], ["Knit scarf", "#b5735a"], ["Gold studs", "#c9a24a"]] },
+  garden: { label: "Botanical garden walk", code: 1, when: "Daytime", setting: "Outdoors, lots of walking", weather: "17° overcast", warmth: 1.5, line: "Easy to move in for a couple of hours on your feet.", finish: [["White trainers", "#e3d3b8"], ["Woven tote", "#c9a27e"], ["Sage scarf", "#8f9a6e"]] },
+  night: { label: "Night out with the girls", code: 3, when: "Late evening", setting: "Bars, maybe dancing", weather: "9° out", warmth: 1.5, contrast: "high", line: "A bit of shine and contrast for later in the evening.", finish: [["Heeled boots", "#3e2b22"], ["Statement earrings", "#c9a24a"], ["Cropped jacket", "#5c3a26"]] },
+  date: { label: "Date night", code: 3, when: "Evening", setting: "Dinner", weather: "11° out", warmth: 2, line: "Polished without looking like you tried too hard.", finish: [["Fine gold chain", "#c9a24a"], ["Block heels", "#5c3a26"]] },
+  interview: { label: "Interview", code: 3, when: "Morning", setting: "Office", weather: "14° out", warmth: 2, contrast: "medium", line: "Clean lines and quiet colour so the focus stays on you.", finish: [["Leather loafers", "#5c3a26"], ["Structured bag", "#a67b5b"]] },
+};
+const CHIPS = ["holiday", "thanksgiving", "garden", "night", "date", "interview"];
+const KW = [["holiday", ["holiday", "christmas", "xmas", "party", "festive", "new year"]], ["thanksgiving", ["thanksgiving", "friendsgiving", "family dinner"]], ["night", ["girls", "night out", "club", "bar", "drinks", "dancing"]], ["date", ["date", "anniversary"]], ["garden", ["garden", "botanical", "walk", "park", "hike", "museum", "picnic"]], ["interview", ["interview", "office", "work", "meeting", "presentation"]], ["thanksgiving", ["dinner", "lunch", "brunch"]]];
+const parseOcc = text => { const t = (text || "").toLowerCase().trim(); if (!t) return "today"; for (const [k, ws] of KW) if (ws.some(w => t.includes(w))) return k; return "custom"; };
+const CODES = ["Casual", "Smart", "Dressy", "Formal"];
+const FIT = { in: 100, near: 72, out: 38 }, MS = { in: 2, near: 1, out: 0 };
+const NAV = [["outfit", "Outfit", "M2 6c6 3 14 3 20 0M7 7.5v10h4v-9.4M13 8.1V14h4V7.5"], ["wardrobe", "Wardrobe", "M4 3h16v18H4zM12 3v18M9.5 11v2M14.5 11v2"], ["add", "Add", "M12 5v14M5 12h14"], ["looks", "Looks", "M12 20s-7.5-4.6-7.5-10A4.2 4.2 0 0 1 12 7.6 4.2 4.2 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"], ["profile", "Profile", "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"]];
+const STEPS = ["Finding the garment", "Removing the background", "Reading its colour", "Placing it in a TCI tone"];
+const QUIZ = [
+  { key: "qh", dim: "Hue", q: "Which metal looks better against your skin?", help: "Hold gold, then silver, under your chin in daylight. Pick the one that makes your skin look clear and even.", opts: [["Gold", 1, "Warm undertone", ["#b8862f", "#c9a24a", "#e0b85c", "#f1d58a"]], ["Both, gold edges it", .5, "Warm-neutral", ["#c9a24a", "#e0b85c", "#c8ccd6", "#b2b6ca"]], ["Both, silver edges it", -.5, "Cool-neutral", ["#c8ccd6", "#b2b6ca", "#c9a24a", "#e0b85c"]], ["Silver", -1, "Cool undertone", ["#9397ab", "#b2b6ca", "#cfd3e5", "#e4e7f5"]]] },
+  { key: "qv", dim: "Value", q: "Which shades sit best near your face?", help: "Not washed out, not heavy. Your skin should look even and awake.", opts: [["Light", .15, "Pastels, ivory, soft grey", ["#f3e6d4", "#e7d3dc", "#d5e1ea", "#e9e3cf"]], ["Mid", .5, "Camel, sage, dusty rose", ["#c9a27e", "#8f9a6e", "#b5735a", "#8a9bb0"]], ["Deep", .85, "Espresso, forest, burgundy", ["#3e2b22", "#2f4a3a", "#5b1a2e", "#2a2d3a"]]] },
+  { key: "qc", dim: "Chroma", q: "Clear and bright, or soft and muted?", help: "Bright colours either light you up or wear you. Muted ones either calm you or dull you.", opts: [["Clear and bright", .9, "Saturated, crisp", ["#ff6f61", "#00b3a6", "#3fa7f5", "#e8418c"]], ["In between", .5, "Rich but not loud", ["#c46a2b", "#5b7fb3", "#2e6b5e", "#d16b8c"]], ["Soft and muted", .15, "Greyed, gentle", ["#a67b5b", "#8a9bb0", "#8f9a6e", "#b0909c"]]] },
+];
+const tLabel = t => t >= 1 ? "Warm" : t > 0 ? "Warm-neutral" : t <= -1 ? "Cool" : "Cool-neutral";
+const vLabel = v => v < .3 ? "Light" : v > .7 ? "Dark" : "Medium";
+const cLabel = c => c > .7 ? "Bright" : c < .3 ? "Soft" : "Medium";
+const toneDesc = T => `${tLabel(T.t)} · ${vLabel(T.v)} · ${cLabel(T.c)}`;
+const lin = c => (c /= 255) <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+function oklch(hex) {
+  const n = parseInt(hex.slice(1), 16), r = lin(n >> 16 & 255), g = lin(n >> 8 & 255), b = lin(n & 255);
+  const l = Math.cbrt(.4122214708 * r + .5363325363 * g + .0514459929 * b), m = Math.cbrt(.2119034982 * r + .6806995451 * g + .1073969566 * b), s = Math.cbrt(.0883024619 * r + .2817188376 * g + .6299787005 * b);
+  const L = .2104542553 * l + .793617785 * m - .0040720468 * s, A = 1.9779984951 * l - 2.428592205 * m + .4505937099 * s, B = .0259040371 * l + .7827717662 * m - .808675766 * s;
+  return { L, C: Math.hypot(A, B), h: (Math.atan2(B, A) * 180 / Math.PI + 360) % 360 };
+}
+function nearestTone(t, v, c) {
+  let best = 0, bd = 1e9;
+  TONES.forEach((T, i) => { const d = (t == null ? 0 : (t - T.t) ** 2 * .8) + (v == null ? 0 : (v - T.v) ** 2) + (c == null ? 0 : (c - T.c) ** 2 * 1.2); if (d < bd) { bd = d; best = i; } });
+  return best;
+}
+function rankTones(t, v, c) {
+  return TONES.map((T, i) => ({ i, d: (t == null ? 0 : (t - T.t) ** 2 * .8) + (v == null ? 0 : (v - T.v) ** 2) + (c == null ? 0 : (c - T.c) ** 2 * 1.2) })).sort((a, b) => a.d - b.d).map(x => x.i);
+}
+function classifyHex(hex) {
+  const { L, C, h } = oklch(hex);
+  const t = Math.cos((h - 70) * Math.PI / 180) * Math.min(1, C / 0.05);
+  return nearestTone(t, Math.max(0, Math.min(1, (0.95 - L) / 0.7)), Math.min(1, C / 0.15));
+}
+const matchOf = (itemTone, userTone) => { const d = Math.min((itemTone - userTone + 12) % 12, (userTone - itemTone + 12) % 12); return d === 0 ? "in" : d === 1 ? "near" : "out"; };
+const mInfo = (m, tone) => m === "in" ? { label: "In your tone", short: "In your tone", dot: "var(--color-accent)", color: "var(--color-accent-300)" } : m === "near" ? { label: `Near your tone · ${tone}`, short: "Near your tone", dot: "var(--color-neutral-400)", color: "var(--color-neutral-300)" } : { label: `Outside your tone · ${tone}`, short: "Outside your tone", dot: "transparent", color: "var(--color-neutral-500)" };
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const hex2 = n => n.toString(16).padStart(2, "0");
+function sampleColor(url) {
+  return new Promise(res => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas"); c.width = c.height = 48; const x = c.getContext("2d");
+      x.drawImage(img, 0, 0, 48, 48); const d = x.getImageData(14, 14, 20, 20).data;
+      let r = 0, g = 0, b = 0, n = 0;
+      for (let i = 0; i < d.length; i += 4) { const mx = Math.max(d[i], d[i + 1], d[i + 2]), mn = Math.min(d[i], d[i + 1], d[i + 2]); if (mx > 245 && mn > 235) continue; if (mx < 14) continue; r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; }
+      res(n ? "#" + hex2(Math.round(r / n)) + hex2(Math.round(g / n)) + hex2(Math.round(b / n)) : "#b8946a");
+    };
+    img.onerror = () => res("#b8946a");
+    img.src = url;
+  });
+}
+const KEY = "clothesline-app-v1";
+
+class Component extends DCLogic {
+  state = {
+    screen: "outfit", from: "outfit", tone: null, items: SEED, topId: "t4", botId: "b2",
+    saved: [{ id: "s1", topId: "t3", botId: "b5", occ: "Today" }, { id: "s2", topId: "t1", botId: "b4", occ: "Holiday party" }],
+    filter: "all", itemId: null, occText: "", occKey: "today", code: null, lookI: 0,
+    qStep: 0, qh: null, qv: null, qc: null,
+    step: "idle", scanI: 0, photo: null, newColor: "#ef7a5f", newName: "Crew tee", newCat: "top",
+  };
+  camRef = React.createRef(); upRef = React.createRef(); drag = {};
+
+  componentDidMount() {
+    try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) this.setState({ tone: s.tone ?? null, saved: s.saved || this.state.saved, topId: s.topId || "t4", botId: s.botId || "b2" }); } catch (e) {}
+  }
+  componentDidUpdate(_, prev) {
+    const s = this.state;
+    if (prev.tone !== s.tone || prev.saved !== s.saved || prev.topId !== s.topId || prev.botId !== s.botId) {
+      const ids = new Set(SEED.map(i => i.id));
+      try { localStorage.setItem(KEY, JSON.stringify({ tone: s.tone, saved: s.saved.filter(l => ids.has(l.topId) && ids.has(l.botId)), topId: ids.has(s.topId) ? s.topId : "t4", botId: ids.has(s.botId) ? s.botId : "b2" })); } catch (e) {}
+    }
+  }
+  componentWillUnmount() { clearInterval(this.timer); }
+
+  go = (screen, extra = {}) => { this.setState(s => ({ screen, from: s.screen, ...extra })); window.scrollTo(0, 0); };
+  userTone() { return this.state.tone ?? Math.max(0, ti(this.props.startTone ?? "Soft Autumn")); }
+  enrich(ut) {
+    return this.state.items.map(it => {
+      const toneI = it.toneI ?? ti(it.tone), m = matchOf(toneI, ut), mi = mInfo(m, TONES[toneI].name);
+      return { ...it, toneI, tone: TONES[toneI].name, m, d: P[it.kind], L: oklch(it.color).L, mLabel: mi.label, mShort: mi.short, mDot: mi.dot, mColor: mi.color, noPhoto: !it.photo };
+    });
+  }
+  preset() {
+    const s = this.state;
+    if (s.occKey === "custom") return { ...PRESETS.today, label: cap(s.occText.trim()).slice(0, 32), code: 2, when: "As described", setting: "As described", line: "Smart-casual is the safe middle ground here." };
+    return PRESETS[s.occKey || "today"];
+  }
+  scoreLook(t, b, pr, code, ut) {
+    const tone = (MS[t.m] * .6 + MS[b.m] * .4) / 2;
+    let form = 1 - Math.abs((t.f + b.f) / 2 - code) / 3;
+    if (code >= 3 && Math.max(t.f, b.f) < code) form -= .5;
+    if (code <= 1 && Math.min(t.f, b.f) > 2) form -= .3;
+    const warm = 1 - Math.abs(Math.max(t.w, b.w) - pr.warmth) / 2;
+    const dv = Math.abs(t.L - b.L);
+    const con = pr.contrast === "high" ? Math.min(1, dv / .35) : pr.contrast === "medium" ? 1 - Math.abs(dv - .2) / .3 : dv > .08 && dv < .4 ? 1 : .5;
+    return tone * .45 + form * .35 + warm * .15 + con * .05;
+  }
+  describe(t, b, pr, code, ut) {
+    const T = TONES[ut], dv = Math.abs(t.L - b.L);
+    const conTxt = dv > .3 ? "Strong light–dark contrast." : dv < .12 ? "Tonal and low-contrast." : "Medium contrast, easy to wear.";
+    const dressier = t.f >= b.f ? t : b;
+    const dn = dressier.name.toLowerCase(), df = dressier.fabric.toLowerCase();
+    const dLabel = dn.includes(df) ? dn : `${df} ${dn}`;
+    const occTxt = `${pr.line} ` + (code >= 3 ? (dressier.f >= code ? `The ${dLabel} does the dressing up.` : "Nothing you own is quite that dressy, so lift it with the accessories below.") : code <= 1 ? "Nothing here needs fussing over." : "Smart enough to sit down to, relaxed enough to stay in all day.");
+    let toneTxt;
+    if (t.m === "in" && b.m === "in") toneTxt = `${t.colorName} and ${b.colorName.toLowerCase()} both sit in your ${T.name} palette. ${conTxt}`;
+    else if (t.m === "in" || b.m === "in") { const a = t.m === "in" ? t : b, o = a === t ? b : t; toneTxt = o.m === "near" ? `${a.colorName} is core ${T.name}; ${o.colorName.toLowerCase()} borrows from ${o.tone} next door, so it still flatters. ${conTxt}` : `${a.colorName} is in your tone. ${o.colorName} sits outside it, so keep it ${o === t ? "under a layer" : "away from your face"}. ${conTxt}`; }
+    else if (t.m === "near" || b.m === "near") toneTxt = `Close to ${T.name} rather than in it. Add an in-tone accessory near your face. ${conTxt}`;
+    else toneTxt = `Neither piece is in your tone. It works for the occasion, but it won’t flatter you as much. ${conTxt}`;
+    const mw = Math.max(t.w, b.w);
+    const wTxt = mw < pr.warmth - .4 ? `${pr.weather}. Bring a warm layer.` : mw > pr.warmth + .6 ? `${pr.weather}. This runs warm, fine indoors.` : `${pr.weather}. Right weight for it.`;
+    return [{ k: "Occasion", v: occTxt }, { k: "Tone", v: toneTxt }, { k: "Weather", v: wTxt }];
+  }
+  ranked(all, ut) {
+    const pr = this.preset(), code = this.state.code ?? pr.code;
+    const tops = all.filter(i => i.cat === "top"), bots = all.filter(i => i.cat === "bottom"), out = [];
+    tops.forEach(t => bots.forEach(b => out.push({ t, b, score: this.scoreLook(t, b, pr, code, ut) })));
+    return out.sort((a, b) => b.score - a.score).slice(0, 5);
+  }
+  startScan(photo) {
+    clearInterval(this.timer);
+    this.setState({ step: "scan", scanI: 0, photo, newName: photo ? "New piece" : "Crew tee", newCat: "top", newColor: photo ? "#b8946a" : "#ef7a5f" });
+    if (photo) sampleColor(photo).then(c => this.setState({ newColor: c }));
+    this.timer = setInterval(() => this.setState(s => { if (s.scanI >= STEPS.length - 1) { clearInterval(this.timer); return { step: "done" }; } return { scanI: s.scanI + 1 }; }), 750);
+  }
+
+  renderVals() {
+    const s = this.state, ut = this.userTone(), T = TONES[ut];
+    const all = this.enrich(ut), byId = id => all.find(i => i.id === id);
+    const tops = all.filter(i => i.cat === "top"), bots = all.filter(i => i.cat === "bottom");
+    const top = byId(s.topId) || tops[0], bot = byId(s.botId) || bots[0];
+    const fitOf = (t, b) => Math.round(FIT[t.m] * .6 + FIT[b.m] * .4);
+    const on = "var(--color-accent-300)", off = "var(--color-neutral-500)";
+    const btn = a => "btn " + (a ? "btn-primary" : "btn-ghost");
+    const tabs = ["outfit", "wardrobe", "add", "looks", "profile"];
+    const isTab = tabs.includes(s.screen);
+    const comboSaved = (t, b) => s.saved.find(l => l.topId === t.id && l.botId === b.id);
+    const toggleSaved = (t, b, occ) => this.setState(st => { const ex = st.saved.find(l => l.topId === t.id && l.botId === b.id); return { saved: ex ? st.saved.filter(l => l !== ex) : [{ id: "s" + Date.now(), topId: t.id, botId: b.id, occ }, ...st.saved] }; });
+    const openItem = id => this.go("item", { itemId: id });
+    const now = new Date();
+    const pr = this.preset(), code = s.code ?? pr.code;
+
+    // outfit strips
+    const strip = (list, cur, label, key) => {
+      const n = list.length, idx = Math.max(0, list.findIndex(i => i.id === cur.id));
+      const step = n > 1 ? 86 / (n - 1) : 0;
+      const setIdx = i => this.setState({ [key]: list[(i + n) % n].id });
+      return {
+        label, pos: `${idx + 1} / ${n}`,
+        prev: () => setIdx(idx - 1), next: () => setIdx(idx + 1),
+        down: e => { this.drag[key] = e.clientX; },
+        up: e => { const dx = e.clientX - (this.drag[key] ?? e.clientX); if (Math.abs(dx) > 36) setIdx(idx + (dx < 0 ? 1 : -1)); this.drag[key] = null; },
+        items: list.map((it, i) => { const sel = i === idx, w = sel ? 58 : 30; return { ...it, x: `calc(${7 + i * step}% )`, y: 12 + Math.sin(Math.PI * (n > 1 ? i / (n - 1) : .5)) * 5, w, ml: -w / 2, op: sel ? 1 : 0.55, pin: sel ? "var(--color-accent)" : "var(--color-neutral-500)", pick: () => setIdx(i) }; }),
+      };
+    };
+    const dvNow = Math.abs(top.L - bot.L), fitNow = fitOf(top, bot), isSaved = !!comboSaved(top, bot);
+
+    // match
+    const looks = s.screen === "match" ? this.ranked(all, ut) : [];
+    const lk = looks.length ? looks[s.lookI % looks.length] : null;
+    const look = lk ? { title: `${lk.t.colorName} & ${lk.b.colorName.toLowerCase()}`, fit: fitOf(lk.t, lk.b), tags: [CODES[code - 1], pr.when.split(" · ").pop(), pr.setting.split(",")[0]], t: lk.t, b: lk.b, why: this.describe(lk.t, lk.b, pr, code, ut) } : { title: "", fit: "", tags: [], t: top, b: bot, why: [] };
+    const nextLook = () => this.setState(st => ({ lookI: (st.lookI + 1) % Math.max(1, looks.length) }));
+    const lookSaved = lk && comboSaved(lk.t, lk.b);
+
+    // wardrobe
+    const row = it => ({ ...it, sub: `${it.colorName} · ${it.fabric} · ${it.tone}`, open: () => openItem(it.id) });
+    let wGroups = [], hidden = 0;
+    if (s.filter === "tone") { const inn = all.filter(i => i.m === "in"), near = all.filter(i => i.m === "near"); hidden = all.length - inn.length - near.length; wGroups = [{ label: "In your tone", count: inn.length, rows: inn.map(row) }, { label: "Near your tone", count: near.length, rows: near.map(row) }].filter(g => g.count); }
+    else if (s.filter === "all") wGroups = [{ label: "Tops", count: tops.length, rows: tops.map(row) }, { label: "Bottoms", count: bots.length, rows: bots.map(row) }];
+    else { const l = s.filter === "tops" ? tops : bots; wGroups = [{ label: s.filter === "tops" ? "Tops" : "Bottoms", count: l.length, rows: l.map(row) }]; }
+    const nIn = all.filter(i => i.m === "in").length, nNear = all.filter(i => i.m === "near").length;
+
+    // item
+    const item = s.screen === "item" ? byId(s.itemId) : null;
+    const dots = (n, max) => Array.from({ length: max }, (_, i) => i < n ? "var(--color-accent)" : "var(--color-neutral-800)");
+    const partners = item ? (item.cat === "top" ? bots : tops).map(o => { const t = item.cat === "top" ? item : o, b = item.cat === "top" ? o : item; return { o, t, b, sc: this.scoreLook(t, b, PRESETS.today, 1, ut) }; }).sort((a, b) => b.sc - a.sc).slice(0, 3) : [];
+
+    // quiz
+    const qAns = [s.qh, s.qv, s.qc], qStep = s.qStep, asking = qStep < 3;
+    const qd = asking ? QUIZ[qStep] : null;
+    const rankedT = rankTones(s.qh, s.qv, s.qc), answered = qAns.filter(a => a != null).length;
+    const shortlist = answered ? rankedT.slice(0, answered === 3 ? 3 : 5 - answered) : [];
+    const quizI = rankedT[0];
+
+    // add
+    const newToneI = classifyHex(s.newColor), newM = mInfo(matchOf(newToneI, ut), TONES[newToneI].name);
+
+    return {
+      hasBack: !isTab, showNav: isTab,
+      backLabel: { occasion: "Outfit", match: "Occasion", item: s.from === "outfit" ? "Outfit" : "Wardrobe", quiz: "Profile", tones: "Profile" }[s.screen] || "Back",
+      backRight: s.screen === "match" ? `Look ${(s.lookI % Math.max(1, looks.length)) + 1} of ${looks.length}` : s.screen === "quiz" ? (asking ? `${qStep + 1} of 3` : "Result") : s.screen === "occasion" ? "Match me" : "",
+      back: () => {
+        if (s.screen === "quiz" && s.qStep > 0) return this.setState({ qStep: s.qStep - 1 });
+        const map = { occasion: "outfit", match: "occasion", item: s.from === "outfit" ? "outfit" : "wardrobe", quiz: "profile", tones: "profile" };
+        this.go(map[s.screen] || "outfit");
+      },
+      isOutfit: s.screen === "outfit", isOccasion: s.screen === "occasion", isMatch: s.screen === "match", isWardrobe: s.screen === "wardrobe", isItem: s.screen === "item", isAdd: s.screen === "add", isLooks: s.screen === "looks", isProfile: s.screen === "profile", isQuiz: s.screen === "quiz", isTones: s.screen === "tones",
+      nav: NAV.map(([k, label, d]) => { const a = s.screen === k, add = k === "add"; return { label, d, color: add ? "var(--color-accent-300)" : a ? on : off, box: add ? 44 : 22, ring: add ? (a ? "0 0 0 1px var(--color-accent), 0 0 18px var(--color-accent-800)" : "0 0 0 1px var(--color-accent)") : "none", labelDisplay: add ? "none" : "block", on: () => this.go(k, k === "add" ? { step: "idle", photo: null } : {}) }; }),
+      toneName: T.name, toneDesc: toneDesc(T), palette: T.sw, itemCount: all.length,
+      dateBig: now.toLocaleDateString("en-GB", { weekday: "short" }) + " " + now.getDate(),
+
+      openOccasion: () => this.go("occasion"),
+      strips: [strip(tops, top, "Tops", "topId"), strip(bots, bot, "Bottoms", "botId")],
+      top, bot,
+      pieces: [top, bot].map(p => ({ ...p, open: () => openItem(p.id) })),
+      conLabel: dvNow > .3 ? "High" : dvNow < .12 ? "Low" : "Medium", conPos: `${Math.min(96, Math.round(dvNow / .6 * 100))}%`,
+      fit: fitNow, fitW: `${fitNow}%`,
+      shuffle: () => { const r = a => a[Math.floor(Math.random() * a.length)]; let t, b; do { t = r(tops); b = r(bots); } while (t.id === top.id && b.id === bot.id && tops.length * bots.length > 1); this.setState({ topId: t.id, botId: b.id }); },
+      toggleSave: () => toggleSaved(top, bot, "Today"), saveLabel: isSaved ? "Saved ♥" : "Save look", saveColor: isSaved ? on : "var(--color-text)",
+
+      occText: s.occText,
+      onOccInput: e => { const v = e.target.value; this.setState({ occText: v, occKey: parseOcc(v), code: null }); },
+      occChips: CHIPS.map(k => { const a = s.occKey === k; return { label: PRESETS[k].label, color: a ? "var(--color-accent-200)" : "var(--color-neutral-300)", ring: a ? "var(--color-accent)" : "var(--color-neutral-700)", bg: a ? "var(--color-accent-900)" : "transparent", on: () => this.setState({ occText: PRESETS[k].label, occKey: k, code: null }) }; }),
+      occLabel: pr.label,
+      occDetails: [{ k: "When", v: pr.when }, { k: "Setting", v: pr.setting }, { k: "Weather", v: pr.weather }],
+      codes: CODES.map((label, i) => ({ label, cls: btn(code === i + 1), on: () => this.setState({ code: i + 1 }) })),
+      findOutfit: () => this.go("match", { lookI: 0 }),
+
+      pips: looks.map((_, i) => ({ w: i === s.lookI % looks.length ? 18 : 6, c: i === s.lookI % looks.length ? "var(--color-accent)" : "var(--color-neutral-700)" })),
+      look, finish: pr.finish.map(([n, c]) => ({ n, c })),
+      nextLook,
+      lookDown: e => { this.drag.look = e.clientX; },
+      lookUp: e => { const dx = e.clientX - (this.drag.look ?? e.clientX); if (Math.abs(dx) > 40) this.setState(st => ({ lookI: (st.lookI + (dx < 0 ? 1 : looks.length - 1)) % looks.length })); this.drag.look = null; },
+      hangLook: () => lk && this.go("outfit", { topId: lk.t.id, botId: lk.b.id }),
+      saveLook: () => lk && toggleSaved(lk.t, lk.b, pr.label),
+      lookSaveFill: lookSaved ? "currentColor" : "none", lookSaveColor: lookSaved ? on : "var(--color-text)",
+
+      wCount: `${all.length} pieces · ${tops.length} tops · ${bots.length} bottoms`,
+      filters: [["all", "All"], ["tone", "In my tone"], ["tops", "Tops"], ["bottoms", "Bottoms"]].map(([v, label]) => ({ label, cls: btn(s.filter === v), on: () => this.setState({ filter: v }) })),
+      wGroups, hiddenNote: hidden ? `${hidden} outside your tone hidden` : "", showAll: () => this.setState({ filter: "all" }),
+
+      item: item ? { ...item, catLabel: item.cat === "top" ? "Top" : "Bottom" } : { d: "", color: "transparent", noPhoto: true },
+      itemAttrs: item ? [
+        { k: "Colour", v: item.colorName, swatch: item.color },
+        { k: "Tone", v: item.tone },
+        { k: "Fabric", v: item.fabric },
+        { k: "Formality", v: CODES[item.f - 1], dots: dots(item.f, 4) },
+        { k: "Warmth", v: ["Light", "Mid", "Warm"][item.w - 1], dots: dots(item.w, 3) },
+        { k: "Worn", v: item.wears ? `${item.wears} times` : "Not yet" },
+      ] : [],
+      partners: partners.map(p => ({ ...p.o, fit: fitOf(p.t, p.b), hang: () => this.go("outfit", { topId: p.t.id, botId: p.b.id }) })),
+      hangItem: () => item && this.go("outfit", item.cat === "top" ? { topId: item.id } : { botId: item.id }),
+      removeItem: () => { if (!item) return; const left = s.items.filter(i => i.id !== item.id); if (!left.some(i => i.cat === item.cat)) return; this.go("wardrobe", { items: left, saved: s.saved.filter(l => l.topId !== item.id && l.botId !== item.id) }); },
+
+      isIdle: s.step === "idle", isScan: s.step === "scan", isDone: s.step === "done",
+      photo: s.photo, showPreviewPhoto: !!s.photo && s.step !== "idle", showDemo: !s.photo && s.step !== "idle",
+      demoD: P.tee, demoOp: s.step === "done" ? 1 : 0.55, newColor: s.newColor,
+      scanLine: s.step === "scan" ? React.createElement("div", { key: "scan", style: { position: "absolute", left: "8%", right: "8%", height: 2, background: "var(--color-accent)", boxShadow: "0 0 18px 2px var(--color-accent)", animation: "scan 1.8s ease-in-out infinite" } }) : null,
+      scanSteps: STEPS.map((label, i) => ({ label, color: i <= s.scanI ? "var(--color-text)" : "var(--color-neutral-600)", dot: i < s.scanI ? "var(--color-accent)" : i === s.scanI ? "var(--color-accent-300)" : "var(--color-neutral-700)" })),
+      camRef: this.camRef, upRef: this.upRef,
+      openCamera: () => this.camRef.current && this.camRef.current.click(),
+      openUpload: () => this.upRef.current && this.upRef.current.click(),
+      onFile: e => { const f = e.target.files && e.target.files[0]; if (f) this.startScan(URL.createObjectURL(f)); e.target.value = ""; },
+      demoScan: () => this.startScan(null),
+      resetAdd: () => { clearInterval(this.timer); this.setState({ step: "idle", photo: null }); },
+      newName: s.newName, onNewName: e => this.setState({ newName: e.target.value }),
+      catOpts: [["top", "Top"], ["bottom", "Bottom"]].map(([v, label]) => ({ label, cls: btn(s.newCat === v), on: () => this.setState({ newCat: v }) })),
+      newTone: TONES[newToneI].name, newMShort: newM.short, newMColor: newM.color,
+      addItem: () => {
+        const id = "n" + Date.now(), cat = s.newCat;
+        const { L, C, h } = oklch(s.newColor);
+        const hueName = C < .03 ? (L > .85 ? "Ivory" : L > .6 ? "Grey" : "Charcoal") : h < 45 ? "Coral" : h < 75 ? (L < .55 ? "Rust" : "Peach") : h < 110 ? (L < .6 ? "Olive" : "Camel") : h < 170 ? "Sage" : h < 230 ? "Teal" : h < 290 ? (L < .5 ? "Navy" : "Blue") : h < 340 ? "Plum" : "Rose";
+        const it = { id, cat, name: s.newName.trim() || "New piece", kind: cat === "top" ? "tee" : "jeans", color: s.newColor, colorName: hueName, fabric: "Cotton", toneI: newToneI, f: 1, w: 1, wears: 0, photo: s.photo };
+        this.go("outfit", { items: [...s.items, it], [cat === "top" ? "topId" : "botId"]: id, step: "idle", photo: null });
+      },
+
+      looksCount: `${s.saved.length} saved`, noLooks: !s.saved.length,
+      savedLooks: s.saved.map(l => { const t = byId(l.topId), b = byId(l.botId); if (!t || !b) return null; return { title: `${t.colorName} & ${b.colorName.toLowerCase()}`, occ: l.occ, fit: fitOf(t, b), td: t.d, tc: t.color, bd: b.d, bc: b.color, hang: () => this.go("outfit", { topId: t.id, botId: b.id }), remove: () => this.setState(st => ({ saved: st.saved.filter(x => x.id !== l.id) })) }; }).filter(Boolean),
+
+      dims: [
+        { k: "Hue", v: tLabel(T.t), a: "Cool", b: "Warm", pos: `${Math.round((T.t + 1) / 2 * 84 + 8)}%`, track: "linear-gradient(90deg, #6f86b8, var(--color-neutral-600), #c98a4b)" },
+        { k: "Value", v: vLabel(T.v), a: "Light", b: "Dark", pos: `${Math.round(T.v * 84 + 8)}%`, track: "linear-gradient(90deg, var(--color-neutral-200), var(--color-neutral-900))" },
+        { k: "Chroma", v: cLabel(T.c), a: "Soft", b: "Bright", pos: `${Math.round(T.c * 84 + 8)}%`, track: "linear-gradient(90deg, #9c8f84, #e2683a)" },
+      ],
+      nIn, nNear, nOut: all.length - nIn - nNear,
+      goQuiz: () => this.go("quiz", { qStep: 0, qh: null, qv: null, qc: null }),
+      goTones: () => this.go("tones"),
+
+      quizBars: [0, 1, 2].map(i => i < qStep || (i === qStep && qAns[i] != null) || !asking ? "var(--color-accent)" : "var(--color-neutral-800)"),
+      quizAsking: asking, quizResult: !asking,
+      q: qd ? { dim: qd.dim, q: qd.q, help: qd.help, opts: qd.opts.map(([label, val, sub, sw]) => { const a = s[qd.key] === val; return { label, sub, sw, ring: a ? "0 0 0 1px var(--color-accent), 0 0 18px var(--color-accent-900)" : "var(--shadow-sm)", radio: a ? "var(--color-accent)" : "var(--color-neutral-600)", dot: a ? "var(--color-accent)" : "transparent", on: () => this.setState({ [qd.key]: val }) }; }) } : { dim: "", q: "", help: "", opts: [] },
+      narrowLabel: asking ? (answered ? "Narrowing to" : "All 12 tones") : "Neighbouring tones",
+      narrow: TONES.map((t, i) => { const inS = asking ? shortlist.includes(i) : (i === quizI || matchOf(i, quizI) === "near"); const top1 = i === quizI && answered; return { n: t.name, color: !answered || inS ? "var(--color-text)" : "var(--color-neutral-700)", ring: top1 ? "var(--color-accent)" : inS ? "var(--color-neutral-600)" : "var(--color-neutral-800)" }; }),
+      quizTone: TONES[quizI].name, quizDesc: toneDesc(TONES[quizI]), quizPal: TONES[quizI].sw,
+      quizBlocked: asking && qAns[qStep] == null,
+      quizCta: asking ? (qStep === 2 ? "See my tone" : "Continue") : `Use ${TONES[quizI].name}`,
+      quizNext: () => { if (asking) { if (qAns[qStep] != null) this.setState({ qStep: qStep + 1 }); } else this.go("profile", { tone: quizI }); },
+
+      seasons: SEASONS.map(se => ({ label: se, tones: TONES.map((t, i) => ({ ...t, i })).filter(t => t.s === se).map(t => ({ name: t.name, sw: t.sw.slice(0, 4), ring: t.i === ut ? "0 0 0 1px var(--color-accent), 0 0 18px var(--color-accent-800)" : "var(--shadow-sm)", pick: () => this.go("profile", { tone: t.i }) })) })),
+    };
+  }
+}
+</script>
+</body>
+</html>

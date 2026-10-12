@@ -1,0 +1,10 @@
+{
+  "name": "Clothesline",
+  "short_name": "Clothesline",
+  "description": "A virtual wardrobe that matches outfits to your colour tone.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#161826",
+  "theme_color": "#161826",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
