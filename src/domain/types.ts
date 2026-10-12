@@ -37,6 +37,8 @@ export interface Item {
   cutout?: boolean
   /** The user's own call on how this piece suits them; beats the classifier. */
   matchOverride?: Match
+  /** Client time (ms) of the last change, for merging across devices. */
+  updatedAt?: number
 }
 
 /** Where a piece's match came from. */

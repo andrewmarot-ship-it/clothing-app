@@ -67,10 +67,10 @@ export function clientIp(headers: Headers): string {
 
 type Route = (request: Request) => Promise<Response>
 
-/** Wrap a route so requests over the limit get a 429 without reaching it. */
-export function rateLimited(route: Route, limiter: RateLimiter): Route {
+/** Wrap a route so requests over the limit get a 429 without reaching it. Keyed by client IP unless `keyOf` says otherwise. */
+export function rateLimited(route: Route, limiter: RateLimiter, keyOf: (request: Request) => string = (r) => clientIp(r.headers)): Route {
   return async (request) => {
-    const v = limiter.check(clientIp(request.headers))
+    const v = limiter.check(keyOf(request))
     if (v.ok) return route(request)
     return new Response(JSON.stringify({ error: 'rate_limited', scope: v.scope }), {
       status: 429,

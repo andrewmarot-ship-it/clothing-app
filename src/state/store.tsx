@@ -4,11 +4,15 @@ import { DEFAULT_TONE, TONES, toneIndex } from '../domain/tones'
 import type { Item } from '../domain/types'
 import { Ctx, today, type AppContext, type AppState, type Images, type Wear } from './context'
 import { deletePhotos, getPhoto, putPhoto } from './photos'
+import { useCloudSync } from './useCloudSync'
 
 const STORAGE_KEY = 'clothesline-app-v1'
 
 /** The part of the state that survives a reload. */
-type Persisted = Pick<AppState, 'tone' | 'items' | 'saved' | 'topId' | 'botId' | 'wearLog' | 'myColours'>
+type Persisted = Pick<AppState, 'tone' | 'items' | 'saved' | 'topId' | 'botId' | 'wearLog' | 'myColours' | 'deleted' | 'profileUpdatedAt'>
+
+/** Fields that make up the synced profile record; changing any of them stamps profileUpdatedAt. */
+const PROFILE_KEYS = ['tone', 'myColours', 'saved', 'wearLog', 'topId', 'botId'] as const
 
 /** Pieces from the old built-in demo wardrobe, cleared out of existing browsers. */
 const LEGACY_DEMO = /^[tb][1-7]$/
@@ -18,8 +22,8 @@ const isItem = (i: unknown): i is Item => {
   return !!o && typeof o.id === 'string' && (o.cat === 'top' || o.cat === 'bottom') && typeof o.color === 'string' && typeof o.tone === 'number'
 }
 
-function initialState(): AppState {
-  const base: AppState = {
+function blankState(): AppState {
+  return {
     screen: 'outfit',
     from: 'outfit',
     tone: null,
@@ -29,6 +33,8 @@ function initialState(): AppState {
     saved: [],
     wearLog: [],
     myColours: [],
+    deleted: {},
+    profileUpdatedAt: 0,
     filter: 'all',
     itemId: null,
     retakeId: null,
@@ -39,6 +45,10 @@ function initialState(): AppState {
     quizStep: 0,
     quiz: [null, null, null],
   }
+}
+
+function initialState(): AppState {
+  const base = blankState()
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return base
@@ -53,6 +63,8 @@ function initialState(): AppState {
       saved: Array.isArray(p.saved) ? p.saved.filter(pair) : [],
       wearLog: Array.isArray(p.wearLog) ? p.wearLog.filter(pair) : [],
       myColours: Array.isArray(p.myColours) ? p.myColours.filter((c) => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c)) : [],
+      deleted: p.deleted && typeof p.deleted === 'object' ? p.deleted : {},
+      profileUpdatedAt: typeof p.profileUpdatedAt === 'number' ? p.profileUpdatedAt : 0,
       topId: p.topId && ids.has(p.topId) ? p.topId : null,
       botId: p.botId && ids.has(p.botId) ? p.botId : null,
     }
@@ -61,27 +73,39 @@ function initialState(): AppState {
   }
 }
 
+/** Stamp profile changes so sync knows which copy is newer (unless the change set its own stamp). */
+function stampProfile(prev: AppState, next: AppState): AppState {
+  if (next === prev || next.profileUpdatedAt !== prev.profileUpdatedAt) return next
+  return PROFILE_KEYS.some((k) => prev[k] !== next[k]) ? { ...next, profileUpdatedAt: Date.now() } : next
+}
+
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState(initialState)
 
-  const set = useCallback<AppContext['set']>((patch) => {
-    setState((s) => ({ ...s, ...(typeof patch === 'function' ? patch(s) : patch) }))
-  }, [])
+  const update = useCallback((fn: (s: AppState) => AppState) => setState((s) => stampProfile(s, fn(s))), [])
 
-  const go = useCallback<AppContext['go']>((screen, patch = {}) => {
-    setState((s) => ({ ...s, screen, from: s.screen, ...patch }))
-    window.scrollTo(0, 0)
-  }, [])
+  const set = useCallback<AppContext['set']>(
+    (patch) => update((s) => ({ ...s, ...(typeof patch === 'function' ? patch(s) : patch) })),
+    [update],
+  )
 
-  const { tone, items, saved, topId, botId, wearLog, myColours } = state
+  const go = useCallback<AppContext['go']>(
+    (screen, patch = {}) => {
+      update((s) => ({ ...s, screen, from: s.screen, ...patch }))
+      window.scrollTo(0, 0)
+    },
+    [update],
+  )
+
+  const { tone, items, saved, topId, botId, wearLog, myColours, deleted, profileUpdatedAt } = state
   useEffect(() => {
-    const data: Persisted = { tone, items, saved, topId, botId, wearLog, myColours }
+    const data: Persisted = { tone, items, saved, topId, botId, wearLog, myColours, deleted, profileUpdatedAt }
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
     } catch {
       // Storage full or unavailable: the session still works, it just won't persist.
     }
-  }, [tone, items, saved, topId, botId, wearLog, myColours])
+  }, [tone, items, saved, topId, botId, wearLog, myColours, deleted, profileUpdatedAt])
 
   // Stored images → object URLs for display. Items keep only the storage key.
   const [urls, setUrls] = useState<Record<string, string>>({})
@@ -126,16 +150,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback<AppContext['addItem']>(
     (item, images) => {
-      const next: Item = { ...item, ...storeImages(item.id, images) }
-      setState((s) => ({ ...s, items: [...s.items, next], [next.cat === 'top' ? 'topId' : 'botId']: next.id }))
+      const next: Item = { ...item, ...storeImages(item.id, images), updatedAt: Date.now() }
+      update((s) => ({ ...s, items: [...s.items, next], [next.cat === 'top' ? 'topId' : 'botId']: next.id }))
     },
-    [storeImages],
+    [storeImages, update],
   )
 
   const updateItem = useCallback<AppContext['updateItem']>(
     (id, patch, images) => {
       const stored = images ? storeImages(id, images) : {}
-      setState((s) => {
+      update((s) => {
         const old = s.items.find((i) => i.id === id)
         if (!old) return s
         // A retake replaces the images: drop the old ones, or the drawn fallback if there's no new cut-out.
@@ -143,7 +167,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           void deletePhotos([old.photoId, old.originalId].filter((k): k is string => !!k))
           if (!stored.photoId) Object.assign(stored, { photoId: undefined, cutout: undefined, photo: undefined })
         }
-        const next: Item = { ...old, ...patch, ...stored }
+        const next: Item = { ...old, ...patch, ...stored, updatedAt: Date.now() }
         const catChanged = next.cat !== old.cat
         return {
           ...s,
@@ -155,33 +179,42 @@ export function AppProvider({ children }: { children: ReactNode }) {
         }
       })
     },
-    [storeImages],
+    [storeImages, update],
   )
 
   const removeItem = useCallback<AppContext['removeItem']>((id) => {
-    setState((s) => {
+    update((s) => {
       const it = s.items.find((i) => i.id === id)
       if (it) void deletePhotos([it.photoId, it.originalId].filter((k): k is string => !!k))
       return {
         ...s,
         items: s.items.filter((i) => i.id !== id),
+        deleted: { ...s.deleted, [id]: Date.now() },
         saved: s.saved.filter((l) => l.topId !== id && l.botId !== id),
         wearLog: s.wearLog.filter((w) => w.topId !== id && w.botId !== id),
         topId: s.topId === id ? null : s.topId,
         botId: s.botId === id ? null : s.botId,
       }
     })
-  }, [])
+  }, [update])
 
   const toggleWorn = useCallback<AppContext['toggleWorn']>((t, b) => {
-    setState((s) => {
+    update((s) => {
       const date = today()
       const existing = s.wearLog.find((w) => w.date === date && w.topId === t && w.botId === b)
       const delta = existing ? -1 : 1
       const wearLog: Wear[] = existing ? s.wearLog.filter((w) => w !== existing) : [...s.wearLog, { date, topId: t, botId: b }]
-      return { ...s, wearLog, items: s.items.map((i) => (i.id === t || i.id === b ? { ...i, wears: Math.max(0, i.wears + delta) } : i)) }
+      const now = Date.now()
+      return { ...s, wearLog, items: s.items.map((i) => (i.id === t || i.id === b ? { ...i, wears: Math.max(0, i.wears + delta), updatedAt: now } : i)) }
     })
+  }, [update])
+
+  const onPhoto = useCallback((key: string, blob: Blob) => {
+    const url = URL.createObjectURL(blob)
+    setUrls((u) => ({ ...u, [key]: url }))
   }, [])
+  const reset = useCallback(() => setState({ ...blankState(), screen: 'profile' }), [])
+  const cloud = useCloudSync(state, update, onPhoto, reset)
 
   const hasTone = tone != null
   const userTone = tone ?? Math.max(0, toneIndex(DEFAULT_TONE))
@@ -222,8 +255,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       removeItem,
       wornToday: (t, b) => state.wearLog.some((w) => w.date === date && w.topId === t && w.botId === b),
       toggleWorn,
+      cloud,
     }
-  }, [state, set, go, userTone, hasTone, rated, addItem, updateItem, removeItem, toggleWorn])
+  }, [state, set, go, userTone, hasTone, rated, addItem, updateItem, removeItem, toggleWorn, cloud])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
