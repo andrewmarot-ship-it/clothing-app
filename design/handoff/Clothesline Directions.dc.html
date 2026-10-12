@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/nocturne-78b96776-4c0a-4959-9ca4-14cad27b0afc/styles.css">
+<script src="_ds/nocturne-78b96776-4c0a-4959-9ca4-14cad27b0afc/_ds_bundle.js"></script>
+<style>
+body{margin:0;background:var(--color-neutral-900);color:var(--color-text);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
+a{color:var(--color-accent-300)}a:hover{color:var(--color-accent-200)}
+</style>
+</helmet>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <linearGradient id="shade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.25"></stop><stop offset="1" stop-color="#000" stop-opacity="0.6"></stop></linearGradient>
+  <linearGradient id="fade" x1="0" x2="1"><stop offset="0" stop-color="var(--color-neutral-400)" stop-opacity="0"></stop><stop offset="0.15" stop-color="var(--color-neutral-400)" stop-opacity="0.9"></stop><stop offset="0.85" stop-color="var(--color-neutral-400)" stop-opacity="0.9"></stop><stop offset="1" stop-color="var(--color-neutral-400)" stop-opacity="0"></stop></linearGradient>
+</defs></svg>
+
+<section style="padding:64px;display:flex;flex-direction:column;gap:var(--space-8)">
+  <div style="display:flex;flex-direction:column;gap:var(--space-2);max-width:720px">
+    <span style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-400)">Turn 3 · Dress for an occasion</span>
+    <h1 style="margin:0;font-size:32px;font-weight:500;letter-spacing:-0.02em">Tell it where you’re going</h1>
+    <p style="margin:0;font-size:14px;color:var(--color-neutral-400);text-wrap:pretty">Match me gains a “What’s it for?” step. You type the occasion or tap one, and it adds dress code and weather to your tone, picks from what you own and says what would finish the look. It extends <a href="#2b">2b</a>.</p>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:64px;align-items:flex-start">
+
+    <!-- 3a -->
+    <div id="3a" style="display:flex;flex-direction:column;gap:var(--space-4);width:390px">
+      <div style="display:flex;align-items:center;gap:var(--space-3)"><span class="tag tag-accent">3a</span><span style="font-size:15px;font-weight:500">What’s it for?</span></div>
+      <p style="margin:0;font-size:13px;color:var(--color-neutral-400);text-wrap:pretty">Free text plus quick picks. It reads the date, setting and dress code from what you type, and you can correct them before it matches.</p>
+      <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;position:relative;background:linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 38%);box-shadow:var(--shadow-lg)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-8) var(--space-6) 0;font-size:13px">
+          <span style="display:flex;align-items:center;gap:var(--space-2);color:var(--color-neutral-300)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>Outfit</span>
+          <span style="color:var(--color-neutral-500)">Match me</span>
+        </div>
+        <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-2)">
+          <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Occasion</span>
+          <span style="font-size:34px;font-weight:500;letter-spacing:-0.03em;line-height:1.05">What’s it for?</span>
+        </div>
+        <div style="padding:var(--space-6) var(--space-6) 0">
+          <div style="min-height:92px;padding:var(--space-4);border-radius:var(--radius-md);background:var(--color-bg);box-shadow:0 0 0 1px var(--color-accent), 0 0 20px var(--color-accent-900);font-size:16px;line-height:1.4">Work holiday party, Friday evening, cocktail-ish<span style="display:inline-block;width:1.5px;height:18px;margin-left:2px;vertical-align:-3px;background:var(--color-accent)"></span></div>
+        </div>
+        <div style="padding:var(--space-4) var(--space-6) 0;display:flex;flex-wrap:wrap;gap:var(--space-2)">
+          <sc-for list="{{ occChips }}" as="c" hint-placeholder-count="6">
+            <span style="font-size:12px;padding:6px 10px;border-radius:999px;color:{{ c.color }};box-shadow:inset 0 0 0 1px {{ c.ring }};background:{{ c.bg }}">{{ c.label }}</span>
+          </sc-for>
+        </div>
+        <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column">
+          <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500);padding-bottom:var(--space-2)">What we picked up</span>
+          <sc-for list="{{ occDetails }}" as="d" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:var(--space-3);align-items:center;min-height:48px;box-shadow:0 1px 0 var(--color-neutral-800);font-size:13px">
+              <span style="color:var(--color-neutral-500);font-size:12px">{{ d.k }}</span><span>{{ d.v }}</span><span style="font-size:12px;color:var(--color-accent-300)">Edit</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-3)">
+          <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Dress code</span>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-2)">
+            <button class="btn btn-ghost" style="font-size:12px">Casual</button><button class="btn btn-ghost" style="font-size:12px">Smart</button><button class="btn btn-primary" style="font-size:12px">Dressy</button><button class="btn btn-ghost" style="font-size:12px">Formal</button>
+          </div>
+        </div>
+        <div style="position:absolute;left:var(--space-6);right:var(--space-6);bottom:var(--space-8);display:flex;flex-direction:column;gap:var(--space-3)">
+          <button class="btn btn-primary btn-block" style="min-height:44px;display:flex;align-items:center;justify-content:center;gap:var(--space-2);box-shadow:0 0 20px var(--color-accent-800)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"></path></svg>Find my outfit</button>
+          <span style="font-size:11px;color:var(--color-neutral-500);text-align:center">Uses your Soft Autumn profile and the 13 pieces you own</span>
+        </div>
+      </div>
+    </div>
+
+    <sc-for list="{{ occResults }}" as="r" hint-placeholder-count="2">
+      <div id="{{ r.id }}" style="display:flex;flex-direction:column;gap:var(--space-4);width:390px">
+        <div style="display:flex;align-items:center;gap:var(--space-3)"><span class="tag tag-accent">{{ r.id }}</span><span style="font-size:15px;font-weight:500">{{ r.board }}</span></div>
+        <p style="margin:0;font-size:13px;color:var(--color-neutral-400);text-wrap:pretty">{{ r.note }}</p>
+        <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;position:relative;background:linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 38%);box-shadow:var(--shadow-lg)">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-8) var(--space-6) 0;font-size:13px">
+            <span style="display:flex;align-items:center;gap:var(--space-2);color:var(--color-neutral-300)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>Edit occasion</span>
+            <span style="color:var(--color-neutral-500)">Look 1 of 3</span>
+          </div>
+          <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-2)">
+            <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">For · {{ r.occ }}</span>
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-4)">
+              <span style="font-size:34px;font-weight:500;letter-spacing:-0.03em;line-height:1.05">{{ r.title }}</span>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;flex:none"><span style="font-size:28px;font-weight:500;letter-spacing:-0.03em;line-height:1">{{ r.fit }}</span><span style="font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--color-neutral-500)">Tone fit</span></div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-1)">
+              <sc-for list="{{ r.tags }}" as="t" hint-placeholder-count="3"><span class="tag tag-neutral">{{ t }}</span></sc-for>
+            </div>
+          </div>
+          <div style="position:relative;height:270px;margin-top:var(--space-4)">
+            <div style="position:absolute;left:50%;top:-20px;width:320px;height:320px;margin-left:-160px;background:radial-gradient(closest-side, var(--color-accent-800), transparent);opacity:0.75"></div>
+            <svg viewBox="0 0 390 30" preserveAspectRatio="none" style="position:absolute;left:0;top:0;width:100%;height:30px"><path d="M0 4 Q195 22 390 4" fill="none" stroke="url(#fade)" stroke-width="1.2"></path></svg>
+            <div style="position:absolute;left:50%;top:12px;width:128px;height:128px;margin-left:-64px;z-index:2;filter:drop-shadow(0 12px 16px rgba(0,0,0,0.5))">
+              <div style="position:absolute;left:28%;top:-4%;width:4%;height:10%;border-radius:2px;background:var(--color-accent);z-index:2"></div>
+              <div style="position:absolute;right:28%;top:-4%;width:4%;height:10%;border-radius:2px;background:var(--color-accent);z-index:2"></div>
+              <svg viewBox="0 0 100 100" style="width:100%;height:100%"><path d="{{ r.td }}" fill="{{ r.tc }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ r.td }}" fill="url(#shade)" opacity="0.35"></path></svg>
+            </div>
+            <svg viewBox="0 0 100 100" style="position:absolute;left:50%;top:116px;width:136px;height:150px;margin-left:-68px;filter:drop-shadow(0 12px 16px rgba(0,0,0,0.5))"><path d="{{ r.bd }}" fill="{{ r.bc }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ r.bd }}" fill="url(#shade)" opacity="0.35"></path></svg>
+            <div style="position:absolute;left:268px;top:56px;display:flex;align-items:flex-start;gap:var(--space-2)">
+              <div style="width:14px;height:1px;margin-top:7px;background:var(--color-accent)"></div>
+              <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;line-height:1.3;max-width:96px"><span style="font-weight:500">{{ r.tName }}</span><span style="color:{{ r.tmColor }}">{{ r.tm }}</span></div>
+            </div>
+            <div style="position:absolute;right:270px;top:186px;display:flex;align-items:flex-start;gap:var(--space-2);flex-direction:row-reverse;text-align:right">
+              <div style="width:14px;height:1px;margin-top:7px;background:var(--color-accent)"></div>
+              <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;line-height:1.3;max-width:96px"><span style="font-weight:500">{{ r.bName }}</span><span style="color:{{ r.bmColor }}">{{ r.bm }}</span></div>
+            </div>
+          </div>
+          <div style="padding:var(--space-4) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-3)">
+            <sc-for list="{{ r.why }}" as="w" hint-placeholder-count="3">
+              <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:var(--space-3);font-size:12px">
+                <span style="color:var(--color-neutral-500);letter-spacing:0.06em;text-transform:uppercase;font-size:10.5px;padding-top:1px">{{ w.k }}</span>
+                <span style="color:var(--color-neutral-200);text-wrap:pretty">{{ w.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-2)">
+            <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Finish it with</span>
+            <div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">
+              <sc-for list="{{ r.finish }}" as="f" hint-placeholder-count="3"><span style="font-size:12px;padding:5px 10px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--color-neutral-700);display:flex;align-items:center;gap:var(--space-2)"><div style="width:8px;height:8px;border-radius:50%;background:{{ f.c }}"></div>{{ f.n }}</span></sc-for>
+            </div>
+          </div>
+          <div style="position:absolute;left:var(--space-6);right:var(--space-6);bottom:var(--space-8);display:grid;grid-template-columns:1fr 1.4fr;gap:var(--space-3)">
+            <button class="btn btn-secondary" style="min-height:44px">Another look</button>
+            <button class="btn btn-primary" style="min-height:44px">Hang this look</button>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+
+  </div>
+</section>
+
+<section style="padding:64px;display:flex;flex-direction:column;gap:var(--space-8)">
+  <div style="display:flex;flex-direction:column;gap:var(--space-2);max-width:720px">
+    <span style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-400)">Turn 2 · Ledger, expanded</span>
+    <h1 style="margin:0;font-size:32px;font-weight:500;letter-spacing:-0.02em">The Ledger direction across the app</h1>
+    <p style="margin:0;font-size:14px;color:var(--color-neutral-400);text-wrap:pretty">Builds on <a href="#1b">1b</a>, with the outfit-first match view from <a href="#1a">1a</a> added. Flow: Outfit → Match me → back to the line; Profile → Find your tone.</p>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:64px;align-items:flex-start">
+
+    <!-- 2a Outfit -->
+    <div id="2a" style="display:flex;flex-direction:column;gap:var(--space-4);width:390px">
+      <div style="display:flex;align-items:center;gap:var(--space-3)"><span class="tag tag-accent">2a</span><span style="font-size:15px;font-weight:500">Outfit</span></div>
+      <p style="margin:0;font-size:13px;color:var(--color-neutral-400);text-wrap:pretty">1b with Match me as the main action next to the date. Dots under the minis show tone fit at a glance.</p>
+      <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;position:relative;background:linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 38%);box-shadow:var(--shadow-lg)">
+        <div style="padding:var(--space-8) var(--space-6) 0;display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-4)">
+          <div style="display:flex;flex-direction:column">
+            <span style="font-size:48px;font-weight:500;letter-spacing:-0.04em;line-height:0.95">Tue 14</span>
+            <span style="font-size:13px;color:var(--color-neutral-400);margin-top:var(--space-2)">17° overcast · Soft Autumn</span>
+          </div>
+          <button class="btn btn-primary" style="display:flex;align-items:center;gap:var(--space-2);min-height:44px;box-shadow:0 0 20px var(--color-accent-800)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"></path></svg>Match me</button>
+        </div>
+        <sc-for list="{{ strips }}" as="st" hint-placeholder-count="2">
+          <div style="margin-top:var(--space-6)">
+            <div style="display:flex;justify-content:space-between;padding:0 var(--space-6);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)"><span>{{ st.label }}</span><span>{{ st.pos }}</span></div>
+            <div style="position:relative;height:{{ st.h }}px">
+              <svg viewBox="0 0 390 30" preserveAspectRatio="none" style="position:absolute;left:0;top:6px;width:100%;height:30px"><path d="M0 4 Q195 18 390 4" fill="none" stroke="url(#fade)" stroke-width="1"></path></svg>
+              <sc-for list="{{ st.items }}" as="g" hint-placeholder-count="7">
+                <div style="position:absolute;left:{{ g.x }}px;top:{{ g.y }}px;width:{{ g.w }}px;height:{{ g.w }}px;margin-left:{{ g.ml }}px;opacity:{{ g.op }}">
+                  <div style="position:absolute;left:46%;top:-6%;width:8%;height:14%;border-radius:1px;background:{{ g.pin }};z-index:2"></div>
+                  <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMin meet" style="width:100%;height:100%"><path d="{{ g.d }}" fill="{{ g.color }}" stroke="var(--color-neutral-700)" stroke-width="1.2" stroke-linejoin="round"></path><path d="{{ g.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+                  <div style="position:absolute;left:50%;bottom:-10px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:{{ g.mDot }}"></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <div style="margin:var(--space-6) var(--space-6) 0;display:grid;grid-template-columns:136px minmax(0,1fr);gap:var(--space-4)">
+          <div style="position:relative;height:196px;border-radius:var(--radius-lg);background:radial-gradient(80% 60% at 50% 40%, var(--color-accent-900), var(--color-bg));box-shadow:var(--shadow-sm)">
+            <svg viewBox="0 0 100 100" style="position:absolute;left:22px;top:10px;width:92px;height:92px;z-index:2;filter:drop-shadow(0 8px 10px rgba(0,0,0,0.45))"><path d="{{ bTop.d }}" fill="{{ bTop.color }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ bTop.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+            <svg viewBox="0 0 100 100" style="position:absolute;left:26px;top:88px;width:84px;height:100px"><path d="{{ bBot.d }}" fill="{{ bBot.color }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ bBot.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-4);min-width:0">
+            <sc-for list="{{ bPieces }}" as="p" hint-placeholder-count="2">
+              <div style="display:grid;grid-template-columns:22px minmax(0,1fr);gap:var(--space-3);align-items:start">
+                <div style="width:22px;height:22px;border-radius:var(--radius-sm);background:{{ p.color }};box-shadow:inset 0 0 0 1px rgba(0,0,0,0.3)"></div>
+                <div style="display:flex;flex-direction:column;gap:2px;font-size:12px;min-width:0"><span style="font-weight:500">{{ p.name }}</span><span style="color:var(--color-neutral-500)">{{ p.tone }}</span><span style="color:{{ p.mColor }}">{{ p.mShort }}</span></div>
+              </div>
+            </sc-for>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-neutral-500)"><span>Contrast</span><span style="color:var(--color-neutral-300)">Medium</span></div>
+              <div style="position:relative;height:4px;border-radius:2px;background:linear-gradient(90deg, var(--color-neutral-800), var(--color-neutral-500))"><div style="position:absolute;left:44%;top:-4px;width:2px;height:12px;border-radius:1px;background:var(--color-accent)"></div></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-neutral-500);margin-top:var(--space-2)"><span>Tone fit</span><span style="color:var(--color-neutral-300)">72</span></div>
+              <div style="position:relative;height:4px;border-radius:2px;background:var(--color-neutral-800)"><div style="width:72%;height:100%;border-radius:2px;background:linear-gradient(90deg, var(--color-accent-700), var(--color-accent))"></div></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin:var(--space-6) var(--space-6) 0">
+          <button class="btn btn-secondary" style="min-height:44px">Shuffle</button>
+          <button class="btn btn-secondary" style="min-height:44px">Save look</button>
+        </div>
+        <nav style="position:absolute;left:0;right:0;bottom:0;height:72px;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;background:var(--color-bg);box-shadow:0 -1px 0 var(--color-neutral-800)">
+          <sc-for list="{{ navOutfit }}" as="n" hint-placeholder-count="4">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:{{ n.color }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{ n.d }}"></path></svg>{{ n.label }}</div>
+          </sc-for>
+        </nav>
+      </div>
+    </div>
+
+    <!-- 2b Match me -->
+    <div id="2b" style="display:flex;flex-direction:column;gap:var(--space-4);width:390px">
+      <div style="display:flex;align-items:center;gap:var(--space-3)"><span class="tag tag-accent">2b</span><span style="font-size:15px;font-weight:500">Match me</span></div>
+      <p style="margin:0;font-size:13px;color:var(--color-neutral-400);text-wrap:pretty">Opens from Match me. One ranked look at a time, shown as an outfit under 1a's glow, with plain reasons. Swipe or tap for the next match.</p>
+      <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;position:relative;background:linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 38%);box-shadow:var(--shadow-lg)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-8) var(--space-6) 0;font-size:13px">
+          <span style="display:flex;align-items:center;gap:var(--space-2);color:var(--color-neutral-300)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>Outfit</span>
+          <div style="display:flex;gap:4px"><sc-for list="{{ matchPips }}" as="p" hint-placeholder-count="6"><div style="width:{{ p.w }}px;height:3px;border-radius:2px;background:{{ p.c }}"></div></sc-for></div>
+        </div>
+        <div style="padding:var(--space-6) var(--space-6) 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--space-6);align-items:end">
+          <div style="display:flex;flex-direction:column">
+            <span style="font-size:72px;font-weight:500;letter-spacing:-0.05em;line-height:0.85">94</span>
+            <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-400);margin-top:var(--space-3)">Tone fit</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-1);padding-bottom:2px">
+            <span class="tag tag-accent" style="align-self:flex-start">Core palette</span>
+            <span style="font-size:17px;font-weight:500;letter-spacing:-0.01em;margin-top:var(--space-2)">Rib tank + Chinos</span>
+            <span style="font-size:12px;color:var(--color-neutral-400)">Match 1 of 6</span>
+          </div>
+        </div>
+        <div style="position:relative;height:300px;margin-top:var(--space-4)">
+          <div style="position:absolute;left:50%;top:-10px;width:340px;height:340px;margin-left:-170px;background:radial-gradient(closest-side, var(--color-accent-800), transparent);opacity:0.8"></div>
+          <svg viewBox="0 0 390 30" preserveAspectRatio="none" style="position:absolute;left:0;top:0;width:100%;height:30px"><path d="M0 4 Q195 22 390 4" fill="none" stroke="url(#fade)" stroke-width="1.2"></path></svg>
+          <div style="position:absolute;left:50%;top:12px;width:140px;height:140px;margin-left:-70px;z-index:2;filter:drop-shadow(0 12px 16px rgba(0,0,0,0.5))">
+            <div style="position:absolute;left:28%;top:-4%;width:4%;height:10%;border-radius:2px;background:var(--color-accent);z-index:2"></div>
+            <div style="position:absolute;right:28%;top:-4%;width:4%;height:10%;border-radius:2px;background:var(--color-accent);z-index:2"></div>
+            <svg viewBox="0 0 100 100" style="width:100%;height:100%"><path d="{{ mTop.d }}" fill="{{ mTop.color }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ mTop.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+          </div>
+          <svg viewBox="0 0 100 100" style="position:absolute;left:50%;top:128px;width:150px;height:166px;margin-left:-75px;filter:drop-shadow(0 12px 16px rgba(0,0,0,0.5))"><path d="{{ mBot.d }}" fill="{{ mBot.color }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ mBot.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+          <div style="position:absolute;left:272px;top:64px;display:flex;align-items:flex-start;gap:var(--space-2)">
+            <div style="width:14px;height:1px;margin-top:7px;background:var(--color-accent)"></div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;line-height:1.3"><span style="font-weight:500">Sage rib</span><span style="color:var(--color-accent-300)">In your tone</span></div>
+          </div>
+          <div style="position:absolute;right:276px;top:200px;display:flex;align-items:flex-start;gap:var(--space-2);flex-direction:row-reverse;text-align:right">
+            <div style="width:14px;height:1px;margin-top:7px;background:var(--color-accent)"></div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;line-height:1.3"><span style="font-weight:500">Camel twill</span><span style="color:var(--color-accent-300)">In your tone</span></div>
+          </div>
+        </div>
+        <div style="padding:var(--space-4) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-2)">
+          <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:3px">
+            <sc-for list="{{ matchPal }}" as="p" hint-placeholder-count="8"><div style="height:16px;border-radius:3px;background:{{ p.c }};box-shadow:{{ p.ring }}"></div></sc-for>
+          </div>
+          <span style="font-size:11px;color:var(--color-neutral-500)">Your Soft Autumn palette. The ringed swatches are the closest to this look.</span>
+        </div>
+        <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-4)">
+          <sc-for list="{{ reasons }}" as="r" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:var(--space-3);font-size:12px">
+              <span style="color:var(--color-neutral-500);letter-spacing:0.06em;text-transform:uppercase;font-size:10.5px;padding-top:1px">{{ r.k }}</span>
+              <span style="color:var(--color-neutral-200);text-wrap:pretty">{{ r.v }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="position:absolute;left:var(--space-6);right:var(--space-6);bottom:var(--space-8);display:grid;grid-template-columns:1fr 1.4fr;gap:var(--space-3)">
+          <button class="btn btn-secondary" style="min-height:44px;display:flex;align-items:center;justify-content:center;gap:var(--space-2)">Next match<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg></button>
+          <button class="btn btn-primary" style="min-height:44px">Hang this look</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2c Profile -->
+    <div id="2c" style="display:flex;flex-direction:column;gap:var(--space-4);width:390px">
+      <div style="display:flex;align-items:center;gap:var(--space-3)"><span class="tag tag-accent">2c</span><span style="font-size:15px;font-weight:500">Colour profile</span></div>
+      <p style="margin:0;font-size:13px;color:var(--color-neutral-400);text-wrap:pretty">Your tone in Ledger form: a named palette, where you sit on hue, value and chroma, and how much of your wardrobe already fits.</p>
+      <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;position:relative;background:linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 38%);box-shadow:var(--shadow-lg)">
+        <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column">
+          <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Colour profile · TCI 12 Tones</span>
+          <span style="font-size:44px;font-weight:500;letter-spacing:-0.04em;line-height:1;margin-top:var(--space-3)">Soft Autumn</span>
+          <span style="font-size:13px;color:var(--color-neutral-400);margin-top:var(--space-2)">Warm-neutral · Medium · Soft</span>
+        </div>
+        <div style="padding:var(--space-6) var(--space-6) 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-3) var(--space-2)">
+          <sc-for list="{{ palNamed }}" as="p" hint-placeholder-count="8">
+            <div style="display:flex;flex-direction:column;gap:var(--space-1)">
+              <div style="aspect-ratio:1.3;border-radius:var(--radius-md);background:{{ p.c }};box-shadow:inset 0 0 0 1px rgba(0,0,0,0.25)"></div>
+              <span style="font-size:11px;color:var(--color-neutral-400)">{{ p.n }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-4)">
+          <sc-for list="{{ dims }}" as="d" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+              <div style="display:flex;justify-content:space-between;font-size:12px"><span>{{ d.k }}</span><span style="color:var(--color-neutral-400)">{{ d.v }}</span></div>
+              <div style="position:relative;height:4px;border-radius:2px;background:{{ d.track }}"><div style="position:absolute;left:{{ d.pos }};top:-4px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--color-bg);box-shadow:0 0 0 2px var(--color-accent)"></div></div>
+              <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--color-neutral-600)"><span>{{ d.a }}</span><span>{{ d.b }}</span></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-3)">
+          <div style="display:flex;justify-content:space-between;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)"><span>Wardrobe fit</span><span>13 pieces</span></div>
+          <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;gap:2px">
+            <div style="flex:5;background:var(--color-accent)"></div><div style="flex:3;background:var(--color-neutral-500)"></div><div style="flex:5;background:var(--color-neutral-800)"></div>
+          </div>
+          <div style="display:flex;gap:var(--space-6);font-size:12px;color:var(--color-neutral-400)"><span><span style="color:var(--color-text)">5</span> in tone</span><span><span style="color:var(--color-text)">3</span> near</span><span><span style="color:var(--color-text)">5</span> outside</span></div>
+        </div>
+        <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column">
+          <div style="display:flex;justify-content:space-between;align-items:center;min-height:44px;font-size:13px;box-shadow:0 1px 0 var(--color-neutral-800)"><span>Retake the tone guide</span><span style="color:var(--color-neutral-500)">›</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;min-height:44px;font-size:13px"><span>Choose from all 12 tones</span><span style="color:var(--color-neutral-500)">›</span></div>
+        </div>
+        <nav style="position:absolute;left:0;right:0;bottom:0;height:72px;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;background:var(--color-bg);box-shadow:0 -1px 0 var(--color-neutral-800)">
+          <sc-for list="{{ navProfile }}" as="n" hint-placeholder-count="4">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:{{ n.color }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{ n.d }}"></path></svg>{{ n.label }}</div>
+          </sc-for>
+        </nav>
+      </div>
+    </div>
+
+    <!-- 2d Find your tone -->
+    <div id="2d" style="display:flex;flex-direction:column;gap:var(--space-4);width:390px">
+      <div style="display:flex;align-items:center;gap:var(--space-3)"><span class="tag tag-accent">2d</span><span style="font-size:15px;font-weight:500">Find your tone</span></div>
+      <p style="margin:0;font-size:13px;color:var(--color-neutral-400);text-wrap:pretty">The guide, one question per screen (step 2 shown). Each answer shows example colours and narrows the 12 tones as you go.</p>
+      <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;position:relative;background:linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 38%);box-shadow:var(--shadow-lg)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-8) var(--space-6) 0;font-size:13px">
+          <span style="display:flex;align-items:center;gap:var(--space-2);color:var(--color-neutral-300)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>Profile</span>
+          <span style="color:var(--color-neutral-500)">2 of 3</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:var(--space-4) var(--space-6) 0">
+          <div style="height:3px;border-radius:2px;background:var(--color-accent)"></div><div style="height:3px;border-radius:2px;background:var(--color-accent)"></div><div style="height:3px;border-radius:2px;background:var(--color-neutral-800)"></div>
+        </div>
+        <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-2)">
+          <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Value</span>
+          <span style="font-size:30px;font-weight:500;letter-spacing:-0.03em;line-height:1.1;text-wrap:pretty">Which shades sit best near your face?</span>
+          <span style="font-size:13px;color:var(--color-neutral-400);text-wrap:pretty">Hold a top of each up in daylight, no makeup. Pick what makes your skin look even, not washed out or heavy.</span>
+        </div>
+        <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-3)">
+          <sc-for list="{{ quizOpts }}" as="o" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:96px minmax(0,1fr) 18px;gap:var(--space-4);align-items:center;padding:var(--space-3);border-radius:var(--radius-md);background:var(--color-surface);box-shadow:{{ o.ring }};min-height:44px">
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);height:40px;border-radius:var(--radius-sm);overflow:hidden">
+                <sc-for list="{{ o.sw }}" as="c" hint-placeholder-count="4"><div style="background:{{ c }}"></div></sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:500">{{ o.label }}</span><span style="font-size:12px;color:var(--color-neutral-500)">{{ o.sub }}</span></div>
+              <div style="width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 1.5px {{ o.radio }};display:flex;align-items:center;justify-content:center"><div style="width:8px;height:8px;border-radius:50%;background:{{ o.dot }}"></div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column;gap:var(--space-3)">
+          <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Narrowing to</span>
+          <div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">
+            <sc-for list="{{ narrow }}" as="t" hint-placeholder-count="12"><span style="font-size:11px;padding:3px 8px;border-radius:999px;color:{{ t.color }};box-shadow:inset 0 0 0 1px {{ t.ring }}">{{ t.n }}</span></sc-for>
+          </div>
+        </div>
+        <div style="position:absolute;left:var(--space-6);right:var(--space-6);bottom:var(--space-8);display:flex;flex-direction:column;gap:var(--space-3)">
+          <button class="btn btn-primary btn-block" style="min-height:44px">Continue</button>
+          <span style="font-size:11px;color:var(--color-neutral-500);text-align:center">A starting point. A certified TCI analysis confirms your tone.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2e Wardrobe -->
+    <div id="2e" style="display:flex;flex-direction:column;gap:var(--space-4);width:390px">
+      <div style="display:flex;align-items:center;gap:var(--space-3)"><span class="tag tag-accent">2e</span><span style="font-size:15px;font-weight:500">Wardrobe</span></div>
+      <p style="margin:0;font-size:13px;color:var(--color-neutral-400);text-wrap:pretty">A list instead of a grid, grouped by fit. The “In my tone” filter is on, so out-of-tone pieces are folded away.</p>
+      <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;position:relative;background:linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 38%);box-shadow:var(--shadow-lg)">
+        <div style="padding:var(--space-8) var(--space-6) 0;display:flex;flex-direction:column">
+          <span style="font-size:48px;font-weight:500;letter-spacing:-0.04em;line-height:0.95">Wardrobe</span>
+          <span style="font-size:13px;color:var(--color-neutral-400);margin-top:var(--space-2)">13 pieces · 7 tops · 6 bottoms</span>
+        </div>
+        <div style="display:flex;gap:var(--space-2);padding:var(--space-6) var(--space-6) 0">
+          <button class="btn btn-ghost" style="font-size:12px">All</button><button class="btn btn-primary" style="font-size:12px">In my tone</button><button class="btn btn-ghost" style="font-size:12px">Tops</button><button class="btn btn-ghost" style="font-size:12px">Bottoms</button>
+        </div>
+        <sc-for list="{{ wGroups }}" as="gr" hint-placeholder-count="2">
+          <div style="padding:var(--space-6) var(--space-6) 0;display:flex;flex-direction:column">
+            <div style="display:flex;justify-content:space-between;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500);padding-bottom:var(--space-2)"><span>{{ gr.label }}</span><span>{{ gr.count }}</span></div>
+            <sc-for list="{{ gr.rows }}" as="r" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:var(--space-4);align-items:center;min-height:52px;box-shadow:0 1px 0 var(--color-neutral-900)">
+                <div style="width:40px;height:40px;border-radius:var(--radius-md);background:var(--color-bg);display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 100 100" style="width:30px;height:30px"><path d="{{ r.d }}" fill="{{ r.color }}" stroke="var(--color-neutral-700)" stroke-width="2"></path></svg></div>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:13px;font-weight:500">{{ r.name }}</span><span style="font-size:11px;color:var(--color-neutral-500)">{{ r.tone }}</span></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:{{ r.mDot }}"></div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+        <div style="padding:var(--space-4) var(--space-6) 0;font-size:12px;color:var(--color-neutral-500)">5 outside your tone hidden · <span style="color:var(--color-accent-300)">Show</span></div>
+        <nav style="position:absolute;left:0;right:0;bottom:0;height:72px;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;background:var(--color-bg);box-shadow:0 -1px 0 var(--color-neutral-800)">
+          <sc-for list="{{ navWardrobe }}" as="n" hint-placeholder-count="4">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:{{ n.color }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{ n.d }}"></path></svg>{{ n.label }}</div>
+          </sc-for>
+        </nav>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section style="padding:64px;display:flex;flex-direction:column;gap:var(--space-8)">
+  <div style="display:flex;flex-direction:column;gap:var(--space-2);max-width:720px">
+    <span style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-400)">Turn 1 · Outfit screen directions</span>
+    <h1 style="margin:0;font-size:32px;font-weight:500;letter-spacing:-0.02em">Three richer takes on the clothesline</h1>
+    <p style="margin:0;font-size:14px;color:var(--color-neutral-400);text-wrap:pretty">Same wardrobe, same Soft Autumn profile, same Nocturne tokens. Each puts the weight somewhere else: the outfit itself, the detail behind it, or the colour profile.</p>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:64px;align-items:flex-start">
+
+    <!-- 1a -->
+    <div id="1a" style="display:flex;flex-direction:column;gap:var(--space-4);width:390px">
+      <div style="display:flex;align-items:center;gap:var(--space-3)"><span class="tag tag-accent">1a</span><span style="font-size:15px;font-weight:500">Spotlight</span></div>
+      <p style="margin:0;font-size:13px;color:var(--color-neutral-400);text-wrap:pretty">The outfit stands as one silhouette under a glow. Labels pinned beside each piece say where it sits against your tone.</p>
+      <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;position:relative;background:var(--color-bg);box-shadow:var(--shadow-lg)">
+        <div style="position:absolute;left:50%;top:150px;width:380px;height:520px;margin-left:-190px;background:radial-gradient(closest-side, var(--color-accent-800), transparent);opacity:0.75"></div>
+        <header style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:var(--space-8) var(--space-6) 0">
+          <span style="font-size:13px;color:var(--color-neutral-400)">Tue 14 Oct · 17° overcast</span>
+          <div style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);border-radius:999px;background:var(--color-surface);box-shadow:var(--shadow-sm);font-size:12px">
+            <div style="display:flex"><sc-for list="{{ dots }}" as="c" hint-placeholder-count="3"><div style="width:10px;height:10px;border-radius:50%;margin-left:-3px;box-shadow:0 0 0 1.5px var(--color-surface);background:{{ c }}"></div></sc-for></div>Soft Autumn
+          </div>
+        </header>
+        <h2 style="position:relative;margin:var(--space-4) var(--space-6) 0;font-size:34px;font-weight:500;letter-spacing:-0.025em;line-height:1.05">Today’s look</h2>
+
+        <div style="position:absolute;left:0;right:0;top:150px;height:500px">
+          <svg viewBox="0 0 390 40" preserveAspectRatio="none" style="position:absolute;left:0;top:0;width:100%;height:40px"><path d="M0 6 Q195 30 390 6" fill="none" stroke="url(#fade)" stroke-width="1.2"></path></svg>
+          <svg viewBox="0 0 390 40" preserveAspectRatio="none" style="position:absolute;left:0;top:236px;width:100%;height:40px"><path d="M0 6 Q195 30 390 6" fill="none" stroke="url(#fade)" stroke-width="1.2"></path></svg>
+          <span style="position:absolute;left:var(--space-6);top:-22px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Tops · 4 / 7</span>
+          <span style="position:absolute;left:var(--space-6);top:214px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Bottoms · 2 / 6</span>
+          <sc-for list="{{ aGarments }}" as="g" hint-placeholder-count="6">
+            <div style="position:absolute;left:{{ g.x }}px;top:{{ g.y }}px;width:{{ g.w }}px;height:{{ g.w }}px;margin-left:{{ g.ml }}px;transform:{{ g.tf }};transform-origin:50% 0;opacity:{{ g.op }};filter:{{ g.f }}">
+              <div style="position:absolute;left:28%;top:-3%;width:4%;height:9%;border-radius:2px;background:var(--color-accent);z-index:2"></div>
+              <div style="position:absolute;right:28%;top:-3%;width:4%;height:9%;border-radius:2px;background:var(--color-accent);z-index:2"></div>
+              <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMin meet" style="width:100%;height:100%;overflow:visible"><path d="{{ g.d }}" fill="{{ g.color }}" stroke="var(--color-neutral-700)" stroke-width="0.8" stroke-linejoin="round"></path><path d="{{ g.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+            </div>
+          </sc-for>
+          <div style="position:absolute;left:290px;top:150px;display:flex;align-items:flex-start;gap:var(--space-2)">
+            <div style="width:14px;height:1px;margin-top:7px;background:var(--color-accent)"></div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;line-height:1.3"><span style="font-weight:500">{{ aTop.name }}</span><span style="color:var(--color-neutral-400)">{{ aTop.tone }}</span><span style="color:var(--color-neutral-300)">{{ aTop.mShort }}</span></div>
+          </div>
+          <div style="position:absolute;right:296px;top:380px;display:flex;align-items:flex-start;gap:var(--space-2);flex-direction:row-reverse;text-align:right">
+            <div style="width:14px;height:1px;margin-top:7px;background:var(--color-accent)"></div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;line-height:1.3"><span style="font-weight:500">{{ aBot.name }}</span><span style="color:var(--color-neutral-400)">{{ aBot.tone }}</span><span style="color:var(--color-accent-300)">{{ aBot.mShort }}</span></div>
+          </div>
+        </div>
+
+        <div style="position:absolute;left:var(--space-6);right:var(--space-6);bottom:96px;display:flex;flex-direction:column;gap:var(--space-4)">
+          <div class="card" style="display:grid;grid-template-columns:auto 1fr;gap:var(--space-6);align-items:center;background:color-mix(in srgb, var(--color-surface) 85%, transparent);backdrop-filter:blur(10px)">
+            <div style="display:flex;flex-direction:column">
+              <span style="font-size:36px;font-weight:500;letter-spacing:-0.03em;line-height:1">86</span>
+              <span style="font-size:11px;color:var(--color-neutral-400)">Tone fit</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+              <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:3px">
+                <sc-for list="{{ palette }}" as="p" hint-placeholder-count="8"><div style="height:18px;border-radius:3px;background:{{ p.c }};box-shadow:{{ p.ring }}"></div></sc-for>
+              </div>
+              <span style="font-size:11px;color:var(--color-neutral-400);text-wrap:pretty">Ecru is core palette; rust borrows from True Autumn next door.</span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:44px 1fr 44px;gap:var(--space-3)">
+            <button class="btn btn-secondary btn-icon" aria-label="Shuffle" style="height:44px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h3.5c2 0 3.2 1 4.3 2.7l2.4 4.6c1 1.7 2.3 2.7 4.3 2.7H21M3 17h3.5c1.2 0 2-.3 2.8-1M14.7 8c.8-.7 1.6-1 2.8-1H21M18.5 4.5 21 7l-2.5 2.5M18.5 14.5 21 17l-2.5 2.5"></path></svg></button>
+            <button class="btn btn-primary" style="height:44px;display:flex;align-items:center;justify-content:center;gap:var(--space-2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"></path></svg>Match me</button>
+            <button class="btn btn-secondary btn-icon" aria-label="Save" style="height:44px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10A4.2 4.2 0 0 1 12 7.6 4.2 4.2 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"></path></svg></button>
+          </div>
+        </div>
+        <nav style="position:absolute;left:0;right:0;bottom:0;height:80px;display:grid;grid-template-columns:repeat(3,1fr);align-items:center;background:linear-gradient(to top, var(--color-bg) 65%, transparent);font-size:11px">
+          <span style="text-align:center;color:var(--color-accent-300)">Outfit</span><span style="text-align:center;color:var(--color-neutral-500)">Add</span><span style="text-align:center;color:var(--color-neutral-500)">Wardrobe</span>
+        </nav>
+      </div>
+    </div>
+
+    <!-- 1b -->
+    <div id="1b" style="display:flex;flex-direction:column;gap:var(--space-4);width:390px">
+      <div style="display:flex;align-items:center;gap:var(--space-3)"><span class="tag tag-accent">1b</span><span style="font-size:15px;font-weight:500">Ledger</span></div>
+      <p style="margin:0;font-size:13px;color:var(--color-neutral-400);text-wrap:pretty">Thin lines show every piece at a glance, so you can tap straight to one. Below, a fitting panel breaks the look down: tone, contrast and ranked matches.</p>
+      <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;position:relative;background:linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 38%);box-shadow:var(--shadow-lg)">
+        <div style="padding:var(--space-8) var(--space-6) 0;display:flex;align-items:flex-end;justify-content:space-between">
+          <div style="display:flex;flex-direction:column">
+            <span style="font-size:48px;font-weight:500;letter-spacing:-0.04em;line-height:0.95">Tue 14</span>
+            <span style="font-size:13px;color:var(--color-neutral-400);margin-top:var(--space-2)">17° overcast · dressing for Soft Autumn</span>
+          </div>
+        </div>
+
+        <sc-for list="{{ strips }}" as="st" hint-placeholder-count="2">
+          <div style="margin-top:var(--space-6)">
+            <div style="display:flex;justify-content:space-between;padding:0 var(--space-6);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)"><span>{{ st.label }}</span><span>{{ st.pos }}</span></div>
+            <div style="position:relative;height:{{ st.h }}px">
+              <svg viewBox="0 0 390 30" preserveAspectRatio="none" style="position:absolute;left:0;top:6px;width:100%;height:30px"><path d="M0 4 Q195 18 390 4" fill="none" stroke="url(#fade)" stroke-width="1"></path></svg>
+              <sc-for list="{{ st.items }}" as="g" hint-placeholder-count="7">
+                <div style="position:absolute;left:{{ g.x }}px;top:{{ g.y }}px;width:{{ g.w }}px;height:{{ g.w }}px;margin-left:{{ g.ml }}px;opacity:{{ g.op }}">
+                  <div style="position:absolute;left:46%;top:-6%;width:8%;height:14%;border-radius:1px;background:{{ g.pin }};z-index:2"></div>
+                  <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMin meet" style="width:100%;height:100%"><path d="{{ g.d }}" fill="{{ g.color }}" stroke="var(--color-neutral-700)" stroke-width="1.2" stroke-linejoin="round"></path><path d="{{ g.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+                  <div style="position:absolute;left:50%;bottom:-10px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:{{ g.mDot }}"></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+
+        <div style="margin:var(--space-6) var(--space-6) 0;display:grid;grid-template-columns:136px minmax(0,1fr);gap:var(--space-4)">
+          <div style="position:relative;height:196px;border-radius:var(--radius-lg);background:radial-gradient(80% 60% at 50% 40%, var(--color-accent-900), var(--color-bg));box-shadow:var(--shadow-sm)">
+            <svg viewBox="0 0 100 100" style="position:absolute;left:22px;top:10px;width:92px;height:92px;z-index:2;filter:drop-shadow(0 8px 10px rgba(0,0,0,0.45))"><path d="{{ bTop.d }}" fill="{{ bTop.color }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ bTop.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+            <svg viewBox="0 0 100 100" style="position:absolute;left:26px;top:88px;width:84px;height:100px"><path d="{{ bBot.d }}" fill="{{ bBot.color }}" stroke="var(--color-neutral-700)" stroke-width="0.8"></path><path d="{{ bBot.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-4);min-width:0">
+            <sc-for list="{{ bPieces }}" as="p" hint-placeholder-count="2">
+              <div style="display:grid;grid-template-columns:22px minmax(0,1fr);gap:var(--space-3);align-items:start">
+                <div style="width:22px;height:22px;border-radius:var(--radius-sm);background:{{ p.color }};box-shadow:inset 0 0 0 1px rgba(0,0,0,0.3)"></div>
+                <div style="display:flex;flex-direction:column;gap:2px;font-size:12px;min-width:0">
+                  <span style="font-weight:500">{{ p.name }}</span>
+                  <span style="color:var(--color-neutral-500)">{{ p.tone }}</span>
+                  <span style="color:{{ p.mColor }}">{{ p.mShort }}</span>
+                </div>
+              </div>
+            </sc-for>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-neutral-500)"><span>Contrast</span><span style="color:var(--color-neutral-300)">Medium</span></div>
+              <div style="position:relative;height:4px;border-radius:2px;background:linear-gradient(90deg, var(--color-neutral-800), var(--color-neutral-500))"><div style="position:absolute;left:44%;top:-4px;width:2px;height:12px;border-radius:1px;background:var(--color-accent)"></div></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-neutral-500);margin-top:var(--space-2)"><span>Tone fit</span><span style="color:var(--color-neutral-300)">86</span></div>
+              <div style="position:relative;height:4px;border-radius:2px;background:var(--color-neutral-800)"><div style="width:86%;height:100%;border-radius:2px;background:linear-gradient(90deg, var(--color-accent-700), var(--color-accent))"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:var(--space-6)">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 var(--space-6)">
+            <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Matched for you</span>
+            <span style="font-size:12px;color:var(--color-accent-300)">Shuffle</span>
+          </div>
+          <div style="display:flex;gap:var(--space-3);padding:var(--space-3) var(--space-6);overflow:hidden">
+            <sc-for list="{{ bSugs }}" as="m" hint-placeholder-count="3">
+              <div class="card" style="flex:0 0 148px;display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-3);box-shadow:{{ m.ring }}">
+                <div style="position:relative;width:32px;height:50px;flex:none">
+                  <svg viewBox="0 0 100 100" style="position:absolute;left:0;top:0;width:32px;height:27px;z-index:2"><path d="{{ m.td }}" fill="{{ m.tc }}" stroke="var(--color-neutral-700)" stroke-width="2"></path></svg>
+                  <svg viewBox="0 0 100 100" style="position:absolute;left:3px;top:23px;width:26px;height:27px"><path d="{{ m.bd }}" fill="{{ m.bc }}" stroke="var(--color-neutral-700)" stroke-width="2"></path></svg>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;min-width:0"><span style="font-weight:500">{{ m.label }}</span><span style="color:var(--color-neutral-500)">{{ m.names }}</span></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <nav style="position:absolute;left:0;right:0;bottom:0;height:72px;display:grid;grid-template-columns:repeat(3,1fr);align-items:center;background:var(--color-bg);box-shadow:0 -1px 0 var(--color-neutral-800);font-size:11px">
+          <span style="text-align:center;color:var(--color-accent-300)">Outfit</span><span style="text-align:center;color:var(--color-neutral-500)">Add</span><span style="text-align:center;color:var(--color-neutral-500)">Wardrobe</span>
+        </nav>
+      </div>
+    </div>
+
+    <!-- 1c -->
+    <div id="1c" style="display:flex;flex-direction:column;gap:var(--space-4);width:390px">
+      <div style="display:flex;align-items:center;gap:var(--space-3)"><span class="tag tag-accent">1c</span><span style="font-size:15px;font-weight:500">Tone wheel</span></div>
+      <p style="margin:0;font-size:13px;color:var(--color-neutral-400);text-wrap:pretty">The TCI 12-tone wheel leads, with every piece you own plotted as a dot. The lines below swing outward, and the pieces near the middle have the best fit.</p>
+      <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;position:relative;background:var(--color-bg);box-shadow:var(--shadow-lg)">
+        <div style="padding:var(--space-8) var(--space-6) 0;display:grid;grid-template-columns:200px minmax(0,1fr);gap:var(--space-4);align-items:center">
+          <svg viewBox="0 0 200 200" style="width:200px;height:200px;overflow:visible">
+            <sc-for list="{{ wheel }}" as="w" hint-placeholder-count="12">
+              <path d="{{ w.d }}" fill="{{ w.c }}" opacity="{{ w.op }}" stroke="var(--color-bg)" stroke-width="1.5"></path>
+            </sc-for>
+            <path d="{{ wheelSel }}" fill="none" stroke="var(--color-accent)" stroke-width="1.5"></path>
+            <circle cx="100" cy="100" r="58" fill="var(--color-bg)"></circle>
+            <sc-for list="{{ plots }}" as="p" hint-placeholder-count="13">
+              <circle cx="{{ p.x }}" cy="{{ p.y }}" r="4.5" fill="{{ p.c }}" stroke="var(--color-bg)" stroke-width="1.5"></circle>
+            </sc-for>
+            <text x="100" y="98" text-anchor="middle" fill="var(--color-text)" font-size="20" font-weight="500" font-family="Inter, system-ui">9</text>
+            <text x="100" y="114" text-anchor="middle" fill="var(--color-neutral-400)" font-size="9" font-family="Inter, system-ui">of 13 in tone</text>
+          </svg>
+          <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+            <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">Your tone</span>
+            <span style="font-size:22px;font-weight:500;letter-spacing:-0.02em;line-height:1.1">Soft Autumn</span>
+            <div style="display:flex;flex-wrap:wrap;gap:var(--space-1)"><span class="tag tag-neutral">Warm-neutral</span><span class="tag tag-neutral">Medium</span><span class="tag tag-neutral">Soft</span></div>
+          </div>
+        </div>
+
+        <sc-for list="{{ arcs }}" as="ar" hint-placeholder-count="2">
+          <div style="position:relative;height:{{ ar.h }}px;margin-top:var(--space-4)">
+            <span style="position:absolute;left:var(--space-6);top:-6px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">{{ ar.label }}</span>
+            <svg viewBox="0 0 390 80" preserveAspectRatio="none" style="position:absolute;left:0;top:14px;width:100%;height:80px"><path d="M-20 4 Q195 104 410 4" fill="none" stroke="url(#fade)" stroke-width="1.2"></path></svg>
+            <sc-for list="{{ ar.items }}" as="g" hint-placeholder-count="5">
+              <div style="position:absolute;left:{{ g.x }}px;top:{{ g.y }}px;width:{{ g.w }}px;height:{{ g.w }}px;margin-left:{{ g.ml }}px;transform:{{ g.tf }};transform-origin:50% 0;opacity:{{ g.op }}">
+                <div style="position:absolute;left:28%;top:-3%;width:5%;height:10%;border-radius:2px;background:var(--color-accent);z-index:2"></div>
+                <div style="position:absolute;right:28%;top:-3%;width:5%;height:10%;border-radius:2px;background:var(--color-accent);z-index:2"></div>
+                <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMin meet" style="width:100%;height:100%;filter:drop-shadow(0 8px 10px rgba(0,0,0,0.45))"><path d="{{ g.d }}" fill="{{ g.color }}" stroke="var(--color-neutral-700)" stroke-width="0.8" stroke-linejoin="round"></path><path d="{{ g.d }}" fill="url(#shade)" opacity="0.35"></path></svg>
+              </div>
+            </sc-for>
+            <div style="position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:var(--space-2);font-size:13px"><span style="font-weight:500">{{ ar.name }}</span><span style="color:{{ ar.mColor }}">· {{ ar.mShort }}</span></div>
+          </div>
+        </sc-for>
+
+        <div style="position:absolute;left:var(--space-6);right:var(--space-6);bottom:92px;display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-3) var(--space-3) var(--space-4);border-radius:999px;background:var(--color-surface);box-shadow:var(--shadow-md)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.6" stroke-linejoin="round" style="flex:none"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"></path></svg>
+          <span style="flex:1;font-size:12px;color:var(--color-neutral-300);text-wrap:pretty">Swap the knit for the <span style="color:var(--color-text)">rib tank</span> for a full core-palette look</span>
+          <button class="btn btn-primary" style="font-size:12px;border-radius:999px">Try</button>
+        </div>
+        <nav style="position:absolute;left:0;right:0;bottom:0;height:80px;display:grid;grid-template-columns:repeat(3,1fr);align-items:center;font-size:11px">
+          <span style="text-align:center;color:var(--color-accent-300)">Outfit</span><span style="text-align:center;color:var(--color-neutral-500)">Add</span><span style="text-align:center;color:var(--color-neutral-500)">Wardrobe</span>
+        </nav>
+      </div>
+    </div>
+
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const P = {
+  shirt: "M32 6 L43 3 Q50 10 57 3 L68 6 L84 20 L95 80 L84 84 L72 40 L72 97 L28 97 L28 40 L16 84 L5 80 L16 20 Z",
+  tee: "M30 7 L42 3 Q50 11 58 3 L70 7 L93 24 L83 40 L72 34 L72 97 L28 97 L28 34 L17 40 L7 24 Z",
+  tank: "M34 3 L42 3 Q50 22 58 3 L66 3 L68 28 L75 40 L75 97 L25 97 L25 40 L32 28 Z",
+  jeans: "M27 3 L73 3 L80 97 L56 97 L50 34 L44 97 L20 97 Z",
+  shorts: "M24 3 L76 3 L85 58 L56 62 L50 30 L44 62 L15 58 Z",
+  skirt: "M32 3 L68 3 L86 78 Q50 88 14 78 Z",
+};
+const TOPS = [
+  { name: "Linen shirt", kind: "shirt", color: "#e6dcc6", tone: "Soft Autumn", m: "in" },
+  { name: "Crew tee", kind: "tee", color: "#34446b", tone: "Dark Winter", m: "out" },
+  { name: "Rib tank", kind: "tank", color: "#9aab8c", tone: "Soft Autumn", m: "in" },
+  { name: "Fisherman knit", kind: "shirt", color: "#b4643c", tone: "True Autumn", m: "near" },
+  { name: "Silk blouse", kind: "shirt", color: "#c2185b", tone: "True Winter", m: "out" },
+  { name: "Overshirt", kind: "shirt", color: "#4d4f58", tone: "Soft Summer", m: "near" },
+  { name: "Boxy tee", kind: "tee", color: "#b8cde8", tone: "Light Summer", m: "out" },
+];
+const BOTS = [
+  { name: "Straight jeans", kind: "jeans", color: "#3e5180", tone: "True Summer", m: "out" },
+  { name: "Wide jeans", kind: "jeans", color: "#d6cab0", tone: "Soft Autumn", m: "in" },
+  { name: "Utility shorts", kind: "shorts", color: "#6f7448", tone: "Soft Autumn", m: "in" },
+  { name: "Midi skirt", kind: "skirt", color: "#5a5c66", tone: "Soft Summer", m: "near" },
+  { name: "Chinos", kind: "jeans", color: "#b8946a", tone: "Soft Autumn", m: "in" },
+  { name: "Cords", kind: "jeans", color: "#5c3a26", tone: "Dark Autumn", m: "out" },
+];
+const WHEEL = [["Light Spring","#f5b7a1"],["True Spring","#f2a23c"],["Bright Spring","#ff6f61"],["Bright Winter","#e0115f"],["True Winter","#1e3a8a"],["Dark Winter","#5b1a2e"],["Dark Autumn","#7a3e14"],["True Autumn","#c46a2b"],["Soft Autumn","#c9a27e"],["Soft Summer","#8a9bb0"],["True Summer","#5b7fb3"],["Light Summer","#b8cde8"]];
+const PAL = ["#c9a27e","#a67b5b","#8f9a6e","#b5735a","#d8bf9a","#7d8c74","#9c6b5a","#e3d3b8"];
+const TI = 3, BI = 1, USER = 8;
+const mShort = it => it.m === "in" ? "In your tone" : it.m === "near" ? "Near your tone" : "Outside your tone";
+const mColor = it => it.m === "in" ? "var(--color-accent-300)" : it.m === "near" ? "var(--color-neutral-300)" : "var(--color-neutral-500)";
+const mDot = it => it.m === "in" ? "var(--color-accent)" : it.m === "near" ? "var(--color-neutral-400)" : "var(--color-neutral-700)";
+const wrap = (i, n) => ((i % n) + n) % n;
+function seg(cx, cy, r0, r1, a0, a1) {
+  const p = (r, a) => [cx + r * Math.cos(a), cy + r * Math.sin(a)].map(v => v.toFixed(2)).join(" ");
+  return `M${p(r1, a0)} A${r1} ${r1} 0 0 1 ${p(r1, a1)} L${p(r0, a1)} A${r0} ${r0} 0 0 0 ${p(r0, a0)} Z`;
+}
+
+class Component extends DCLogic {
+  renderVals() {
+    const top = TOPS[TI], bot = BOTS[BI];
+    // 1a
+    const aGarments = [];
+    [[TOPS, TI, 18, 190, 120], [BOTS, BI, 254, 200, 130]].forEach(([list, idx, y, w, sw]) => {
+      [-1, 1, 0].forEach(o => {
+        const it = list[wrap(idx + o, list.length)], a = Math.abs(o), ww = a ? sw : w;
+        aGarments.push({ ...it, d: P[it.kind], x: 195 + o * 150, y: y - (a ? 6 : 0), w: ww, ml: -ww / 2, tf: `rotate(${o * -6}deg)`, op: a ? 0.28 : 1, f: a ? "blur(1.5px)" : "drop-shadow(0 14px 18px rgba(0,0,0,0.5))" });
+      });
+    });
+    const palette = PAL.map((c, i) => ({ c, ring: i === 4 ? "0 0 0 1.5px var(--color-bg), 0 0 0 2.5px var(--color-accent)" : "none" }));
+    // 1b
+    const strip = (list, idx, label, big, h) => ({
+      label, h, pos: `${idx + 1} / ${list.length}`,
+      items: list.map((it, i) => { const sel = i === idx, w = sel ? big : 30, step = 330 / (list.length - 1); return { ...it, d: P[it.kind], x: 30 + i * step, y: 12 + Math.sin(Math.PI * i / (list.length - 1)) * 5, w, ml: -w / 2, op: sel ? 1 : 0.6, pin: sel ? "var(--color-accent)" : "var(--color-neutral-500)", mDot: mDot(it) }; }),
+    });
+    const sugPairs = [[2, 4, "Core palette"], [0, 2, "Core palette"], [3, 1, "Strong match"]];
+    // 1c
+    const wheel = WHEEL.map(([n, c], i) => {
+      const a0 = (i / 12) * Math.PI * 2 - Math.PI / 2 - Math.PI / 12, a1 = a0 + Math.PI * 2 / 12;
+      const d = Math.min(wrap(i - USER, 12), wrap(USER - i, 12));
+      return { d: seg(100, 100, 64, i === USER ? 98 : 90, a0, a1), c, op: d === 0 ? 1 : d === 1 ? 0.6 : 0.28 };
+    });
+    const ua0 = (USER / 12) * Math.PI * 2 - Math.PI / 2 - Math.PI / 12;
+    const all = [...TOPS, ...BOTS], counts = {};
+    const plots = all.map(it => {
+      const ti = WHEEL.findIndex(w => w[0] === it.tone), k = counts[ti] = (counts[ti] || 0) + 1;
+      const a = (ti / 12) * Math.PI * 2 - Math.PI / 2 + (k % 2 ? 1 : -1) * Math.floor(k / 2) * 0.13;
+      const r = 77 + ((k - 1) % 2) * 0;
+      return { x: (100 + r * Math.cos(a)).toFixed(1), y: (100 + r * Math.sin(a)).toFixed(1), c: it.color };
+    });
+    const arc = (list, idx, label, h, big) => ({
+      label, h, name: list[idx].name, mShort: mShort(list[idx]), mColor: mColor(list[idx]),
+      items: [-2, 2, -1, 1, 0].map(o => {
+        const it = list[wrap(idx + o, list.length)], a = Math.abs(o), x = 195 + o * 96, t = (x + 20) / 430;
+        const y = 14 + 4 + 100 * t * (1 - t) * 0.8 * 0.95 - 6, w = a === 0 ? big : a === 1 ? big * 0.66 : big * 0.48;
+        const ang = Math.atan2(100 * (1 - 2 * t), 430) * 180 / Math.PI;
+        return { ...it, d: P[it.kind], x, y, w, ml: -w / 2, tf: `rotate(${(-ang * 0.9).toFixed(1)}deg)`, op: a === 0 ? 1 : a === 1 ? 0.55 : 0.25 };
+      }),
+    });
+    const NAV = [["Outfit", "M2 6c6 3 14 3 20 0M7 7.5v10h4v-9.4M13 8.1V14h4V7.5"], ["Wardrobe", "M4 3h16v18H4zM12 3v18M9.5 11v2M14.5 11v2"], ["Add", "M12 5v14M5 12h14"], ["Profile", "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"]];
+    const nav = act => NAV.map(([label, d]) => ({ label, d, color: label === act ? "var(--color-accent-300)" : "var(--color-neutral-500)" }));
+    const PALN = ["Camel", "Cocoa", "Sage", "Clay", "Oat", "Moss", "Rosewood", "Cream"];
+    const mt = TOPS[2], mb = BOTS[4];
+    const row = it => ({ ...it, d: P[it.kind], mDot: mDot(it) });
+    const SOFTA = ["Soft Autumn", "True Autumn", "Dark Autumn", "Soft Summer"];
+    const occ = (id, board, note, o, title, fit, tags, t, b, why, finish) => ({
+      id, board, note, occ: o, title, fit, tags, why, finish,
+      td: P[t.kind], tc: t.color, tName: t.name, tm: mShort(t), tmColor: mColor(t),
+      bd: P[b.kind], bc: b.color, bName: b.name, bm: mShort(b), bmColor: mColor(b),
+    });
+    return {
+      occChips: ["Holiday party", "Thanksgiving", "Botanical garden walk", "Night out with the girls", "Date night", "Interview"].map((label, i) => ({
+        label, color: i === 0 ? "var(--color-accent-200)" : "var(--color-neutral-300)", ring: i === 0 ? "var(--color-accent)" : "var(--color-neutral-700)", bg: i === 0 ? "var(--color-accent-900)" : "transparent",
+      })),
+      occDetails: [{ k: "When", v: "Fri 19 Dec · evening" }, { k: "Setting", v: "Indoors, standing, then bar" }, { k: "Weather", v: "4° outside, warm inside" }],
+      occResults: [
+        occ("3b", "Result · Holiday party", "Dressy but warm-toned. The satin skirt dresses it up, and it flags what to add from outside your wardrobe.", "Holiday party", "Satin & knit", 81, ["Dressy", "Evening", "Indoors"], TOPS[3], BOTS[3],
+          [{ k: "Occasion", v: "A satin midi reads party; a chunky knit keeps it relaxed enough for a work crowd." },
+           { k: "Tone", v: "Rust borrows from True Autumn next door, so it still flatters. Slate satin is a cool neighbour, worn away from the face." },
+           { k: "Weather", v: "4° out. The wool knit means no coat swap at the door." }],
+          [{ n: "Gold hoops", c: "#c9a24a" }, { n: "Tan ankle boots", c: "#a67b5b" }, { n: "Bronze lip", c: "#9c5a44" }]),
+        occ("3c", "Result · Botanical garden walk", "Same flow for a casual daytime ask. Comfort and walking set the dress code, and the palette echoes the setting.", "Botanical garden walk", "Linen & camel", 96, ["Casual", "Daytime", "Lots of walking"], TOPS[0], BOTS[4],
+          [{ k: "Occasion", v: "Breathable linen and easy chinos for a couple of hours on your feet." },
+           { k: "Tone", v: "Cream and camel are both core Soft Autumn. Against all that green, they look deliberate." },
+           { k: "Weather", v: "17° and overcast. Roll the sleeves in the glasshouse; add the sage tank under if it’s cool." }],
+          [{ n: "White trainers", c: "#e3d3b8" }, { n: "Woven tote", c: "#c9a27e" }, { n: "Sage scarf", c: "#8f9a6e" }]),
+      ],
+      navOutfit: nav("Outfit"), navProfile: nav("Profile"), navWardrobe: nav("Wardrobe"),
+      matchPips: [0, 1, 2, 3, 4, 5].map(i => ({ w: i === 0 ? 18 : 6, c: i === 0 ? "var(--color-accent)" : "var(--color-neutral-700)" })),
+      mTop: { ...mt, d: P[mt.kind] }, mBot: { ...mb, d: P[mb.kind] },
+      matchPal: PAL.map((c, i) => ({ c, ring: i === 2 || i === 0 ? "0 0 0 1.5px var(--color-bg), 0 0 0 2.5px var(--color-accent)" : "none" })),
+      reasons: [
+        { k: "Tone", v: "Sage and camel both sit in your Soft Autumn palette: muted, warm-neutral, mid-depth." },
+        { k: "Contrast", v: "Low to medium. Tonal, so it reads calm and pulled together." },
+        { k: "Day", v: "17° and overcast. Add the overshirt if it cools; it’s a near-tone layer." },
+      ],
+      palNamed: PAL.map((c, i) => ({ c, n: PALN[i] })),
+      dims: [
+        { k: "Hue", v: "Warm-neutral", a: "Cool", b: "Warm", pos: "68%", track: "linear-gradient(90deg, #6f86b8, var(--color-neutral-600), #c98a4b)" },
+        { k: "Value", v: "Medium", a: "Light", b: "Dark", pos: "48%", track: "linear-gradient(90deg, var(--color-neutral-200), var(--color-neutral-900))" },
+        { k: "Chroma", v: "Soft", a: "Soft", b: "Bright", pos: "20%", track: "linear-gradient(90deg, #9c8f84, #e2683a)" },
+      ],
+      quizOpts: [
+        { label: "Light", sub: "Pastels, ivory, soft grey", sw: ["#f3e6d4", "#e7d3dc", "#d5e1ea", "#e9e3cf"], ring: "var(--shadow-sm)", radio: "var(--color-neutral-600)", dot: "transparent" },
+        { label: "Mid", sub: "Camel, sage, dusty rose", sw: ["#c9a27e", "#8f9a6e", "#b5735a", "#8a9bb0"], ring: "0 0 0 1px var(--color-accent), 0 0 18px var(--color-accent-900)", radio: "var(--color-accent)", dot: "var(--color-accent)" },
+        { label: "Deep", sub: "Espresso, forest, burgundy", sw: ["#3e2b22", "#2f4a3a", "#5b1a2e", "#2a2d3a"], ring: "var(--shadow-sm)", radio: "var(--color-neutral-600)", dot: "transparent" },
+      ],
+      narrow: WHEEL.map(([n]) => ({ n, color: SOFTA.includes(n) ? "var(--color-text)" : "var(--color-neutral-700)", ring: n === "Soft Autumn" ? "var(--color-accent)" : SOFTA.includes(n) ? "var(--color-neutral-600)" : "var(--color-neutral-800)" })),
+      wGroups: [
+        { label: "In your tone", count: "5", rows: [TOPS[0], TOPS[2], BOTS[1], BOTS[2], BOTS[4]].map(row) },
+        { label: "Near your tone", count: "3", rows: [TOPS[3], TOPS[5], BOTS[3]].map(row) },
+      ],
+      dots: PAL.slice(0, 3), aGarments, palette,
+      aTop: { ...top, mShort: mShort(top) }, aBot: { ...bot, mShort: mShort(bot) },
+      strips: [strip(TOPS, TI, "Tops", 56, 82), strip(BOTS, BI, "Bottoms", 56, 82)],
+      bTop: { ...top, d: P[top.kind] }, bBot: { ...bot, d: P[bot.kind] },
+      bPieces: [top, bot].map(it => ({ ...it, mShort: mShort(it), mColor: mColor(it) })),
+      bSugs: sugPairs.map(([t, b, label], i) => ({ label, names: `${TOPS[t].name} · ${BOTS[b].name}`, td: P[TOPS[t].kind], tc: TOPS[t].color, bd: P[BOTS[b].kind], bc: BOTS[b].color, ring: i === 0 ? "0 0 0 1px var(--color-accent)" : "var(--shadow-sm)" })),
+      wheel, wheelSel: seg(100, 100, 61, 101, ua0, ua0 + Math.PI / 6), plots,
+      arcs: [arc(TOPS, TI, "Tops", 210, 150), arc(BOTS, BI, "Bottoms", 230, 160)],
+    };
+  }
+}
+</script>
+</body>
+</html>
