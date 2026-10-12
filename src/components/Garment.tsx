@@ -3,7 +3,7 @@ import { SILHOUETTES } from '../domain/silhouettes'
 import type { Item } from '../domain/types'
 
 interface Props {
-  item: Pick<Item, 'kind' | 'color' | 'name' | 'photo'>
+  item: Pick<Item, 'kind' | 'color' | 'name' | 'photo' | 'cutout'>
   className?: string
   style?: CSSProperties
   /** Outline width in viewBox units. */
@@ -15,13 +15,16 @@ interface Props {
 }
 
 /**
- * A garment: the user's cut-out photo when there is one, otherwise a
- * placeholder silhouette filled with the item colour.
+ * A garment: the user's photo when there is one (normally a transparent
+ * cut-out), otherwise a placeholder silhouette filled with the item colour.
  */
 export function Garment({ item, className, style, stroke = 0.8, shade = true, align = 'top' }: Props) {
   if (item.photo) {
+    // Raw photos blend in with .lighten so a dark backdrop falls away. A real
+    // cut-out already has transparency, and lighten would make dark garments
+    // (black, navy) vanish into the page, so it's drawn as is.
     return (
-      <div className={`lighten ${className ?? ''}`} style={style}>
+      <div className={`${item.cutout ? 'cutout' : 'lighten'} ${className ?? ''}`} style={style}>
         <div
           role="img"
           aria-label={item.name}

@@ -461,3 +461,20 @@ h1 { margin: 0; }
 .tone-tile:hover { box-shadow: 0 0 0 1px var(--color-neutral-600); }
 .tone-tile.is-on { box-shadow: 0 0 0 1px var(--color-accent), 0 0 18px var(--color-accent-800); }
 .tone-sw { display: grid; grid-template-columns: repeat(4, 1fr); height: 16px; border-radius: 3px; overflow: hidden; }
+
+/* — photo capture — */
+.notice {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-neutral-300);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: inset 2px 0 0 var(--color-accent-600);
+  text-wrap: pretty;
+}
+.seg-grid--3 { grid-template-columns: repeat(3, 1fr); }
+/* A faint rim, like the silhouettes' outline, so dark garments stay visible on the dark page. */
+.cutout .garment-photo, .garment-photo.cutout { filter: drop-shadow(0 0 0.5px var(--color-neutral-500)) drop-shadow(0 0 0.5px var(--color-neutral-600)); }
+.garment-photo.cutout-shadow { filter: drop-shadow(0 0 0.5px var(--color-neutral-500)) drop-shadow(0 12px 18px rgba(0, 0, 0, 0.5)); }

@@ -49,6 +49,10 @@ export interface AppContext {
   isSaved: (topId: string, botId: string) => boolean
   toggleSaved: (topId: string, botId: string, occ: string) => void
   openItem: (id: string) => void
+  /** Add a piece, storing its images, and hang it on the line. */
+  addItem: (item: Item, images: { photo?: Blob | null; original?: Blob | null }) => void
+  /** Remove a piece, its saved looks and its stored images. */
+  removeItem: (id: string) => void
 }
 
 export const Ctx = createContext<AppContext | null>(null)

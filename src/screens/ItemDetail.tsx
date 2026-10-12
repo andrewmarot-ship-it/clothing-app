@@ -8,7 +8,7 @@ import { TONES } from '../domain/tones'
 import { useApp } from '../state/context'
 
 export function ItemDetail() {
-  const { state, go, set, byId, rated } = useApp()
+  const { state, go, byId, rated, removeItem } = useApp()
   const item = byId(state.itemId)
   const backTo = state.from === 'outfit' ? 'outfit' : 'wardrobe'
   const back = <BackRow label={backTo === 'outfit' ? 'Outfit' : 'Wardrobe'} onBack={() => go(backTo)} />
@@ -28,10 +28,7 @@ export function ItemDetail() {
 
   const remove = () => {
     if (isLast) return
-    set((s) => ({
-      items: s.items.filter((i) => i.id !== item.id),
-      saved: s.saved.filter((l) => l.topId !== item.id && l.botId !== item.id),
-    }))
+    removeItem(item.id)
     go('wardrobe')
   }
 

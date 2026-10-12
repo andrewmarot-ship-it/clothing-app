@@ -8,8 +8,19 @@ Mobile-first web app built with React, TypeScript and Vite, styled with the Noct
 
 ```sh
 npm install
-npm run dev        # http://localhost:5173
+cp .env.example .env.local   # add your API keys (optional, see below)
+npm run dev                  # http://localhost:5173
 ```
+
+The dev server also serves the `api/` functions, so photo capture works locally. Without keys the app still runs: new pieces fall back to a drawn silhouette, and you fill in the details yourself.
+
+| Variable | Used for |
+|---|---|
+| `BG_REMOVAL_API_KEY` | Background removal ([remove.bg](https://www.remove.bg/api)) |
+| `ANTHROPIC_API_KEY` | Garment tagging with Claude |
+| `TAG_MODEL` | Optional tagging-model override (default `claude-haiku-5-5`) |
+
+Deploy on Vercel: it serves the Vite build plus `api/` as serverless functions. Set the same variables under Project → Settings → Environment Variables.
 
 | Script | What it does |
 |---|---|
@@ -34,10 +45,11 @@ Pushed screens: **Occasion** → **Match** (Match me results), **Item** detail, 
 ## Project layout
 
 ```
+api/             Vercel functions: process-photo (background removal + tagging)
 src/
-  domain/        Pure, unit-tested logic: tones, colour (OKLCH), occasions,
-                 outfit scoring and reason copy, quiz, seed wardrobe
-  state/         App state (React context) with localStorage persistence
+  domain/        Pure, unit-tested logic: tones, colour (OKLCH/OKLab), image
+                 pixels, occasions, outfit scoring and reason copy, quiz
+  state/         App state (React context), localStorage + IndexedDB photos
   components/    Garment rendering, clothesline, tab bar, back row
   screens/       One component per screen
   styles/        nocturne.css (design-system tokens) + app.css
@@ -46,18 +58,26 @@ design/handoff/  The original design handoff: spec, prototype, screenshots
 
 The design spec is `design/handoff/README.md`. To open the HTML prototype, serve that folder (`npx serve design/handoff`) and open `Clothesline App.dc.html`.
 
+## Photo capture
+
+Pieces are photographed **laid flat on a plain, light surface**. The app shows your real garment, cut out, never a generated mock-up, because tone matching depends on true colour.
+
+1. **Check** (browser): downscale to 1024px; warn on blur, darkness or glare, and let the user retake or carry on.
+2. **Cut out and tag** (`api/process-photo`): remove.bg removes the background while Claude tags the piece (category, type, fabric, formality, warmth, colour name). The two calls run in parallel, and either can fail on its own.
+3. **Read the colour** (browser, `src/domain/pixels.ts`): keep the largest piece of the mask, and use the surface as a grey card to correct the lighting when it's near-neutral. Then run k-means in OKLab on the garment pixels, flagging two-colour patterns.
+4. **Place it in a tone** with `classifyHex`, then straighten small tilts, crop, and save a transparent WebP.
+
+Cut-outs and original photos are stored in IndexedDB; the rest of the state is in `localStorage`. If processing fails, the piece is drawn as a silhouette and the original photo is kept, so it can be reprocessed later.
+
 ## What's real and what's simulated
 
-Like the prototype, this build keeps everything in the browser:
-
-- **Storage:** your tone, wardrobe (including photos, downscaled), outfit and saved looks are kept in `localStorage`.
-- **Photo scan:** it reads the dominant colour from the centre of the photo and classifies it into a tone with an OKLCH fallback classifier. Background removal and attribute tagging are simulated. New pieces default to cotton, casual, light.
+- **Storage:** everything lives in this browser. There are no accounts yet.
 - **Occasions:** they're parsed by keyword. Weather is fixed placeholder text.
 - **Tone palettes:** they're placeholders. Commercial use needs TCI's licensed tone data and branding approval.
+- **`/api/process-photo` is unauthenticated:** anyone who finds it can spend your API credits. Put it behind sign-in before sharing a deployment.
 
 ## Next steps
 
-- Server-side garment segmentation (cut-outs) and vision tagging (category, kind, fabric, formality, warmth)
 - LLM occasion parsing, e.g. the Claude API returning `{label, code, when, setting, warmth, contrastPref, finish[]}`, plus a forecast API for weather
 - Accounts and a backend: items, photos in object storage, saved looks, wear history ("I wore this")
 - More lines: outerwear, shoes, accessories

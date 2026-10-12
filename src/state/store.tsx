@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { rate } from '../domain/scoring'
 import { SEED_ITEMS, SEED_OUTFIT, SEED_SAVED } from '../domain/seed'
 import { DEFAULT_TONE, TONES, toneIndex } from '../domain/tones'
+import type { Item } from '../domain/types'
 import { Ctx, type AppContext, type AppState } from './context'
+import { deletePhotos, getPhoto, putPhoto } from './photos'
 
 const STORAGE_KEY = 'clothesline-app-v1'
 
@@ -69,8 +71,58 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [tone, items, saved, topId, botId])
 
+  // Stored images → object URLs for display. Items keep only the storage key.
+  const [urls, setUrls] = useState<Record<string, string>>({})
+  const startItems = useRef(items)
+  useEffect(() => {
+    let live = true
+    const made: string[] = []
+    for (const it of startItems.current) {
+      const key = it.photoId
+      if (!key) continue
+      getPhoto(key).then((blob) => {
+        if (!blob || !live) return
+        const url = URL.createObjectURL(blob)
+        made.push(url)
+        setUrls((u) => ({ ...u, [key]: url }))
+      })
+    }
+    return () => {
+      live = false
+      made.forEach((u) => URL.revokeObjectURL(u))
+    }
+  }, [])
+
+  const addItem = useCallback<AppContext['addItem']>((item, images) => {
+    const next: Item = { ...item }
+    if (images.photo) {
+      const key = `${item.id}-cut`
+      next.photoId = key
+      next.cutout = true
+      void putPhoto(key, images.photo)
+      const url = URL.createObjectURL(images.photo)
+      setUrls((u) => ({ ...u, [key]: url }))
+    }
+    if (images.original) {
+      next.originalId = `${item.id}-orig`
+      void putPhoto(next.originalId, images.original)
+    }
+    setState((s) => ({ ...s, items: [...s.items, next], [next.cat === 'top' ? 'topId' : 'botId']: next.id }))
+  }, [])
+
+  const removeItem = useCallback<AppContext['removeItem']>((id) => {
+    setState((s) => {
+      const it = s.items.find((i) => i.id === id)
+      if (it) void deletePhotos([it.photoId, it.originalId].filter((k): k is string => !!k))
+      return { ...s, items: s.items.filter((i) => i.id !== id), saved: s.saved.filter((l) => l.topId !== id && l.botId !== id) }
+    })
+  }, [])
+
   const userTone = tone ?? Math.max(0, toneIndex(DEFAULT_TONE))
-  const rated = useMemo(() => rate(items, userTone), [items, userTone])
+  const rated = useMemo(
+    () => rate(items.map((i) => (i.photoId && urls[i.photoId] ? { ...i, photo: urls[i.photoId] } : i)), userTone),
+    [items, urls, userTone],
+  )
 
   const value = useMemo<AppContext>(() => {
     const byId = (id: string | null) => rated.find((i) => i.id === id)
@@ -97,8 +149,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
           }
         }),
       openItem: (id) => go('item', { itemId: id }),
+      addItem,
+      removeItem,
     }
-  }, [state, set, go, userTone, rated])
+  }, [state, set, go, userTone, rated, addItem, removeItem])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
