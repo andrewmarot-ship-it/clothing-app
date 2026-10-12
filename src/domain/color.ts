@@ -52,9 +52,20 @@ export function oklabToHex({ L, a, b }: Oklab): string {
   )
 }
 
-export function oklch(hex: string): Oklch {
+export function hexToOklab(hex: string): Oklab {
   const n = parseInt(hex.slice(1), 16)
-  const { L, a, b } = linearToOklab(srgbToLinear((n >> 16) & 255), srgbToLinear((n >> 8) & 255), srgbToLinear(n & 255))
+  return linearToOklab(srgbToLinear((n >> 16) & 255), srgbToLinear((n >> 8) & 255), srgbToLinear(n & 255))
+}
+
+/** Perceptual distance between two colours (OKLab ΔE; ~0.02 is a just-noticeable difference). */
+export function colourDistance(a: string, b: string): number {
+  const x = hexToOklab(a)
+  const y = hexToOklab(b)
+  return Math.hypot(x.L - y.L, x.a - y.a, x.b - y.b)
+}
+
+export function oklch(hex: string): Oklch {
+  const { L, a, b } = hexToOklab(hex)
   return { L, C: Math.hypot(a, b), h: ((Math.atan2(b, a) * 180) / Math.PI + 360) % 360 }
 }
 

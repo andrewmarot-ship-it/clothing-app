@@ -16,4 +16,10 @@ export function matchInfo(match: Match, toneName: string): MatchInfo {
   return { label: `Outside your tone · ${toneName}`, short: 'Outside your tone', dot: 'transparent', color: 'var(--color-neutral-500)' }
 }
 
-export const itemMatch = (it: RatedItem) => matchInfo(it.match, TONES[it.tone].name)
+/** Match info for a piece, saying so when the call is the user's rather than the classifier's. */
+export function itemMatch(it: RatedItem): MatchInfo {
+  const m = matchInfo(it.match, TONES[it.tone].name)
+  if (it.matchSource === 'tone') return m
+  const why = it.matchSource === 'you' ? 'your call' : 'one of your colours'
+  return { ...m, label: `${m.short} · ${why}` }
+}

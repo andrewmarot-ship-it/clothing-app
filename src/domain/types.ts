@@ -35,11 +35,17 @@ export interface Item {
   photo?: string
   /** True when `photo` is a transparent cut-out rather than a raw photo. */
   cutout?: boolean
+  /** The user's own call on how this piece suits them; beats the classifier. */
+  matchOverride?: Match
 }
+
+/** Where a piece's match came from. */
+export type MatchSource = 'tone' | 'palette' | 'you'
 
 /** An item scored against the user's tone. */
 export interface RatedItem extends Item {
   match: Match
+  matchSource: MatchSource
   /** OKLCH lightness of the item colour, used for contrast. */
   L: number
 }

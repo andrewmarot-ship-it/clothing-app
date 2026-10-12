@@ -119,6 +119,31 @@ suite('scoring', () => {
   })
 })
 
+suite('your call on tone', () => {
+  it('lets the user overrule the classifier', () => {
+    const fuchsia = FIXTURE_ITEMS.find((i) => i.id === 't5')!
+    expect(rate([fuchsia], SOFT_AUTUMN)[0]).toMatchObject({ match: 'out', matchSource: 'tone' })
+    expect(rate([{ ...fuchsia, matchOverride: 'in' }], SOFT_AUTUMN)[0]).toMatchObject({ match: 'in', matchSource: 'you' })
+  })
+
+  it('counts pieces close to one of your colours as in tone', () => {
+    const fuchsia = FIXTURE_ITEMS.find((i) => i.id === 't5')!
+    expect(rate([fuchsia], SOFT_AUTUMN, ['#c51a5e'])[0]).toMatchObject({ match: 'in', matchSource: 'palette' })
+    expect(rate([fuchsia], SOFT_AUTUMN, ['#2f6b3a'])[0].matchSource).toBe('tone')
+  })
+
+  it('puts your own call ahead of your colours', () => {
+    const fuchsia = { ...FIXTURE_ITEMS.find((i) => i.id === 't5')!, matchOverride: 'out' as const }
+    expect(rate([fuchsia], SOFT_AUTUMN, ['#c2185b'])[0]).toMatchObject({ match: 'out', matchSource: 'you' })
+  })
+
+  it('explains a near piece by your call rather than the neighbouring tone', () => {
+    const t = { ...byId('t1') }
+    const b = rate([{ ...FIXTURE_ITEMS.find((i) => i.id === 'b1')!, matchOverride: 'near' }], SOFT_AUTUMN)[0]
+    expect(describe(t, b, PRESETS.today, 1, SOFT_AUTUMN)[1].v).toContain('you rate indigo close enough to work')
+  })
+})
+
 suite('quiz', () => {
   it('narrows the shortlist as answers come in', () => {
     expect(shortlist([null, null, null])).toEqual([])

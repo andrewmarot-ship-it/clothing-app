@@ -29,6 +29,8 @@ export interface AppState {
   botId: string | null
   saved: SavedLook[]
   wearLog: Wear[]
+  /** Colours the user says suit them; pieces close to one count as in tone. */
+  myColours: string[]
   filter: Filter
   itemId: string | null
   /** When set, the Add screen retakes the photo of this piece instead of adding a new one. */

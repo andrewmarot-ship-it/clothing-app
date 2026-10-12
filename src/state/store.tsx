@@ -8,7 +8,7 @@ import { deletePhotos, getPhoto, putPhoto } from './photos'
 const STORAGE_KEY = 'clothesline-app-v1'
 
 /** The part of the state that survives a reload. */
-type Persisted = Pick<AppState, 'tone' | 'items' | 'saved' | 'topId' | 'botId' | 'wearLog'>
+type Persisted = Pick<AppState, 'tone' | 'items' | 'saved' | 'topId' | 'botId' | 'wearLog' | 'myColours'>
 
 /** Pieces from the old built-in demo wardrobe, cleared out of existing browsers. */
 const LEGACY_DEMO = /^[tb][1-7]$/
@@ -28,6 +28,7 @@ function initialState(): AppState {
     botId: null,
     saved: [],
     wearLog: [],
+    myColours: [],
     filter: 'all',
     itemId: null,
     retakeId: null,
@@ -51,6 +52,7 @@ function initialState(): AppState {
       items,
       saved: Array.isArray(p.saved) ? p.saved.filter(pair) : [],
       wearLog: Array.isArray(p.wearLog) ? p.wearLog.filter(pair) : [],
+      myColours: Array.isArray(p.myColours) ? p.myColours.filter((c) => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c)) : [],
       topId: p.topId && ids.has(p.topId) ? p.topId : null,
       botId: p.botId && ids.has(p.botId) ? p.botId : null,
     }
@@ -71,15 +73,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     window.scrollTo(0, 0)
   }, [])
 
-  const { tone, items, saved, topId, botId, wearLog } = state
+  const { tone, items, saved, topId, botId, wearLog, myColours } = state
   useEffect(() => {
-    const data: Persisted = { tone, items, saved, topId, botId, wearLog }
+    const data: Persisted = { tone, items, saved, topId, botId, wearLog, myColours }
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
     } catch {
       // Storage full or unavailable: the session still works, it just won't persist.
     }
-  }, [tone, items, saved, topId, botId, wearLog])
+  }, [tone, items, saved, topId, botId, wearLog, myColours])
 
   // Stored images → object URLs for display. Items keep only the storage key.
   const [urls, setUrls] = useState<Record<string, string>>({})
@@ -184,8 +186,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const hasTone = tone != null
   const userTone = tone ?? Math.max(0, toneIndex(DEFAULT_TONE))
   const rated = useMemo(
-    () => rate(items.map((i) => (i.photoId && urls[i.photoId] ? { ...i, photo: urls[i.photoId] } : i)), userTone),
-    [items, urls, userTone],
+    () => rate(items.map((i) => (i.photoId && urls[i.photoId] ? { ...i, photo: urls[i.photoId] } : i)), userTone, myColours),
+    [items, urls, userTone, myColours],
   )
 
   const value = useMemo<AppContext>(() => {
