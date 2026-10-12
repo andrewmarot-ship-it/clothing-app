@@ -19,6 +19,7 @@ The dev server also serves the API routes in `server/`, so photo capture works l
 | `BG_REMOVAL_API_KEY` | Background removal ([remove.bg](https://www.remove.bg/api)) |
 | `ANTHROPIC_API_KEY` | Garment tagging with Claude |
 | `TAG_MODEL` | Optional tagging-model override (default `claude-haiku-5-5`) |
+| `PHOTO_LIMIT_PER_HOUR`, `PHOTO_LIMIT_PER_DAY` | Optional spend guard on photo processing (defaults 30 per client per hour, 300 per day overall) |
 
 ### Deploying
 
@@ -82,7 +83,7 @@ Cut-outs and original photos are stored in IndexedDB; the rest of the state is i
 - **Storage:** everything lives in this browser. There are no accounts yet.
 - **Occasions:** they're parsed by keyword. Weather is fixed placeholder text.
 - **Tone palettes:** they're placeholders. Commercial use needs TCI's licensed tone data and branding approval.
-- **`/api/process-photo` is unauthenticated:** anyone who finds it can spend your API credits. Put it behind sign-in before sharing a deployment.
+- **`/api/process-photo` is unauthenticated** until sign-in exists. An in-memory limit caps it at 30 photos per client per hour and 300 per day overall, which bounds what a stranger could spend. It resets on redeploy.
 
 ## Next steps
 

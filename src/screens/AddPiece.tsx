@@ -10,6 +10,7 @@ import { PhotoError, analysePhoto, preparePhoto, type AnalysedPhoto, type Prepar
 import type { QualityIssue } from '../domain/pixels'
 import { KINDS, defaultKind } from '../domain/tags'
 import { TONES, matchOf } from '../domain/tones'
+import { RateLimitedError } from '../state/processPhoto'
 import type { Category, Item } from '../domain/types'
 import { useApp } from '../state/context'
 
@@ -92,7 +93,9 @@ export function AddPiece() {
       reset(
         e instanceof PhotoError
           ? 'We couldn’t find a garment in that photo. Lay one piece flat on a plain surface and try again.'
-          : 'Something went wrong reading that photo. Try another one.',
+          : e instanceof RateLimitedError
+            ? 'You’ve added a lot of photos in the last hour. Try again a bit later.'
+            : 'Something went wrong reading that photo. Try another one.',
       )
     }
   }
