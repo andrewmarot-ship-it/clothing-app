@@ -1,5 +1,30 @@
-const FALLBACK = '#b8946a'
-const hex2 = (n: number) => n.toString(16).padStart(2, '0')
+/**
+ * The flat-lay photo pipeline (browser side). Pixel maths lives in
+ * pixels.ts; this file handles canvases, the network call and ordering.
+ */
+import { RateLimitedError, requestProcessing } from '../state/processPhoto'
+import {
+  alphaBBox,
+  applyGains,
+  backgroundGains,
+  centreColour,
+  checkQuality,
+  dominantColours,
+  fillSmallHoles,
+  largestComponent,
+  maskFromAlpha,
+  maskStats,
+  refineAlpha,
+  straightenBy,
+  type Pixels,
+  type QualityIssue,
+} from './pixels'
+import type { GarmentTags } from './tags'
+
+/** Upload and working size. Big enough for the item screen at 2×, small enough to send quickly. */
+const WORK_SIDE = 1024
+const QUALITY_SIDE = 256
+const FALLBACK_COLOUR = '#b8946a'
 
 function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -10,53 +35,174 @@ function loadImage(url: string): Promise<HTMLImageElement> {
   })
 }
 
-/**
- * Average colour of the centre of an image, skipping near-white and
- * near-black pixels (background and shadow). Production should cluster the
- * cut-out's opaque pixels instead.
- */
-function sampleColor(img: HTMLImageElement): string {
+function canvas(w: number, h: number) {
   const c = document.createElement('canvas')
-  c.width = c.height = 48
-  const x = c.getContext('2d')
-  if (!x) return FALLBACK
-  x.drawImage(img, 0, 0, 48, 48)
-  const d = x.getImageData(14, 14, 20, 20).data
-  let r = 0, g = 0, b = 0, n = 0
-  for (let i = 0; i < d.length; i += 4) {
-    const mx = Math.max(d[i], d[i + 1], d[i + 2])
-    const mn = Math.min(d[i], d[i + 1], d[i + 2])
-    if ((mx > 245 && mn > 235) || mx < 14) continue
-    r += d[i]
-    g += d[i + 1]
-    b += d[i + 2]
-    n++
-  }
-  return n ? `#${hex2(Math.round(r / n))}${hex2(Math.round(g / n))}${hex2(Math.round(b / n))}` : FALLBACK
+  c.width = w
+  c.height = h
+  const ctx = c.getContext('2d', { willReadFrequently: true })
+  if (!ctx) throw new Error('Canvas 2D is not available')
+  return { c, ctx }
 }
 
-/** Downscale a photo so it fits in local storage. */
-function shrink(img: HTMLImageElement, max = 640): string {
-  const scale = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight))
-  const c = document.createElement('canvas')
-  c.width = Math.round(img.naturalWidth * scale)
-  c.height = Math.round(img.naturalHeight * scale)
-  c.getContext('2d')?.drawImage(img, 0, 0, c.width, c.height)
-  return c.toDataURL('image/jpeg', 0.85)
+function draw(src: CanvasImageSource, sw: number, sh: number, maxSide: number) {
+  const scale = Math.min(1, maxSide / Math.max(sw, sh))
+  const out = canvas(Math.max(1, Math.round(sw * scale)), Math.max(1, Math.round(sh * scale)))
+  out.ctx.drawImage(src, 0, 0, out.c.width, out.c.height)
+  return out
 }
 
-export interface ProcessedPhoto {
-  url: string
-  color: string
+const pixelsOf = ({ c, ctx }: ReturnType<typeof canvas>): Pixels => {
+  const d = ctx.getImageData(0, 0, c.width, c.height)
+  return { width: d.width, height: d.height, data: d.data }
 }
 
-/** Read a picked photo: a small storable copy plus its dominant colour. */
-export async function processPhoto(file: File): Promise<ProcessedPhoto> {
-  const src = URL.createObjectURL(file)
+function toBlob(c: HTMLCanvasElement, type: string, quality?: number): Promise<Blob> {
+  return new Promise((resolve, reject) => c.toBlob((b) => (b ? resolve(b) : reject(new Error('encode failed'))), type, quality))
+}
+
+export interface PreparedPhoto {
+  /** ≤1024px JPEG to send to the server; also kept as the original. */
+  upload: Blob
+  /** The same image as pixels, for white balance and the fallback colour. */
+  pixels: Pixels
+  /** Advisory: the user may retake or carry on. */
+  issue: QualityIssue | null
+}
+
+/** Decode (honouring camera rotation), downscale and check the photo. */
+export async function preparePhoto(file: Blob): Promise<PreparedPhoto> {
+  const url = URL.createObjectURL(file)
   try {
-    const img = await loadImage(src)
-    return { url: shrink(img), color: sampleColor(img) }
+    const img = await loadImage(url)
+    const work = draw(img, img.naturalWidth, img.naturalHeight, WORK_SIDE)
+    const small = draw(work.c, work.c.width, work.c.height, QUALITY_SIDE)
+    return { upload: await toBlob(work.c, 'image/jpeg', 0.88), pixels: pixelsOf(work), issue: checkQuality(pixelsOf(small)) }
   } finally {
-    URL.revokeObjectURL(src)
+    URL.revokeObjectURL(url)
+  }
+}
+
+export type Warning =
+  /** The garment runs off the edge of the frame. */
+  | 'cut_off'
+  /** Background removal was unavailable: no cut-out, colour from the centre of the photo. */
+  | 'no_cutout'
+  /** Tagging was unavailable: the user fills in the details. */
+  | 'no_tags'
+  /** A dress, coat, shoes…: the app only has tops and bottoms for now. */
+  | 'not_supported'
+
+export class PhotoError extends Error {
+  readonly code: 'no_garment'
+  constructor(code: 'no_garment') {
+    super(code)
+    this.code = code
+  }
+}
+
+export interface AnalysedPhoto {
+  /** Normalised transparent cut-out, or null when background removal failed. */
+  photo: Blob | null
+  original: Blob
+  color: string
+  color2: string | null
+  pattern: boolean
+  tags: GarmentTags | null
+  warnings: Warning[]
+}
+
+/** Pipeline stages, matching the four steps on the Add screen. */
+export type Stage = 0 | 1 | 2 | 3
+
+async function blobPixels(blob: Blob, w: number, h: number): Promise<Pixels> {
+  const bmp = await createImageBitmap(blob)
+  try {
+    // Stretch to the original's size so the mask lines up pixel for pixel.
+    const out = canvas(w, h)
+    out.ctx.drawImage(bmp, 0, 0, w, h)
+    return pixelsOf(out)
+  } finally {
+    bmp.close()
+  }
+}
+
+/** Straighten, crop to the garment with a little padding, and encode with transparency. */
+async function normaliseCutout(px: Pixels, angle: number): Promise<Blob> {
+  const src = canvas(px.width, px.height)
+  src.ctx.putImageData(new ImageData(new Uint8ClampedArray(px.data), px.width, px.height), 0, 0)
+
+  const rad = (straightenBy(angle) * Math.PI) / 180
+  const cos = Math.abs(Math.cos(rad))
+  const sin = Math.abs(Math.sin(rad))
+  const rot = canvas(Math.ceil(px.width * cos + px.height * sin), Math.ceil(px.width * sin + px.height * cos))
+  rot.ctx.translate(rot.c.width / 2, rot.c.height / 2)
+  rot.ctx.rotate(rad)
+  rot.ctx.drawImage(src.c, -px.width / 2, -px.height / 2)
+
+  const box = alphaBBox(pixelsOf(rot)) ?? { x0: 0, y0: 0, x1: rot.c.width - 1, y1: rot.c.height - 1 }
+  const bw = box.x1 - box.x0 + 1
+  const bh = box.y1 - box.y0 + 1
+  const pad = Math.round(Math.max(bw, bh) * 0.06)
+  const sx = Math.max(0, box.x0 - pad)
+  const sy = Math.max(0, box.y0 - pad)
+  const sw = Math.min(rot.c.width - sx, bw + 2 * pad)
+  const sh = Math.min(rot.c.height - sy, bh + 2 * pad)
+
+  const scale = Math.min(1, WORK_SIDE / Math.max(sw, sh))
+  const out = canvas(Math.round(sw * scale), Math.round(sh * scale))
+  out.ctx.drawImage(rot.c, sx, sy, sw, sh, 0, 0, out.c.width, out.c.height)
+
+  const webp = await toBlob(out.c, 'image/webp', 0.9).catch(() => null)
+  // Older Safari can't encode WebP and silently hands back a PNG instead.
+  return webp && webp.type === 'image/webp' ? webp : toBlob(out.c, 'image/png')
+}
+
+export async function analysePhoto(prepared: PreparedPhoto, onStage: (s: Stage) => void, signal?: AbortSignal): Promise<AnalysedPhoto> {
+  const { pixels, upload } = prepared
+  const warnings: Warning[] = []
+  onStage(1)
+
+  let server: Awaited<ReturnType<typeof requestProcessing>> | null = null
+  try {
+    server = await requestProcessing(upload, signal)
+  } catch (e) {
+    // A limit is worth telling the user about; any other failure falls back to a drawn piece.
+    if (signal?.aborted || e instanceof RateLimitedError) throw e
+  }
+  const tags = server?.tags ?? null
+  if (tags && !tags.isGarment) throw new PhotoError('no_garment')
+  if (!tags) warnings.push('no_tags')
+  if (tags?.category === 'other') warnings.push('not_supported')
+
+  if (!server?.cutout) {
+    onStage(2)
+    const color = centreColour(pixels) ?? FALLBACK_COLOUR
+    onStage(3)
+    return { photo: null, original: upload, color, color2: null, pattern: false, tags, warnings: [...warnings, 'no_cutout'] }
+  }
+
+  onStage(2)
+  const { width: w, height: h } = pixels
+  const cut = await blobPixels(server.cutout, w, h)
+  const mask = fillSmallHoles(largestComponent(maskFromAlpha(cut), w, h), w, h, Math.round(w * h * 0.005))
+  const stats = maskStats(mask, w, h)
+  if (!stats || stats.fraction < 0.02) throw new PhotoError('no_garment')
+  if (stats.touchesEdge) warnings.push('cut_off')
+
+  // The surface is a free grey card: correct the light before reading colour.
+  const gains = backgroundGains(pixels, mask)
+  const balanced = gains ? applyGains(cut, gains) : cut
+  const colours = dominantColours(balanced, mask)
+
+  onStage(3)
+  const photo = await normaliseCutout(refineAlpha(balanced, mask), stats.angle)
+  return {
+    photo,
+    original: upload,
+    color: colours?.primary ?? FALLBACK_COLOUR,
+    color2: colours?.secondary ?? null,
+    pattern: colours?.pattern ?? tags?.pattern ?? false,
+    tags,
+    warnings,
   }
 }

@@ -1,5 +1,5 @@
 import { toneIndex } from './tones'
-import type { Item, SavedLook } from './types'
+import type { Item } from './types'
 
 type SeedItem = Omit<Item, 'tone'> & { tone: string }
 
@@ -19,12 +19,5 @@ const seed: SeedItem[] = [
   { id: 'b6', cat: 'bottom', name: 'Cords', kind: 'jeans', color: '#5c3a26', colorName: 'Chocolate', fabric: 'Corduroy', tone: 'Dark Autumn', f: 2, w: 3, wears: 4 },
 ]
 
-/** A starter wardrobe so the app has something on the line before the first scan. */
-export const SEED_ITEMS: Item[] = seed.map((it) => ({ ...it, tone: toneIndex(it.tone) }))
-
-export const SEED_SAVED: SavedLook[] = [
-  { id: 's1', topId: 't3', botId: 'b5', occ: 'Today' },
-  { id: 's2', topId: 't1', botId: 'b4', occ: 'Holiday party' },
-]
-
-export const SEED_OUTFIT = { topId: 't4', botId: 'b2' }
+/** A sample wardrobe for tests (the app itself starts empty). */
+export const FIXTURE_ITEMS: Item[] = seed.map((it) => ({ ...it, tone: toneIndex(it.tone) }))

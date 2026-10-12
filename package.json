@@ -6,15 +6,18 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "oxlint",
+    "start": "node server/index.ts",
     "preview": "vite preview",
     "test": "vitest run",
+    "lint": "oxlint",
     "typecheck": "tsc -b"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.133.0",
     "@phosphor-icons/react": "^2.1.10",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
@@ -25,5 +28,8 @@
     "typescript": "~6.0.2",
     "vite": "^8.3.0",
     "vitest": "^5.0.4"
+  },
+  "engines": {
+    "node": ">=22.18"
   }
 }

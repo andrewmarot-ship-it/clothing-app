@@ -21,8 +21,20 @@ export interface Item {
   /** Warmth, 1 light … 3 warm. */
   w: number
   wears: number
-  /** Cut-out image (data URL or remote URL). */
+  /** Second colour, when the garment has one (stripes, prints). */
+  color2?: string
+  pattern?: boolean
+  /** Key of the stored cut-out image (see state/photos.ts). */
+  photoId?: string
+  /** Key of the stored original photo, kept so items can be reprocessed. */
+  originalId?: string
+  /**
+   * Display URL for the garment image. Resolved at runtime from photoId; a
+   * stored data URL here is a pre-cut-out photo from an older version.
+   */
   photo?: string
+  /** True when `photo` is a transparent cut-out rather than a raw photo. */
+  cutout?: boolean
 }
 
 /** An item scored against the user's tone. */

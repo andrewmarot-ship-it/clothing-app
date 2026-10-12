@@ -6,7 +6,7 @@ import type { DressCode } from '../domain/types'
 import { useApp } from '../state/context'
 
 export function Occasion() {
-  const { state, set, go, userTone, rated } = useApp()
+  const { state, set, go, userTone, hasTone, rated, top, bot } = useApp()
   const occ = occasionFor(state.occKey, state.occText)
   const code = state.code ?? occ.code
 
@@ -71,12 +71,16 @@ export function Occasion() {
         </div>
       </div>
       <div className="pad top-8 stack-3">
-        <button type="button" className="btn btn-primary btn-block btn-tall glow" onClick={() => go('match', { lookI: 0 })}>
+        <button type="button" className="btn btn-primary btn-block btn-tall glow" disabled={!top || !bot} onClick={() => go('match', { lookI: 0 })}>
           <Sparkle size={16} />
           Find my outfit
         </button>
         <span className="hint">
-          Uses your {TONES[userTone].name} profile and the {rated.length} pieces you own
+          {!top || !bot
+            ? 'Add at least one top and one bottom to get a match'
+            : hasTone
+              ? `Uses your ${TONES[userTone].name} profile and the ${rated.length} pieces you own`
+              : `Uses the ${rated.length} pieces you own. Find your tone on Profile to match on colour too`}
         </span>
       </div>
     </>

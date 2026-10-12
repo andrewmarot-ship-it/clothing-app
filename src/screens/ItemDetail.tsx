@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { PencilSimple } from '@phosphor-icons/react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { BackRow, Dots, Kicker } from '../components/Chrome'
 import { Garment, Line, Pins } from '../components/Garment'
 import { itemMatch } from '../components/match'
@@ -8,10 +9,22 @@ import { TONES } from '../domain/tones'
 import { useApp } from '../state/context'
 
 export function ItemDetail() {
-  const { state, go, set, byId, rated } = useApp()
+  const { state, go, byId, rated, removeItem } = useApp()
   const item = byId(state.itemId)
   const backTo = state.from === 'outfit' ? 'outfit' : 'wardrobe'
-  const back = <BackRow label={backTo === 'outfit' ? 'Outfit' : 'Wardrobe'} onBack={() => go(backTo)} />
+  const [confirming, setConfirming] = useState(false)
+  useEffect(() => {
+    if (!confirming) return
+    const t = setTimeout(() => setConfirming(false), 4000)
+    return () => clearTimeout(t)
+  }, [confirming])
+  const editButton = item && (
+    <button type="button" className="btn btn-ghost back-edit" onClick={() => go('edit', { itemId: item.id })}>
+      <PencilSimple size={14} />
+      Edit
+    </button>
+  )
+  const back = <BackRow label={backTo === 'outfit' ? 'Outfit' : 'Wardrobe'} onBack={() => go(backTo)} right={editButton} />
 
   if (!item) {
     return (
@@ -24,24 +37,25 @@ export function ItemDetail() {
 
   const m = itemMatch(item)
   const partners = bestPartners(item, rated, PRESETS.today)
-  const isLast = !rated.some((i) => i.id !== item.id && i.cat === item.cat)
+  const lastWorn = state.wearLog
+    .filter((w) => w.topId === item.id || w.botId === item.id)
+    .reduce<string | null>((latest, w) => (!latest || w.date > latest ? w.date : latest), null)
+  const lastWornLabel = lastWorn ? new Date(`${lastWorn}T12:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : null
 
+  // Removing deletes the photo too, so it takes a second tap to confirm.
   const remove = () => {
-    if (isLast) return
-    set((s) => ({
-      items: s.items.filter((i) => i.id !== item.id),
-      saved: s.saved.filter((l) => l.topId !== item.id && l.botId !== item.id),
-    }))
+    if (!confirming) return setConfirming(true)
+    removeItem(item.id)
     go('wardrobe')
   }
 
-  const attrs: { k: string; v: ReactNode; swatch?: string; dots?: [number, number] }[] = [
-    { k: 'Colour', v: item.colorName, swatch: item.color },
+  const attrs: { k: string; v: ReactNode; swatch?: string; swatch2?: string; dots?: [number, number] }[] = [
+    { k: 'Colour', v: item.pattern ? `${item.colorName} · patterned` : item.colorName, swatch: item.color, swatch2: item.color2 },
     { k: 'Tone', v: TONES[item.tone].name },
     { k: 'Fabric', v: item.fabric },
     { k: 'Formality', v: CODES[item.f - 1], dots: [item.f, 4] },
     { k: 'Warmth', v: ['Light', 'Mid', 'Warm'][item.w - 1], dots: [item.w, 3] },
-    { k: 'Worn', v: item.wears ? `${item.wears} times` : 'Not yet' },
+    { k: 'Worn', v: item.wears ? `${item.wears} ${item.wears === 1 ? 'time' : 'times'}${lastWornLabel ? ` · last ${lastWornLabel}` : ''}` : 'Not yet' },
   ]
 
   return (
@@ -69,36 +83,33 @@ export function ItemDetail() {
             <span className="kv-key">{a.k}</span>
             <span className="row gap-3">
               {a.swatch && <span className="swatch-sm" style={{ background: a.swatch }} />}
+              {a.swatch2 && <span className="swatch-sm" style={{ background: a.swatch2 }} />}
               <span>{a.v}</span>
               {a.dots && <Dots n={a.dots[0]} max={a.dots[1]} />}
             </span>
           </div>
         ))}
       </div>
-      <div className="pad top-6 stack-3">
-        <Kicker>Goes with</Kicker>
-        <div className="grid-3">
-          {partners.map((p) => {
-            const other = item.cat === 'top' ? p.b : p.t
-            return (
-              <button key={other.id} type="button" className="card partner" onClick={() => go('outfit', { topId: p.t.id, botId: p.b.id })}>
-                <Garment item={other} stroke={1.5} shade={false} align="center" className="partner-img" />
-                <span className="partner-name">{other.name}</span>
-                <span className="meta">Fit {toneFit(p.t, p.b)}</span>
-              </button>
-            )
-          })}
+      {partners.length > 0 && (
+        <div className="pad top-6 stack-3">
+          <Kicker>Goes with</Kicker>
+          <div className="grid-3">
+            {partners.map((p) => {
+              const other = item.cat === 'top' ? p.b : p.t
+              return (
+                <button key={other.id} type="button" className="card partner" onClick={() => go('outfit', { topId: p.t.id, botId: p.b.id })}>
+                  <Garment item={other} stroke={1.5} shade={false} align="center" className="partner-img" />
+                  <span className="partner-name">{other.name}</span>
+                  <span className="meta">Fit {toneFit(p.t, p.b)}</span>
+                </button>
+              )
+            })}
+          </div>
         </div>
-      </div>
+      )}
       <div className="pad top-6 actions-item">
-        <button
-          type="button"
-          className="btn btn-ghost btn-tall btn-quiet"
-          onClick={remove}
-          disabled={isLast}
-          title={isLast ? `You need at least one ${item.cat} on the line` : undefined}
-        >
-          Remove
+        <button type="button" className={`btn btn-ghost btn-tall ${confirming ? 'btn-danger' : 'btn-quiet'}`} onClick={remove}>
+          {confirming ? 'Tap again to remove' : 'Remove'}
         </button>
         <button type="button" className="btn btn-primary btn-tall" onClick={() => go('outfit', item.cat === 'top' ? { topId: item.id } : { botId: item.id })}>
           Put on the line

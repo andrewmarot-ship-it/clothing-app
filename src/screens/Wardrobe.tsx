@@ -29,7 +29,7 @@ function Row({ it, onOpen }: { it: RatedItem; onOpen: () => void }) {
 }
 
 export function Wardrobe() {
-  const { state, set, rated, tops, bots, openItem } = useApp()
+  const { state, set, go, rated, tops, bots, openItem } = useApp()
   const f = state.filter
 
   let groups: { label: string; rows: RatedItem[] }[]
@@ -59,14 +59,24 @@ export function Wardrobe() {
           {rated.length} pieces · {tops.length} tops · {bots.length} bottoms
         </span>
       </header>
-      <div className="pad top-6 chips">
-        {FILTERS.map(([v, label]) => (
-          <button key={v} type="button" aria-pressed={f === v} className={`btn btn-sm ${f === v ? 'btn-primary' : 'btn-ghost'}`} onClick={() => set({ filter: v })}>
-            {label}
+      {rated.length === 0 && (
+        <div className="pad top-8 stack-4">
+          <p className="muted body-13 pretty">Nothing on the line yet. Lay a piece flat on a plain surface, take a photo, and it lands here.</p>
+          <button type="button" className="btn btn-primary btn-tall" onClick={() => go('add')}>
+            Add your first piece
           </button>
-        ))}
-      </div>
-      {groups.map((g) => (
+        </div>
+      )}
+      {rated.length > 0 && (
+        <div className="pad top-6 chips">
+          {FILTERS.map(([v, label]) => (
+            <button key={v} type="button" aria-pressed={f === v} className={`btn btn-sm ${f === v ? 'btn-primary' : 'btn-ghost'}`} onClick={() => set({ filter: v })}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+      {groups.filter((g) => g.rows.length).map((g) => (
         <section key={g.label} className="pad top-6 col">
           <div className="group-head kicker">
             <span>{g.label}</span>
@@ -85,7 +95,7 @@ export function Wardrobe() {
           </button>
         </div>
       )}
-      {f === 'tone' && groups.length === 0 && (
+      {f === 'tone' && rated.length > 0 && groups.length === 0 && (
         <p className="pad top-4 muted">
           <Kicker>Nothing in or near your tone yet</Kicker>
         </p>
