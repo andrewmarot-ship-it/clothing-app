@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
 import { z } from 'zod'
-import { ProviderError, type Image } from './handler.js'
+import { ProviderError, type Image } from './handler.ts'
 
 /** Cheap and fast is right for tagging; set TAG_MODEL to try a bigger model. */
 const MODEL = process.env.TAG_MODEL || 'claude-haiku-5-5'

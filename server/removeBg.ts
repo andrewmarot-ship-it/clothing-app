@@ -1,4 +1,4 @@
-import { ProviderError, type Image } from './handler.js'
+import { ProviderError, type Image } from './handler.ts'
 
 const ENDPOINT = 'https://api.remove.bg/v1.0/removebg'
 

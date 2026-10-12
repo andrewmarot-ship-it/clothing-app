@@ -1,4 +1,4 @@
-import { normaliseTags, type GarmentTags } from '../../src/domain/tags.js'
+import { normaliseTags, type GarmentTags } from '../src/domain/tags.ts'
 
 export interface Image {
   bytes: Uint8Array
@@ -20,7 +20,7 @@ export interface ProcessPhotoResponse {
   errors: string[]
 }
 
-/** Vercel's request body limit is 4.5MB; the client sends ≤1024px JPEGs, far below this. */
+/** The client sends ≤1024px JPEGs (well under 1MB); anything near this is not from the app. */
 export const MAX_BYTES = 4 * 1024 * 1024
 const TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
 

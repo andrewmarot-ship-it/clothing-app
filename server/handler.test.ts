@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import { normaliseTags } from '../../src/domain/tags.js'
-import { MAX_BYTES, ProviderError, createHandler, type ProcessPhotoResponse, type Providers } from './handler.js'
+import { normaliseTags } from '../src/domain/tags.ts'
+import { MAX_BYTES, ProviderError, createHandler, type ProcessPhotoResponse, type Providers } from './handler.ts'
 
 const PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47])
 const TAGS = { isGarment: true, category: 'top', kind: 'shirt', name: 'linen shirt', fabric: 'linen', colourName: 'cream', formality: 2, warmth: 1, pattern: false }

@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "oxlint",
+    "start": "node server/index.ts",
     "preview": "vite preview",
     "test": "vitest run",
+    "lint": "oxlint",
     "typecheck": "tsc -b"
   },
   "dependencies": {
@@ -27,5 +28,8 @@
     "typescript": "~6.0.2",
     "vite": "^8.3.0",
     "vitest": "^5.0.4"
+  },
+  "engines": {
+    "node": ">=22.18"
   }
 }
