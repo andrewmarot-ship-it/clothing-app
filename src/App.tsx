@@ -1,13 +1,11 @@
 import { useCallback, useState, type JSX } from 'react'
-import { TabBar } from './components/Chrome'
+import { Dock } from './components/Chrome'
 import { SvgDefs } from './components/Garment'
 import { AddPiece } from './screens/AddPiece'
 import { EditItem } from './screens/EditItem'
 import { ItemDetail } from './screens/ItemDetail'
 import { Looks } from './screens/Looks'
-import { Match } from './screens/Match'
-import { Occasion } from './screens/Occasion'
-import { Outfit } from './screens/Outfit'
+import { Stage } from './screens/Stage'
 import { Profile } from './screens/Profile'
 import { Quiz } from './screens/Quiz'
 import { Tones } from './screens/Tones'
@@ -19,13 +17,11 @@ import { useThemePref } from './state/theme'
 import { shouldWelcome } from './state/welcome'
 
 const SCREENS: Record<Screen, () => JSX.Element> = {
-  outfit: Outfit,
+  outfit: Stage,
   wardrobe: Wardrobe,
   add: AddPiece,
   looks: Looks,
   profile: Profile,
-  occasion: Occasion,
-  match: Match,
   item: ItemDetail,
   edit: EditItem,
   quiz: Quiz,
@@ -42,10 +38,10 @@ function Shell() {
   const isTab = TABS.includes(state.screen as Tab)
   return (
     <div className="page">
-      <main className={`app ${isTab ? 'has-tabs' : ''}`}>
+      <main className={`app ${isTab ? 'has-tabs' : ''} ${state.screen === 'outfit' ? 'is-stage' : ''}`}>
         <Current key={state.screen} />
       </main>
-      {isTab && <TabBar />}
+      {isTab && !state.sheet && <Dock />}
     </div>
   )
 }

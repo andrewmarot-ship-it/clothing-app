@@ -1,6 +1,7 @@
 import { colourDistance, oklch } from './color.ts'
 import type { Occasion } from './occasions.ts'
 import { TONES, matchOf, type Tone } from './tones.ts'
+import type { BodyPref } from './categories.ts'
 import type { Item, Match, MatchSource, RatedItem } from './types.ts'
 
 const FIT: Record<Match, number> = { in: 100, near: 72, out: 38 }
@@ -53,11 +54,11 @@ export function scoreLook(t: RatedItem, b: RatedItem | null, occ: Occasion, code
   if (code >= 3 && Math.max(...fs) < code) form -= 0.5
   if (code <= 1 && Math.min(...fs) > 2) form -= 0.3
   const warm = 1 - Math.abs(Math.max(...pieces.map((p) => p.w)) - occ.warmth) / 2
-  // Contrast is between two pieces; a dress sits in the middle.
-  const dl = b ? Math.abs(t.L - b.L) : 0
+  // A dress covers the face, so its tone counts in full; some occasions suit a dress more than others.
+  if (!b) return tone * 0.5 + form * 0.35 + warm * 0.15 + occ.dressBias
+  const dl = Math.abs(t.L - b.L)
   const con =
-    !b ? 0.75
-    : occ.contrast === 'high' ? Math.min(1, dl / 0.35)
+    occ.contrast === 'high' ? Math.min(1, dl / 0.35)
     : occ.contrast === 'medium' ? 1 - Math.abs(dl - 0.2) / 0.3
     : dl > 0.08 && dl < 0.4 ? 1 : 0.5
   return tone * 0.45 + form * 0.35 + warm * 0.15 + con * 0.05
@@ -74,13 +75,13 @@ export interface Pair extends Look {
   b: RatedItem
 }
 
-/** Every top × bottom pair and every dress, best first. */
-export function rankLooks(items: RatedItem[], occ: Occasion, code: number, limit = 5): Look[] {
+/** Top × bottom pairs and/or dresses, best first. `shape` limits the looks to one outfit shape. */
+export function rankLooks(items: RatedItem[], occ: Occasion, code: number, limit = 5, shape: BodyPref = 'auto'): Look[] {
   const tops = items.filter((i) => i.cat === 'top')
   const bots = items.filter((i) => i.cat === 'bottom')
   const out: Look[] = []
-  for (const t of tops) for (const b of bots) out.push({ t, b, score: scoreLook(t, b, occ, code) })
-  for (const d of items) if (d.cat === 'dress') out.push({ t: d, b: null, score: scoreLook(d, null, occ, code) })
+  if (shape !== 'dress') for (const t of tops) for (const b of bots) out.push({ t, b, score: scoreLook(t, b, occ, code) })
+  if (shape !== 'separates') for (const d of items) if (d.cat === 'dress') out.push({ t: d, b: null, score: scoreLook(d, null, occ, code) })
   return out.sort((a, b) => b.score - a.score).slice(0, limit)
 }
 
@@ -98,7 +99,12 @@ export function bestPartners(item: RatedItem, items: RatedItem[], everyday: Occa
     .slice(0, limit)
 }
 
-export const lookTitle = (t: Item, b: Item | null) => (b ? `${t.colorName} & ${b.colorName.toLowerCase()}` : t.name)
+/** "Cream & slate" for separates; "Camel wrap dress" for a dress (its colour leads, unless the name already says it). */
+export function lookTitle(t: Item, b: Item | null): string {
+  if (b) return `${t.colorName} & ${b.colorName.toLowerCase()}`
+  const name = t.name.toLowerCase()
+  return name.includes(t.colorName.toLowerCase()) ? t.name : `${t.colorName} ${name}`
+}
 
 export interface Reason {
   k: 'Occasion' | 'Tone' | 'Weather'
@@ -137,12 +143,12 @@ export function describe(t: RatedItem, b: RatedItem | null, occ: Occasion, code:
 }
 
 function pieceToneText(d: RatedItem, T: Tone): string {
-  if (d.match === 'in') return `${d.colorName} sits in your ${T.name} palette, head to toe.`
+  if (d.match === 'in') return `${d.colorName} is core ${T.name}: one piece, head to hem, in your palette.`
   if (d.match === 'near')
     return d.matchSource === 'tone'
-      ? `${d.colorName} borrows from ${TONES[d.tone].name}, next door to ${T.name}, so it still flatters.`
-      : `You rate ${d.colorName.toLowerCase()} close enough to ${T.name} to work.`
-  return `${d.colorName} sits outside your tone. Wear an in-tone scarf or necklace near your face.`
+      ? `${d.colorName} borrows from ${TONES[d.tone].name} next door, so it still flatters. Keep an in-tone scarf or earrings near your face.`
+      : `You rate ${d.colorName.toLowerCase()} close enough to ${T.name} to work. Keep an in-tone scarf or earrings near your face.`
+  return `${d.colorName} sits outside your tone. It works for the occasion, but put an in-tone piece near your face.`
 }
 
 function pairToneText(t: RatedItem, b: RatedItem, T: Tone): string {

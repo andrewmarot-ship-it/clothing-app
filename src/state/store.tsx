@@ -7,7 +7,7 @@ import { isCategory, migrateDress } from '../domain/tags'
 import { DEFAULT_TONE, TONES, toneIndex } from '../domain/tones'
 import type { Item } from '../domain/types'
 import { Ctx, today, type AppContext, type AppState, type Images, type Wear } from './context'
-import { currentOutfit, hangPatch } from './outfit'
+import { currentOutfit, hangPatch, lookPatch, migratePicks } from './outfit'
 import { deletePhotos, getPhoto, putPhoto } from './photos'
 import { useCloudSync } from './useCloudSync'
 
@@ -17,10 +17,10 @@ const STORAGE_KEY = 'clothesline-app-v1'
 const DATA_VERSION = 2
 
 /** The part of the state that survives a reload. */
-type Persisted = Pick<AppState, 'tone' | 'items' | 'saved' | 'topId' | 'botId' | 'wearLog' | 'myColours' | 'deleted' | 'profileUpdatedAt'> & { v?: number }
+type Persisted = Pick<AppState, 'tone' | 'items' | 'saved' | 'topId' | 'botId' | 'dressId' | 'shape' | 'bodyPref' | 'wearLog' | 'myColours' | 'deleted' | 'profileUpdatedAt'> & { v?: number }
 
 /** Fields that make up the synced profile record; changing any of them stamps profileUpdatedAt. */
-const PROFILE_KEYS = ['tone', 'myColours', 'saved', 'wearLog', 'topId', 'botId'] as const
+const PROFILE_KEYS = ['tone', 'myColours', 'saved', 'wearLog', 'topId', 'botId', 'dressId', 'shape', 'bodyPref'] as const
 
 /** Pieces from the old built-in demo wardrobe, cleared out of existing browsers. */
 const LEGACY_DEMO = /^[tb][1-7]$/
@@ -38,6 +38,9 @@ function blankState(): AppState {
     items: [],
     topId: null,
     botId: null,
+    dressId: null,
+    shape: 'separates',
+    bodyPref: 'auto',
     saved: [],
     wearLog: [],
     myColours: [],
@@ -51,6 +54,7 @@ function blankState(): AppState {
     occAi: null,
     code: null,
     lookI: 0,
+    sheet: null,
     quizStep: 0,
     quiz: [null, null, null],
   }
@@ -78,8 +82,16 @@ function initialState(): AppState {
       myColours: Array.isArray(p.myColours) ? p.myColours.filter((c) => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c)) : [],
       deleted: p.deleted && typeof p.deleted === 'object' ? p.deleted : {},
       profileUpdatedAt: typeof p.profileUpdatedAt === 'number' ? p.profileUpdatedAt : 0,
-      topId: p.topId && ids.has(p.topId) ? p.topId : null,
-      botId: p.botId && ids.has(p.botId) ? p.botId : null,
+      ...migratePicks(
+        {
+          topId: p.topId && ids.has(p.topId) ? p.topId : null,
+          botId: p.botId && ids.has(p.botId) ? p.botId : null,
+          dressId: p.dressId && ids.has(p.dressId) ? p.dressId : null,
+          shape: p.shape === 'dress' ? 'dress' : 'separates',
+        },
+        items,
+      ),
+      bodyPref: p.bodyPref === 'separates' || p.bodyPref === 'dress' ? p.bodyPref : 'auto',
     }
   } catch {
     return base
@@ -110,15 +122,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [update],
   )
 
-  const { tone, items, saved, topId, botId, wearLog, myColours, deleted, profileUpdatedAt } = state
+  const { tone, items, saved, topId, botId, dressId, shape, bodyPref, wearLog, myColours, deleted, profileUpdatedAt } = state
   useEffect(() => {
-    const data: Persisted = { v: DATA_VERSION, tone, items, saved, topId, botId, wearLog, myColours, deleted, profileUpdatedAt }
+    const data: Persisted = { v: DATA_VERSION, tone, items, saved, topId, botId, dressId, shape, bodyPref, wearLog, myColours, deleted, profileUpdatedAt }
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
     } catch {
       // Storage full or unavailable: the session still works, it just won't persist.
     }
-  }, [tone, items, saved, topId, botId, wearLog, myColours, deleted, profileUpdatedAt])
+  }, [tone, items, saved, topId, botId, dressId, shape, bodyPref, wearLog, myColours, deleted, profileUpdatedAt])
 
   // Stored images → object URLs for display. Items keep only the storage key.
   const [urls, setUrls] = useState<Record<string, string>>({})
@@ -198,6 +210,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           saved: catChanged ? s.saved.filter((l) => l.topId !== id && l.botId !== id) : s.saved,
           topId: catChanged && s.topId === id ? null : s.topId,
           botId: catChanged && s.botId === id ? null : s.botId,
+          dressId: catChanged && s.dressId === id ? null : s.dressId,
         }
       })
     },
@@ -216,6 +229,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         wearLog: s.wearLog.filter((w) => w.topId !== id && w.botId !== id),
         topId: s.topId === id ? null : s.topId,
         botId: s.botId === id ? null : s.botId,
+        dressId: s.dressId === id ? null : s.dressId,
       }
     })
   }, [update])
@@ -295,7 +309,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       tops,
       bots,
       dresses,
-      outfit: currentOutfit(rated, state.topId, state.botId),
+      outfit: currentOutfit(rated, state),
       byId,
       isSaved: (t, b) => !!find(t, b),
       toggleSaved: (t, b, occ) =>
@@ -307,6 +321,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         }),
       openItem: (id) => go('item', { itemId: id }),
       hang: (id) => set((s) => hangPatch(s, id)),
+      wear: (t, b) => set(lookPatch(t, b)),
       addItem,
       updateItem,
       removeItem,

@@ -18,6 +18,8 @@ export interface Occasion {
   contrast?: 'high' | 'medium'
   /** One-line summary used in the reason copy. */
   line: string
+  /** Added to a dress's score: some occasions suit a dress more than others. */
+  dressBias: number
   /** Accessories: [name, colour]. */
   finish: [string, string][]
 }
@@ -28,17 +30,28 @@ export type OccasionKey = PresetKey | 'custom'
 export const CODES = ['Casual', 'Smart', 'Dressy', 'Formal'] as const
 
 export const PRESETS: Record<PresetKey, Occasion> = {
-  today: { label: 'Today', code: 1, when: 'Today · daytime', setting: 'Out and about', weather: '', warmth: 2, indoor: false, time: 'daytime', date: null, line: 'An easy everyday look.', finish: [['White trainers', '#e3d3b8'], ['Canvas tote', '#c9a27e']] },
-  holiday: { label: 'Holiday party', code: 3, when: 'Evening', setting: 'Indoors, standing, then a bar', weather: '', warmth: 2, indoor: true, time: 'evening', date: null, line: 'Dressed up enough for a party, relaxed enough for a work crowd.', finish: [['Gold hoops', '#c9a24a'], ['Tan ankle boots', '#a67b5b'], ['Bronze lip', '#9c5a44']] },
-  thanksgiving: { label: 'Thanksgiving', code: 2, when: 'Afternoon into evening', setting: 'Indoors, long sit-down meal', weather: '', warmth: 3, indoor: true, time: 'daytime', date: null, line: 'Smart-casual for a long table: comfortable, warm and photo-ready.', finish: [['Suede loafers', '#8a5a3b'], ['Knit scarf', '#b5735a'], ['Gold studs', '#c9a24a']] },
-  garden: { label: 'Botanical garden walk', code: 1, when: 'Daytime', setting: 'Outdoors, lots of walking', weather: '', warmth: 1.5, indoor: false, time: 'daytime', date: null, line: 'Easy to move in for a couple of hours on your feet.', finish: [['White trainers', '#e3d3b8'], ['Woven tote', '#c9a27e'], ['Sage scarf', '#8f9a6e']] },
-  night: { label: 'Night out with the girls', code: 3, when: 'Late evening', setting: 'Bars, maybe dancing', weather: '', warmth: 1.5, indoor: true, time: 'late', date: null, contrast: 'high', line: 'A bit of shine and contrast for later in the evening.', finish: [['Heeled boots', '#3e2b22'], ['Statement earrings', '#c9a24a'], ['Cropped jacket', '#5c3a26']] },
-  date: { label: 'Date night', code: 3, when: 'Evening', setting: 'Dinner', weather: '', warmth: 2, indoor: true, time: 'evening', date: null, line: 'Polished without looking like you tried too hard.', finish: [['Fine gold chain', '#c9a24a'], ['Block heels', '#5c3a26']] },
-  interview: { label: 'Interview', code: 3, when: 'Morning', setting: 'Office', weather: '', warmth: 2, indoor: true, time: 'morning', date: null, contrast: 'medium', line: 'Clean lines and quiet colour so the focus stays on you.', finish: [['Leather loafers', '#5c3a26'], ['Structured bag', '#a67b5b']] },
+  today: { label: 'Today', code: 1, when: 'Today · daytime', setting: 'Out and about', weather: '', warmth: 2, indoor: false, time: 'daytime', date: null, line: 'An easy everyday look.', dressBias: 0, finish: [['White trainers', '#e3d3b8'], ['Canvas tote', '#c9a27e']] },
+  holiday: { label: 'Holiday party', code: 3, when: 'Evening', setting: 'Indoors, standing, then a bar', weather: '', warmth: 2, indoor: true, time: 'evening', date: null, line: 'Dressed up enough for a party, relaxed enough for a work crowd.', dressBias: 0.04, finish: [['Gold hoops', '#c9a24a'], ['Tan ankle boots', '#a67b5b'], ['Bronze lip', '#9c5a44']] },
+  thanksgiving: { label: 'Thanksgiving', code: 2, when: 'Afternoon into evening', setting: 'Indoors, long sit-down meal', weather: '', warmth: 3, indoor: true, time: 'daytime', date: null, line: 'Smart-casual for a long table: comfortable, warm and photo-ready.', dressBias: -0.02, finish: [['Suede loafers', '#8a5a3b'], ['Knit scarf', '#b5735a'], ['Gold studs', '#c9a24a']] },
+  garden: { label: 'Botanical garden walk', code: 1, when: 'Daytime', setting: 'Outdoors, lots of walking', weather: '', warmth: 1.5, indoor: false, time: 'daytime', date: null, line: 'Easy to move in for a couple of hours on your feet.', dressBias: -0.02, finish: [['White trainers', '#e3d3b8'], ['Woven tote', '#c9a27e'], ['Sage scarf', '#8f9a6e']] },
+  night: { label: 'Night out with the girls', code: 3, when: 'Late evening', setting: 'Bars, maybe dancing', weather: '', warmth: 1.5, indoor: true, time: 'late', date: null, contrast: 'high', line: 'A bit of shine and contrast for later in the evening.', dressBias: 0.04, finish: [['Heeled boots', '#3e2b22'], ['Statement earrings', '#c9a24a'], ['Cropped jacket', '#5c3a26']] },
+  date: { label: 'Date night', code: 3, when: 'Evening', setting: 'Dinner', weather: '', warmth: 2, indoor: true, time: 'evening', date: null, line: 'Polished without looking like you tried too hard.', dressBias: 0.04, finish: [['Fine gold chain', '#c9a24a'], ['Block heels', '#5c3a26']] },
+  interview: { label: 'Interview', code: 3, when: 'Morning', setting: 'Office', weather: '', warmth: 2, indoor: true, time: 'morning', date: null, contrast: 'medium', line: 'Clean lines and quiet colour so the focus stays on you.', dressBias: 0, finish: [['Leather loafers', '#5c3a26'], ['Structured bag', '#a67b5b']] },
 }
 
 /** Quick-pick chips on the Occasion screen. */
-export const CHIPS: PresetKey[] = ['holiday', 'thanksgiving', 'garden', 'night', 'date', 'interview']
+export const CHIPS: PresetKey[] = ['holiday', 'thanksgiving', 'night', 'garden', 'date', 'interview']
+
+/** Short chip labels for the Stage and Cast. */
+export const CHIP_LABELS: Record<PresetKey, string> = {
+  today: 'Today',
+  holiday: 'Holiday party',
+  thanksgiving: 'Thanksgiving',
+  night: 'Girls’ night',
+  garden: 'Garden walk',
+  date: 'Date night',
+  interview: 'Interview',
+}
 
 /** Keyword lists, checked in order. */
 const KEYWORDS: [PresetKey, string[]][] = [
@@ -134,6 +147,7 @@ export function occasionFromAi(raw: unknown, typed: string, today: string): Occa
     date,
     contrast: r.contrast === 'high' || r.contrast === 'medium' ? r.contrast : undefined,
     line: text(r.line, 140) || 'Smart-casual is the safe middle ground here.',
+    dressBias: 0,
     finish: finish.length ? finish : PRESETS.today.finish,
   }
 }

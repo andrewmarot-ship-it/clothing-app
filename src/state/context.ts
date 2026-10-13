@@ -1,11 +1,12 @@
 import { createContext, useContext } from 'react'
+import type { BodyPref, Shape } from '../domain/categories'
 import type { Occasion, OccasionKey } from '../domain/occasions'
 import type { QuizAnswers } from '../domain/quiz'
 import type { DressCode, Item, RatedItem, SavedLook } from '../domain/types'
 import type { CloudState } from './useCloudSync'
 
 export type Tab = 'outfit' | 'wardrobe' | 'add' | 'looks' | 'profile'
-export type Screen = Tab | 'occasion' | 'match' | 'item' | 'edit' | 'quiz' | 'tones'
+export type Screen = Tab | 'item' | 'edit' | 'quiz' | 'tones'
 export type Filter = 'all' | 'tone' | 'tops' | 'bottoms' | 'dresses'
 
 export const TABS: Tab[] = ['outfit', 'wardrobe', 'add', 'looks', 'profile']
@@ -27,9 +28,14 @@ export interface AppState {
   /** Index into TONES; null until the user finds or picks one. */
   tone: number | null
   items: Item[]
-  /** The outfit on the line: the top or dress, and the bottom (unused while a dress is on). */
+  /** The picks on the Stage. Each shape keeps its own, so switching between them loses nothing. */
   topId: string | null
   botId: string | null
+  dressId: string | null
+  /** The outfit shape on the Stage. */
+  shape: Shape
+  /** What Cast may pick: a fixed shape, or whichever suits the occasion. */
+  bodyPref: BodyPref
   saved: SavedLook[]
   wearLog: Wear[]
   /** Colours the user says suit them; pieces close to one count as in tone. */
@@ -49,6 +55,8 @@ export interface AppState {
   /** Dress-code override; null follows the occasion. */
   code: DressCode | null
   lookI: number
+  /** A bottom sheet over the Stage; the dock hides while one is open. */
+  sheet: 'cast' | 'body' | null
   quizStep: number
   quiz: QuizAnswers
 }
@@ -87,8 +95,10 @@ export interface AppContext {
   isSaved: (topId: string, botId: string | null) => boolean
   toggleSaved: (topId: string, botId: string | null, occ: string) => void
   openItem: (id: string) => void
-  /** Put a piece on the line, swapping out whatever it replaces. */
+  /** Put a piece on the line, switching to its outfit shape. */
   hang: (id: string) => void
+  /** Wear a look: a top and bottom, or a dress (no bottom). */
+  wear: (topId: string, botId: string | null) => void
   /** Add a piece, storing its images, and hang it on the line. */
   addItem: (item: Item, images: Images) => void
   /** Change a piece; new images replace (and delete) the old ones. */

@@ -12,7 +12,7 @@ import { useApp } from '../state/context'
 import { glowFill, useGlowPref } from '../state/theme'
 
 export function ItemDetail() {
-  const { state, go, hang, byId, rated, removeItem } = useApp()
+  const { state, go, hang, wear, byId, rated, removeItem } = useApp()
   const item = byId(state.itemId)
   const backTo = state.from === 'outfit' ? 'outfit' : 'wardrobe'
   const [confirming, setConfirming] = useState(false)
@@ -97,7 +97,10 @@ export function ItemDetail() {
             {partners.map((p) => {
               const other = item.cat === 'top' ? p.b : p.t
               return (
-                <button key={other.id} type="button" className="card partner" onClick={() => go('outfit', { topId: p.t.id, botId: p.b.id })}>
+                <button key={other.id} type="button" className="card partner" onClick={() => {
+                  wear(p.t.id, p.b.id)
+                  go('outfit')
+                }}>
                   <Garment item={other} stroke={1.5} shade={false} align="center" fit="tight" className="partner-img" />
                   <span className="partner-name">{other.name}</span>
                   <span className="meta">Fit {toneFit(p.t, p.b)}</span>
