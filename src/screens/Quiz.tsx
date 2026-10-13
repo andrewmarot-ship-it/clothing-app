@@ -2,6 +2,7 @@ import { BackRow, Kicker } from '../components/Chrome'
 import { QUIZ, quizResult, shortlist, type QuizAnswers } from '../domain/quiz'
 import { TONES, matchOf, toneDesc } from '../domain/tones'
 import { useApp } from '../state/context'
+import { fx } from '../state/feedback'
 
 export function Quiz() {
   const { state, set, go } = useApp()
@@ -16,6 +17,7 @@ export function Quiz() {
   const answer = (value: number) => {
     const next = [...answers] as QuizAnswers
     next[step] = value
+    fx('tick')
     set({ quiz: next })
   }
   // Opened from the first-run checklist on Outfit, or from Profile.

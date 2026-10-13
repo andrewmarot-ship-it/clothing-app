@@ -1,182 +1,25 @@
-import { CaretLeft, CaretRight, Check, Sparkle } from '@phosphor-icons/react'
-import { useEffect, useRef, useState } from 'react'
-import { Garment, Line } from '../components/Garment'
+import { CaretRight, Check, Heart, MapPin, Shuffle, Sparkle } from '@phosphor-icons/react'
+import { useState } from 'react'
 import { itemMatch } from '../components/match'
-import { PRESETS } from '../domain/occasions'
+import { Rail } from '../components/Rail'
+import { PRESETS, type PresetKey } from '../domain/occasions'
 import { contrastLabel, rankLooks, toneFit } from '../domain/scoring'
-import { TONES } from '../domain/tones'
-import type { Category, RatedItem } from '../domain/types'
+import { currentLine, forecastFor, tempBars, timeOfDay, warmthFor, warmthNote } from '../domain/weather'
 import { useApp, type Outfit as Look } from '../state/context'
-import { useWeather } from '../state/weather'
-import { currentLine } from '../domain/weather'
+import { fx } from '../state/feedback'
+import { outfitColour, useGlowPref, washFill } from '../state/theme'
+import { askForLocation, useWeather } from '../state/weather'
 
-/** Piece sizes on the line. Bottoms and dresses get taller boxes because they're tall. */
-const SIZES: Record<Category, { w: number; h: number; selW: number; selH: number }> = {
-  top: { w: 64, h: 64, selW: 104, selH: 104 },
-  bottom: { w: 52, h: 72, selW: 84, selH: 120 },
-  dress: { w: 52, h: 84, selW: 84, selH: 136 },
-}
-const GAP = 14
+/** Quick-pick occasions on the home screen. */
+const HOME_CHIPS: [PresetKey, string][] = [
+  ['holiday', 'Holiday party'],
+  ['thanksgiving', 'Thanksgiving'],
+  ['night', 'Girls’ night'],
+  ['garden', 'Garden walk'],
+]
 
-/** One line of pieces. `current` is the piece being worn from this line, if any. */
-function Strip({ label, cat, list, current, onSelect }: { label: string; cat: Category; list: RatedItem[]; current: RatedItem | null; onSelect: (id: string) => void }) {
-  const n = list.length
-  const worn = list.findIndex((i) => i.id === current?.id)
-  const idx = Math.max(0, worn)
-  const size = SIZES[cat]
-  const select = (i: number) => onSelect(list[(i + n) % n].id)
-  const scroller = useRef<HTMLDivElement>(null)
-  const first = useRef(true)
-
-  // Keep the selected piece centred. The track is padded by half the view on each
-  // side, so piece i is centred exactly when the line is scrolled by i pitches.
-  useEffect(() => {
-    scroller.current?.scrollTo({ left: idx * (size.w + GAP), behavior: first.current ? 'auto' : 'smooth' })
-    first.current = false
-  }, [idx, size.w])
-
-  return (
-    <section className="strip">
-      <div className="strip-head">
-        <span className="kicker">
-          {worn >= 0 ? `${label} · ${idx + 1} / ${n}` : `${label} · ${n}`}
-        </span>
-        <div className="strip-nav">
-          <button type="button" className="btn btn-ghost btn-icon" aria-label={`Previous ${label.toLowerCase()}`} onClick={() => select(worn >= 0 ? idx - 1 : 0)} disabled={n < 2 && worn >= 0}>
-            <CaretLeft size={18} />
-          </button>
-          <button type="button" className="btn btn-ghost btn-icon" aria-label={`Next ${label.toLowerCase()}`} onClick={() => select(worn >= 0 ? idx + 1 : 0)} disabled={n < 2 && worn >= 0}>
-            <CaretRight size={18} />
-          </button>
-        </div>
-      </div>
-      <div className="strip-scroll" ref={scroller} style={{ height: size.selH + 36 }}>
-        <div className="strip-track" style={{ gap: GAP, paddingInline: `calc(50% - ${size.selW / 2}px)` }}>
-          <Line sag={10} style={{ top: 4 }} />
-          {list.map((it, i) => {
-            const sel = i === worn
-            return (
-              <button
-                key={it.id}
-                type="button"
-                aria-label={it.name}
-                aria-pressed={sel}
-                className={`hanging ${sel ? 'is-selected' : ''}`}
-                onClick={() => select(i)}
-                style={{ width: sel ? size.selW : size.w, height: sel ? size.selH : size.h }}
-              >
-                <span className="hanging-pin" />
-                <Garment item={it} stroke={1.2} className="fill" />
-                <span className={`hanging-dot match-dot--${it.match}`} />
-              </button>
-            )
-          })}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Fitting({ look }: { look: Look }) {
-  const { rated, set, isSaved, toggleSaved, openItem, wornToday, toggleWorn } = useApp()
-  const { t, b } = look
-  const fit = toneFit(t, b)
-  const saved = isSaved(t.id, b?.id ?? null)
-  const worn = wornToday(t.id, b?.id ?? null)
-  const dl = b ? Math.abs(t.L - b.L) : 0
-
-  // Any other look you could put together, dresses included.
-  const options = rankLooks(rated, PRESETS.today, 1, Infinity)
-  const shuffle = () => {
-    const others = options.filter((o) => o.t.id !== t.id || o.b?.id !== b?.id)
-    const next = others[Math.floor(Math.random() * others.length)]
-    if (next) set(next.b ? { topId: next.t.id, botId: next.b.id } : { topId: next.t.id })
-  }
-
-  return (
-    <>
-      <section className="fitting pad">
-        <div className="fitting-figure">
-          {b ? (
-            <>
-              <Garment item={t} className="fitting-top" />
-              <Garment item={b} className="fitting-bot" align="center" />
-            </>
-          ) : (
-            <Garment item={t} className="fitting-dress" align="center" />
-          )}
-        </div>
-        <div className="fitting-info">
-          {(b ? [t, b] : [t]).map((p) => {
-            const m = itemMatch(p)
-            return (
-              <button key={p.id} type="button" className="piece" onClick={() => openItem(p.id)}>
-                <span className="swatch" style={{ background: p.color }} />
-                <span className="piece-text">
-                  <span className="piece-name">{p.name}</span>
-                  <span className="muted">{TONES[p.tone].name}</span>
-                  <span style={{ color: m.color }}>{m.short}</span>
-                </span>
-              </button>
-            )
-          })}
-          <div className="meters">
-            {b && (
-              <>
-                <div className="meter-head">
-                  <span>Contrast</span>
-                  <span className="meter-val">{contrastLabel(t, b)}</span>
-                </div>
-                <div className="meter meter--contrast">
-                  <span className="meter-mark" style={{ left: `${Math.min(96, Math.round((dl / 0.6) * 100))}%` }} />
-                </div>
-              </>
-            )}
-            <div className="meter-head" style={b ? { marginTop: 'var(--space-2)' } : undefined}>
-              <span>Tone fit</span>
-              <span className="meter-val">{fit}</span>
-            </div>
-            <div className="meter">
-              <span className="meter-fill" style={{ width: `${fit}%` }} />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="actions-2 pad">
-        <button type="button" className="btn btn-secondary btn-tall" onClick={shuffle} disabled={options.length < 2}>
-          Shuffle
-        </button>
-        <button
-          type="button"
-          className="btn btn-secondary btn-tall"
-          aria-pressed={saved}
-          style={{ color: saved ? 'var(--color-accent-300)' : undefined }}
-          onClick={() => toggleSaved(t.id, b?.id ?? null, 'Today')}
-        >
-          {saved ? 'Saved ♥' : 'Save look'}
-        </button>
-      </div>
-      <div className="pad top-3">
-        <button
-          type="button"
-          className={`btn btn-block btn-tall ${worn ? 'btn-secondary worn' : 'btn-primary'}`}
-          aria-pressed={worn}
-          onClick={() => toggleWorn(t.id, b?.id ?? null)}
-        >
-          {worn ? (
-            <>
-              <Check size={16} />
-              Worn today · tap to undo
-            </>
-          ) : (
-            'I wore this today'
-          )}
-        </button>
-      </div>
-    </>
-  )
-}
+/** Circumference of the tone-fit ring (r = 34). */
+const RING = 2 * Math.PI * 34
 
 /** First-run checklist: a tone, then something to wear: a top and a bottom, or a dress. */
 function Setup() {
@@ -189,7 +32,7 @@ function Setup() {
   ]
   const fresh = !steps.some((st) => st.done)
   return (
-    <section className="pad top-6">
+    <section className="pad top-6 rel">
       <div className="card setup">
         <span className="card-kicker">{fresh ? 'Welcome to Clothesline' : 'Almost there'}</span>
         <span className="setup-title">{fresh ? `Set up your line in ${steps.length} steps` : 'Finish setting up to start matching'}</span>
@@ -214,41 +57,251 @@ function Setup() {
   )
 }
 
-export function Outfit() {
-  const { go, hang, tops, bots, dresses, outfit, userTone, hasTone } = useApp()
-  const weather = useWeather()
-  const [date] = useState(() => {
-    const now = new Date()
-    return `${now.toLocaleDateString('en-GB', { weekday: 'short' })} ${now.getDate()}`
-  })
-  const ready = hasTone && !!outfit
-  // Highlight what's being worn: a top and bottom, or a dress.
-  const wornTop = outfit?.b ? outfit.t : null
-  const wornDress = outfit && !outfit.b ? outfit.t : null
-
+/** The pieces being worn: swatch, name and how they suit you. Tap for details. */
+function Pieces({ look }: { look: Look }) {
+  const { openItem } = useApp()
   return (
-    <>
-      <header className="outfit-head">
-        <div className="col">
-          <h1 className="display">{date}</h1>
-          <span className="sub">
-            {weather.current ? `${currentLine(weather.current)} · ` : ''}
-            {hasTone ? TONES[userTone].name : 'Tone not set'}
-          </span>
-        </div>
-        {outfit && (
-          <button type="button" className="btn btn-primary btn-tall glow" onClick={() => go('occasion')}>
-            <Sparkle size={16} />
-            Match me
+    <div className="pad pieces rel">
+      {(look.b ? [look.t, look.b] : [look.t]).map((p) => {
+        const m = itemMatch(p)
+        return (
+          <button key={p.id} type="button" className="pieces-cell" onClick={() => openItem(p.id)}>
+            <span className="pieces-swatch" style={{ background: p.color }} />
+            <span className="col gap-1px min-0">
+              <span className="pieces-name">{p.name}</span>
+              <span style={{ color: m.color }}>{m.short}</span>
+            </span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+function FitCard({ look }: { look: Look }) {
+  const fit = toneFit(look.t, look.b)
+  return (
+    <div className="card bento-fit">
+      <svg viewBox="0 0 80 80" className="fit-ring" aria-hidden="true">
+        <circle cx="40" cy="40" r="34" className="fit-ring-track" />
+        <circle cx="40" cy="40" r="34" className="fit-ring-arc" strokeDasharray={`${(fit / 100) * RING} ${RING}`} />
+      </svg>
+      <div className="col">
+        <span className="bento-num">{fit}</span>
+        <span className="bento-cap">Tone fit</span>
+        <span className="meta">{look.b ? `${contrastLabel(look.t, look.b)} contrast` : 'One piece'}</span>
+      </div>
+    </div>
+  )
+}
+
+function WeatherCard({ look, hour, today }: { look: Look; hour: number; today: string }) {
+  const weather = useWeather()
+  if (!weather.current) {
+    const note =
+      weather.status === 'asking' || weather.status === 'loading' ? 'Getting the forecast…'
+      : weather.status === 'denied' ? 'Location is off. Allow it in your browser for weather'
+      : weather.status === 'error' ? 'Couldn’t get the forecast'
+      : null
+    return (
+      <div className="card bento-weather">
+        <span className="bento-cap">Weather</span>
+        {note ? (
+          <span className="meta">{note}</span>
+        ) : (
+          <button type="button" className="btn btn-ghost btn-sm weather-ask" onClick={askForLocation}>
+            <MapPin size={14} />
+            Add location
           </button>
         )}
+      </div>
+    )
+  }
+  const { temp, code } = weather.current
+  // Today's target warmth for this time of day; the current temperature stands in if there's no forecast.
+  const day = forecastFor(weather.days, today) ?? { date: today, tMax: temp, tMin: temp, code, rain: 0 }
+  const target = warmthFor(day, timeOfDay(hour), false)
+  const warmth = Math.max(look.t.w, look.b?.w ?? 0)
+  const words = currentLine(weather.current).replace(/^-?\d+° /, '')
+  return (
+    <div className="card bento-weather">
+      <span className="bento-num">{Math.round(temp)}°</span>
+      <span className="bento-cap">
+        {words.charAt(0).toUpperCase() + words.slice(1)} · {warmthNote(warmth, target)}
+      </span>
+      <div className="temp-bars" aria-hidden="true">
+        {tempBars(weather.hours).map((h, i) => (
+          <span key={i} style={{ height: h }} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function OccasionCard() {
+  const { go } = useApp()
+  return (
+    <div className="card bento-occasion">
+      <span className="card-kicker">Dressing for something?</span>
+      <div className="chips">
+        {HOME_CHIPS.map(([k, label]) => (
+          <button
+            key={k}
+            type="button"
+            className="tag tag-neutral tag-btn"
+            onClick={() => {
+              fx('tap')
+              go('occasion', { occKey: k, occText: PRESETS[k].label, code: null })
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <button
+        type="button"
+        className="btn btn-primary btn-block btn-tall glow"
+        onClick={() => {
+          fx('tap')
+          go('occasion')
+        }}
+      >
+        <Sparkle size={16} />
+        Match me
+      </button>
+    </div>
+  )
+}
+
+export function Outfit() {
+  const { set, hang, rated, tops, bots, dresses, outfit, hasTone, isSaved, toggleSaved, wornToday, toggleWorn } = useApp()
+  const [glow] = useGlowPref()
+  const [now] = useState(() => new Date())
+  const hour = now.getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+  const date = `${now.toLocaleDateString('en-GB', { weekday: 'short' })} ${now.getDate()}`
+
+  const t = outfit?.t
+  const b = outfit?.b ?? null
+  const saved = !!t && isSaved(t.id, b?.id ?? null)
+  const worn = !!t && wornToday(t.id, b?.id ?? null)
+  const canSeparate = tops.length > 0 && bots.length > 0
+  const wearingDress = !!outfit && !outfit.b
+
+  // Any other look you could put together, dresses included.
+  const options = rankLooks(rated, PRESETS.today, 1, Infinity)
+  const shuffle = () => {
+    const others = options.filter((o) => o.t.id !== t?.id || o.b?.id !== b?.id)
+    const next = others[Math.floor(Math.random() * others.length)]
+    if (!next) return
+    fx('tick')
+    set(next.b ? { topId: next.t.id, botId: next.b.id } : { topId: next.t.id })
+  }
+  const save = () => {
+    if (!t) return
+    fx('peg')
+    toggleSaved(t.id, b?.id ?? null, 'Today')
+  }
+
+  // Rails for what's being worn; before there's an outfit, whatever pieces exist.
+  const rails = outfit
+    ? wearingDress
+      ? [{ label: 'Dresses', list: dresses, current: outfit.t, aspect: 1.35 }]
+      : [
+          { label: 'Tops', list: tops, current: outfit.t, aspect: 1 },
+          { label: 'Bottoms', list: bots, current: outfit.b!, aspect: 1 },
+        ]
+    : [
+        { label: 'Tops', list: tops, current: tops[0], aspect: 1 },
+        { label: 'Bottoms', list: bots, current: bots[0], aspect: 1 },
+      ].filter((r) => r.list.length > 0)
+
+  return (
+    <div className="outfit">
+      <div className="outfit-wash" style={{ background: t ? washFill(glow, outfitColour(t.color, b?.color)) : 'none' }} aria-hidden="true" />
+      <header className="outfit-head rel">
+        <div className="col gap-2px">
+          <span className="meta">
+            {greeting} · {date}
+          </span>
+          <h1 className="outfit-title">What are we wearing?</h1>
+        </div>
+        <div className="row gap-1 flex-none">
+          <button type="button" className="btn btn-ghost btn-icon" aria-label="Shuffle" onClick={shuffle} disabled={options.length < 2}>
+            <Shuffle size={18} />
+          </button>
+          <button
+            type="button"
+            className={`btn btn-ghost btn-icon ${saved ? 'is-saved' : ''}`}
+            aria-label={saved ? 'Unsave look' : 'Save look'}
+            aria-pressed={saved}
+            onClick={save}
+            disabled={!t}
+          >
+            <Heart size={18} weight={saved ? 'fill' : 'regular'} />
+          </button>
+        </div>
       </header>
 
-      {!ready && <Setup />}
-      {tops.length > 0 && <Strip label="Tops" cat="top" list={tops} current={wornTop} onSelect={hang} />}
-      {bots.length > 0 && <Strip label="Bottoms" cat="bottom" list={bots} current={outfit?.b ?? null} onSelect={hang} />}
-      {dresses.length > 0 && <Strip label="Dresses" cat="dress" list={dresses} current={wornDress} onSelect={hang} />}
-      {outfit && <Fitting look={outfit} />}
-    </>
+      {!(hasTone && outfit) && <Setup />}
+
+      {canSeparate && dresses.length > 0 && (
+        <div className="pad top-4 rel">
+          <div className="seg-grid seg-grid--2" role="radiogroup" aria-label="What to wear">
+            {[
+              { label: 'Separates', on: !wearingDress, pick: () => hang(tops[0].id) },
+              { label: 'Dress', on: wearingDress, pick: () => hang(dresses[0].id) },
+            ].map((m) => (
+              <button
+                key={m.label}
+                type="button"
+                role="radio"
+                aria-checked={m.on}
+                className={`btn btn-sm ${m.on ? 'btn-primary' : 'btn-ghost'}`}
+                onClick={() => {
+                  if (m.on) return
+                  fx('tick')
+                  m.pick()
+                }}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {rails.map((r) => (
+        <Rail key={r.label} label={r.label} list={r.list} current={r.current} aspect={r.aspect} onPick={hang} />
+      ))}
+
+      {outfit && (
+        <>
+          <Pieces look={outfit} />
+          <div className="pad top-3 rel">
+            <button
+              type="button"
+              className={`btn btn-block btn-tall ${worn ? 'btn-secondary worn' : 'btn-secondary'}`}
+              aria-pressed={worn}
+              onClick={() => toggleWorn(outfit.t.id, outfit.b?.id ?? null)}
+            >
+              {worn ? (
+                <>
+                  <Check size={16} />
+                  Worn today · tap to undo
+                </>
+              ) : (
+                'I wore this today'
+              )}
+            </button>
+          </div>
+          <div className="pad top-4 bento rel">
+            <FitCard look={outfit} />
+            <WeatherCard look={outfit} hour={hour} today={now.toLocaleDateString('en-CA')} />
+            <OccasionCard />
+          </div>
+        </>
+      )}
+    </div>
   )
 }

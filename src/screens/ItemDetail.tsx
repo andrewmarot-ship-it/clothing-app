@@ -8,12 +8,14 @@ import { bestPartners, toneFit } from '../domain/scoring'
 import { CATEGORY_LABELS } from '../domain/tags'
 import { TONES } from '../domain/tones'
 import { useApp } from '../state/context'
+import { glowFill, useGlowPref } from '../state/theme'
 
 export function ItemDetail() {
   const { state, go, hang, byId, rated, removeItem } = useApp()
   const item = byId(state.itemId)
   const backTo = state.from === 'outfit' ? 'outfit' : 'wardrobe'
   const [confirming, setConfirming] = useState(false)
+  const [glow] = useGlowPref()
   useEffect(() => {
     if (!confirming) return
     const t = setTimeout(() => setConfirming(false), 4000)
@@ -62,7 +64,7 @@ export function ItemDetail() {
     <>
       {back}
       <div className="stage stage--item">
-        <div className="glow-bg" />
+        <div className="glow-bg" style={{ background: glowFill(glow, item.color, 70), opacity: 0.8 }} />
         <Line sag={22} width={1.2} style={{ top: 8 }} />
         <div className="item-figure">
           <Pins top="-3%" width="3.5%" height="9%" />

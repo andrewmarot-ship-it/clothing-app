@@ -6,7 +6,9 @@ import { Garment } from '../components/Garment'
 import type { RatedItem } from '../domain/types'
 import { TONES, chromaLabel, hueLabel, toneDesc, valueLabel, type Tone } from '../domain/tones'
 import { useApp } from '../state/context'
-import { useThemePref, type ThemePref } from '../state/theme'
+import { SwitchRow } from '../components/Switch'
+import { fx, setFeedback, useFeedback } from '../state/feedback'
+import { useGlowPref, useThemePref, type GlowPref, type ThemePref } from '../state/theme'
 
 const pos = (x: number) => `${Math.round(x * 84 + 8)}%`
 
@@ -79,6 +81,7 @@ export function Profile() {
           <CaretRight size={14} className="muted" />
         </button>
       </div>
+      <Feedback />
     </>
   )
 }
@@ -89,26 +92,69 @@ const THEMES: { value: ThemePref; label: string }[] = [
   { value: 'system', label: 'Match device' },
 ]
 
-/** Light (Linen) or dark (Nocturne). Kept on this device only. */
+const GLOWS: { value: GlowPref; label: string }[] = [
+  { value: 'tone', label: 'Your clothes' },
+  { value: 'accent', label: 'Violet' },
+  { value: 'off', label: 'Off' },
+]
+
+function Choice<T extends string>({ label, options, value, onChange }: { label: string; options: { value: T; label: string }[]; value: T; onChange: (v: T) => void }) {
+  return (
+    <div className="seg-grid seg-grid--3" role="radiogroup" aria-label={label}>
+      {options.map((o) => (
+        <button
+          key={o.value}
+          type="button"
+          role="radio"
+          aria-checked={value === o.value}
+          className={`btn ${value === o.value ? 'btn-primary' : 'btn-ghost'}`}
+          onClick={() => onChange(o.value)}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+/** Light (Linen) or dark (Nocturne), and the glow behind garments. Kept on this device only. */
 function Appearance() {
   const [theme, setTheme] = useThemePref()
+  const [glow, setGlow] = useGlowPref()
   return (
     <section className="pad top-6 stack-3">
       <span className="kicker">Appearance</span>
-      <div className="seg-grid seg-grid--3" role="radiogroup" aria-label="Appearance">
-        {THEMES.map((t) => (
-          <button
-            key={t.value}
-            type="button"
-            role="radio"
-            aria-checked={theme === t.value}
-            className={`btn ${theme === t.value ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => setTheme(t.value)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <Choice label="Appearance" options={THEMES} value={theme} onChange={setTheme} />
+      <span className="meta">Glow behind your clothes</span>
+      <Choice label="Glow" options={GLOWS} value={glow} onChange={setGlow} />
+    </section>
+  )
+}
+
+/** Sound and haptics, on this device. Turning one on plays a preview. */
+function Feedback() {
+  const { sound, haptics } = useFeedback()
+  return (
+    <section className="pad top-6 col">
+      <span className="kicker kicker-pad">Feedback</span>
+      <SwitchRow
+        label="Sound"
+        hint="Soft ticks, peg clicks, a chime on a match"
+        checked={sound}
+        onChange={(on) => {
+          setFeedback({ sound: on })
+          if (on) fx('peg', { sound: true, haptics: false })
+        }}
+      />
+      <SwitchRow
+        label="Haptics"
+        hint="Light taps as pieces snap into place"
+        checked={haptics}
+        onChange={(on) => {
+          setFeedback({ haptics: on })
+          if (on) fx('tick', { sound: false, haptics: true })
+        }}
+      />
     </section>
   )
 }

@@ -1,8 +1,10 @@
 # Clothesline
 
-A virtual wardrobe that matches outfits to your colour tone. Photograph your clothes, hang them on clotheslines (tops, bottoms and dresses), and flip through them to build outfits: a top with a bottom, or a dress on its own. Every piece is placed in one of the **TCI 12 Tones** and scored against yours. **Match me** recommends outfits for an occasion you type or pick.
+A virtual wardrobe that matches outfits to your colour tone. Photograph your clothes, hang them on closet rails (tops, bottoms and dresses), and flip through them to build outfits: a top with a bottom, or a dress on its own. Every piece is placed in one of the **TCI 12 Tones** and scored against yours. **Match me** recommends outfits for an occasion you type or pick.
 
-Mobile-first web app built with React, TypeScript and Vite, styled with the Nocturne design system. There are two themes: **Linen** (light, the default) and **Nocturne** (dark). People switch between them, or follow their device, under Profile → Appearance; the choice is kept on the device (`src/state/theme.ts`, tokens in `src/styles/nocturne.css`).
+Mobile-first web app built with React, TypeScript and Vite, styled with the Nocturne design system. There are two themes: **Linen** (light, the default) and **Nocturne** (dark). People switch between them, or follow their device, under Profile → Appearance; the choice is kept on the device (`src/state/theme.ts`, tokens in `src/styles/nocturne.css`). The glow behind garments takes the clothes' own colours by default; Appearance can switch it to the accent violet or off.
+
+**Haptics and sound** (`src/state/feedback.ts`): one `fx(kind)` call per moment: `tick` when a piece snaps into place, `peg` when a look is saved or a piece added, `match` when an outfit is found or hung, `tap` for navigation. Vibration uses `navigator.vibrate` (Android; iOS Safari has none) and is skipped with reduced motion. Sound is synthesised with WebAudio. Haptics start on and sound off; both are switches under Profile → Feedback, kept on the device.
 
 ## Getting started
 
@@ -42,7 +44,7 @@ GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests and the build on ev
 
 | Tab | Screen |
 |---|---|
-| **Outfit** (home) | A first-run checklist (find your tone, add a top, add a bottom), then two clotheslines, a fitting panel with contrast and tone-fit meters, Shuffle, Save look and "I wore this today" |
+| **Outfit** (home) | A first-run checklist, then closet rails: swipe, tap a hanger or use the arrows. A Separates · Dress switch when you own both. The page takes on the outfit's colour. Under the rails: the pieces, "I wore this today", a tone-fit ring, the weather with a warmth note and an 18-hour chart, and quick occasions with Match me. Shuffle and Save sit in the header |
 | **Wardrobe** | Every piece, filterable by tops, bottoms or "in my tone" |
 | **Add** | Take or upload a photo; the app reads its colour, places it in a tone and hangs it on the line |
 | **Looks** | Saved outfits |
