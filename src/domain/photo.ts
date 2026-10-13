@@ -18,8 +18,8 @@ import {
   straightenBy,
   type Pixels,
   type QualityIssue,
-} from './pixels'
-import type { GarmentTags } from './tags'
+} from './pixels.ts'
+import type { GarmentTags } from './tags.ts'
 
 /** Upload and working size. Big enough for the item screen at 2×, small enough to send quickly. */
 const WORK_SIDE = 1024

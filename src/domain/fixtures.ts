@@ -1,5 +1,5 @@
-import { toneIndex } from './tones'
-import type { Item } from './types'
+import { toneIndex } from './tones.ts'
+import type { Item } from './types.ts'
 
 type SeedItem = Omit<Item, 'tone'> & { tone: string }
 

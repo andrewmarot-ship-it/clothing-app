@@ -1,5 +1,5 @@
-import type { DressCode } from './types'
-import { forecastFor, warmthFor, weatherLine, type DayForecast, type TimeOfDay } from './weather'
+import type { DressCode } from './types.ts'
+import { forecastFor, warmthFor, weatherLine, type DayForecast, type TimeOfDay } from './weather.ts'
 
 export interface Occasion {
   label: string

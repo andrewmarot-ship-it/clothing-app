@@ -1,7 +1,7 @@
-import { colourDistance, oklch } from './color'
-import type { Occasion } from './occasions'
-import { TONES, matchOf } from './tones'
-import type { Item, Match, MatchSource, RatedItem } from './types'
+import { colourDistance, oklch } from './color.ts'
+import type { Occasion } from './occasions.ts'
+import { TONES, matchOf } from './tones.ts'
+import type { Item, Match, MatchSource, RatedItem } from './types.ts'
 
 const FIT: Record<Match, number> = { in: 100, near: 72, out: 38 }
 const MATCH_SCORE: Record<Match, number> = { in: 2, near: 1, out: 0 }
