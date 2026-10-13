@@ -1,6 +1,7 @@
 import { Heart } from '@phosphor-icons/react'
 import { BackRow, Kicker } from '../components/Chrome'
 import { Garment, Line, Pins } from '../components/Garment'
+import { pegsFor } from '../domain/frame'
 import { itemMatch } from '../components/match'
 import { useSwipe } from '../components/useSwipe'
 import { CODES } from '../domain/occasions'
@@ -71,7 +72,7 @@ export function Match() {
         <div className="glow-bg" style={{ background: glowFill(glow, outfitColour(t.color, b?.color), 70), opacity: 0.85 }} />
         <Line sag={22} width={1.2} style={{ top: 0 }} />
         <div className={b ? 'match-top' : 'match-dress'}>
-          <Pins inset={b ? '28%' : '34%'} />
+          <Pins inset={b ? pegsFor(t, 1) : pegsFor(t, 250 / 156, '34%')} />
           <Garment item={t} className="fill" />
         </div>
         {b && <Garment item={b} className="match-bot" align="center" />}

@@ -2,6 +2,8 @@ import { CaretRight, Check, Heart, MapPin, Shuffle, Sparkle } from '@phosphor-ic
 import { useState } from 'react'
 import { itemMatch } from '../components/match'
 import { Rail } from '../components/Rail'
+import { FRAMES } from '../domain/frame'
+import type { Category } from '../domain/types'
 import { PRESETS, type PresetKey } from '../domain/occasions'
 import { contrastLabel, rankLooks, toneFit } from '../domain/scoring'
 import { currentLine, forecastFor, tempBars, timeOfDay, warmthFor, warmthNote } from '../domain/weather'
@@ -17,6 +19,13 @@ const HOME_CHIPS: [PresetKey, string][] = [
   ['night', 'Girls’ night'],
   ['garden', 'Garden walk'],
 ]
+
+/** Rail box shapes match each category's canvas, so framed pieces keep their sizes. */
+const RAIL: Record<Category, { aspect: number; reach: number }> = {
+  top: { aspect: FRAMES.top.h / FRAMES.top.w, reach: 0.86 },
+  bottom: { aspect: FRAMES.bottom.h / FRAMES.bottom.w, reach: 0.8 },
+  dress: { aspect: FRAMES.dress.h / FRAMES.dress.w, reach: 0.92 },
+}
 
 /** Circumference of the tone-fit ring (r = 34). */
 const RING = 2 * Math.PI * 34
@@ -206,14 +215,14 @@ export function Outfit() {
   // Rails for what's being worn; before there's an outfit, whatever pieces exist.
   const rails = outfit
     ? wearingDress
-      ? [{ label: 'Dresses', list: dresses, current: outfit.t, aspect: 1.35 }]
+      ? [{ label: 'Dresses', list: dresses, current: outfit.t, ...RAIL.dress }]
       : [
-          { label: 'Tops', list: tops, current: outfit.t, aspect: 1 },
-          { label: 'Bottoms', list: bots, current: outfit.b!, aspect: 1 },
+          { label: 'Tops', list: tops, current: outfit.t, ...RAIL.top },
+          { label: 'Bottoms', list: bots, current: outfit.b!, ...RAIL.bottom },
         ]
     : [
-        { label: 'Tops', list: tops, current: tops[0], aspect: 1 },
-        { label: 'Bottoms', list: bots, current: bots[0], aspect: 1 },
+        { label: 'Tops', list: tops, current: tops[0], ...RAIL.top },
+        { label: 'Bottoms', list: bots, current: bots[0], ...RAIL.bottom },
       ].filter((r) => r.list.length > 0)
 
   return (
@@ -272,7 +281,7 @@ export function Outfit() {
       )}
 
       {rails.map((r) => (
-        <Rail key={r.label} label={r.label} list={r.list} current={r.current} aspect={r.aspect} onPick={hang} />
+        <Rail key={r.label} label={r.label} list={r.list} current={r.current} aspect={r.aspect} reach={r.reach} onPick={hang} />
       ))}
 
       {outfit && (

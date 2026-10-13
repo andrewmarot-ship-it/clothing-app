@@ -81,6 +81,11 @@ Pieces are photographed **laid flat on a plain, light surface**. The app shows y
 2. **Cut out and tag** (`POST /api/process-photo`, `server/`): remove.bg removes the background while Claude tags the piece (category, type, fabric, formality, warmth, colour name). The two calls run in parallel, and either can fail on its own.
 3. **Read the colour** (browser, `src/domain/pixels.ts`): keep the largest piece of the mask, and use the surface as a grey card to correct the lighting when it's near-neutral. Then run k-means in OKLab on the garment pixels, flagging two-colour patterns.
 4. **Place it in a tone** with `classifyHex`, then straighten small tilts, crop, and save a transparent WebP.
+5. **Frame it** (`src/domain/frame.ts`) so pieces of a kind look alike, whatever the camera distance or pose. The cut-out is redrawn onto a standard canvas for its category, pinned at the top and centred on its waistband or shoulders.
+   - **Bottoms** are scaled by waistband width, which is similar on any trousers, shorts or skirt. They keep real proportions: shorts come out shorter than trousers, and spread legs don't shorten the trousers.
+   - **Tops and dresses** are scaled by length, shrinking only if outstretched sleeves wouldn't fit.
+   - **Thumbnails** crop back to the garment using the stored frame position.
+   - **When it runs:** framing happens in the background on the device (no extra API calls) for new pieces, retakes, pieces moved to another category, and pieces from before framing. The framed image then syncs like a retake. Bump `FRAME_VERSION` to re-frame everything after changing the rules.
 
 Cut-outs and original photos are stored in IndexedDB; the rest of the state is in `localStorage`. If processing fails, the piece is drawn as a silhouette and the original photo is kept, so it can be reprocessed later.
 

@@ -2,6 +2,7 @@ import { PencilSimple } from '@phosphor-icons/react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { BackRow, Dots, Kicker } from '../components/Chrome'
 import { Garment, Line, Pins } from '../components/Garment'
+import { pegsFor } from '../domain/frame'
 import { ToneOverride } from '../components/ToneOverride'
 import { CODES, PRESETS } from '../domain/occasions'
 import { bestPartners, toneFit } from '../domain/scoring'
@@ -67,7 +68,7 @@ export function ItemDetail() {
         <div className="glow-bg" style={{ background: glowFill(glow, item.color, 70), opacity: 0.8 }} />
         <Line sag={22} width={1.2} style={{ top: 8 }} />
         <div className="item-figure">
-          <Pins top="-3%" width="3.5%" height="9%" />
+          <Pins inset={pegsFor(item, 1)} top="-3%" width="3.5%" height="9%" />
           <Garment item={item} className="fill" />
         </div>
       </div>
@@ -97,7 +98,7 @@ export function ItemDetail() {
               const other = item.cat === 'top' ? p.b : p.t
               return (
                 <button key={other.id} type="button" className="card partner" onClick={() => go('outfit', { topId: p.t.id, botId: p.b.id })}>
-                  <Garment item={other} stroke={1.5} shade={false} align="center" className="partner-img" />
+                  <Garment item={other} stroke={1.5} shade={false} align="center" fit="tight" className="partner-img" />
                   <span className="partner-name">{other.name}</span>
                   <span className="meta">Fit {toneFit(p.t, p.b)}</span>
                 </button>
