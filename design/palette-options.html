@@ -1,0 +1,239 @@
+<title>Clothesline Palette Options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: why it's hard to see now, then one column per palette (phone mock, swatches, a measured visibility row, notes), then the pick.
+   Page chrome is hue-free grey on purpose, so it doesn't tint the palettes being judged. */
+:root {
+  --bg: #f4f4f3; --fg: #1a1a1a; --muted: #5f5f5f; --rule: #dcdcda; --card: #ffffff;
+  --bad: #b3261e; --ok: #2e6b3a; --pick: #4b3db5;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #141414; --fg: #ececec; --muted: #a3a3a3; --rule: #2e2e2e; --card: #1d1d1d; --bad: #ff8a80; --ok: #8fd19e; --pick: #b2a8ff; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #141414; --fg: #ececec; --muted: #a3a3a3; --rule: #2e2e2e; --card: #1d1d1d; --bad: #ff8a80; --ok: #8fd19e; --pick: #b2a8ff; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.55; margin: 0; padding: 0 16px; }
+.wrap { max-width: 1360px; margin: 0 auto; padding-block: 40px 64px; }
+.eyebrow { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; margin: 8px 0 12px; text-wrap: balance; max-width: 22ch; }
+.lede { max-width: 68ch; margin: 0 0 22px; }
+.causes { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin: 0 0 36px; padding: 0; list-style: none; }
+.causes li { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 12px 14px; font-size: 13.5px; min-width: 0; }
+.causes b { display: block; font-weight: 600; margin-bottom: 2px; }
+.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 44px 28px; justify-items: center; }
+.opt { width: 100%; max-width: 312px; display: grid; gap: 14px; align-content: start; }
+.opt-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.opt-head h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+.badge { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--rule); color: var(--muted); white-space: nowrap; }
+.badge.pick { color: var(--pick); border-color: var(--pick); }
+.swatches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.sw { display: grid; gap: 3px; font-size: 10.5px; color: var(--muted); min-width: 0; }
+.sw i { display: block; height: 26px; border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(127,127,127,0.35); }
+.sw code { font-family: var(--mono); font-size: 10px; overflow: hidden; text-overflow: ellipsis; }
+.vis { display: grid; gap: 6px; }
+.vis-head { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.vis-head b { font-weight: 600; }
+.vis-head .n { font-variant-numeric: tabular-nums; }
+.vis-head .n.bad { color: var(--bad); } .vis-head .n.ok { color: var(--ok); }
+.chips { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 3px; padding: 6px; border-radius: 8px; }
+.chip { aspect-ratio: 1; border-radius: 3px; position: relative; }
+.chip.miss::after { content: ""; position: absolute; inset: -3px; border-radius: 5px; box-shadow: 0 0 0 1.5px var(--bad); }
+.vis small { color: var(--muted); font-size: 12px; }
+.notes { font-size: 13.5px; display: grid; gap: 6px; }
+.notes p { margin: 0; }
+.notes dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 2px 0 0; font-size: 13px; }
+.notes dt { color: var(--muted); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding-top: 2px; }
+.notes dd { margin: 0; min-width: 0; }
+.pickbox { margin-top: 48px; max-width: 70ch; background: var(--card); border: 1px solid var(--rule); border-radius: 14px; padding: 18px 20px; display: grid; gap: 8px; }
+.pickbox h3 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+.pickbox p, .pickbox ul { margin: 0; }
+.pickbox ul { padding-left: 18px; display: grid; gap: 4px; }
+
+/* ── Phone mock: every colour comes from the palette's own --p-* tokens ── */
+.phone { width: 300px; max-width: 100%; aspect-ratio: 300 / 650; border-radius: 40px; padding: 7px; background: #050505; box-shadow: 0 0 0 1px rgba(127,127,127,0.3), 0 24px 50px rgba(0,0,0,0.25); }
+.scr { position: relative; height: 100%; border-radius: 33px; overflow: hidden; background: var(--p-bg); color: var(--p-text); font-family: var(--font); display: flex; flex-direction: column; }
+.scr::before { content: ""; position: absolute; top: 9px; left: 50%; width: 84px; height: 24px; margin-left: -42px; border-radius: 14px; background: #050505; z-index: 5; }
+.m-head { padding: 46px 16px 0; display: flex; justify-content: space-between; align-items: flex-start; }
+.m-date { font-size: 34px; font-weight: 500; letter-spacing: -0.04em; line-height: 1; }
+.m-sub { font-size: 11.5px; color: var(--p-muted); margin-top: 4px; }
+.m-match { font: 500 12px var(--font); color: var(--p-accent); border: 1px solid var(--p-accent); border-radius: 8px; padding: 7px 10px; background: transparent; margin-top: 2px; }
+.m-stage { margin-top: 14px; background: var(--p-stage); padding: 2px 0 6px; }
+.m-kick { font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--p-stage-muted); padding: 8px 16px 0; }
+.m-strip { position: relative; height: 112px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+.m-strip.bot { height: 122px; }
+.m-strip svg.rope { position: absolute; left: 0; top: 10px; width: 100%; height: 20px; }
+.m-track { position: absolute; top: 14px; left: 50%; display: flex; gap: 8px; align-items: flex-start; transform: translateX(-50%); }
+.m-piece { position: relative; flex: none; }
+.m-piece svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.m-peg { position: absolute; top: -5px; left: 50%; width: 4px; height: 10px; margin-left: -2px; border-radius: 1px; background: var(--p-peg); }
+.m-piece.sel .m-peg { background: var(--p-accent); width: 5px; height: 12px; margin-left: -2.5px; top: -6px; }
+.m-card { margin: 12px 16px 0; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; }
+.m-fig { height: 120px; border-radius: 12px; background: var(--p-fig); box-shadow: 0 0 0 1px var(--p-hair); position: relative; }
+.m-fig svg { position: absolute; }
+.m-info { display: grid; gap: 8px; align-content: start; font-size: 12px; min-width: 0; }
+.m-info .row { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 7px; align-items: start; }
+.m-info i { width: 14px; height: 14px; border-radius: 3px; display: block; margin-top: 2px; box-shadow: 0 0 0 1px var(--p-hair); }
+.m-info span b { display: block; font-weight: 500; }
+.m-info span em { font-style: normal; color: var(--p-muted); font-size: 11px; }
+.m-tabs { margin-top: auto; height: 58px; background: var(--p-tab); box-shadow: 0 -1px 0 var(--p-hair); display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; justify-items: center; font-size: 9.5px; color: var(--p-muted); }
+.m-tabs .on { color: var(--p-text); }
+.m-tabs .add { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--p-muted); display: grid; place-items: center; font-size: 18px; color: var(--p-text); }
+</style>
+
+<div class="wrap">
+  <span class="eyebrow">Clothesline · colour palette</span>
+  <h1>Grounds that let the clothes show</h1>
+  <p class="lede">Most wardrobes are dark: black, navy, charcoal, denim, brown. The app's navy ground sits at almost the same lightness as all of them. Below, the same Outfit screen is shown in four palettes with the same 13 pieces. Under each phone, every piece that sits within 0.15 of the ground in OKLab colour distance is circled as hard to see.</p>
+
+  <ul class="causes">
+    <li><b>The ground is as dark as the clothes</b>The navy background has a lightness of 0.21. Black pieces are at 0.21 too, and navy, charcoal and brown sit between 0.30 and 0.35.</li>
+    <li><b>Pieces off the centre are dimmed</b>Unselected pieces are drawn at 72% opacity, which mixes them further into the background.</li>
+    <li><b>Dark shadows on a dark ground</b>The drop shadows under each piece are black, so on navy they blur the edges instead of lifting the piece.</li>
+    <li><b>A tinted ground skews colour</b>The ground is slightly blue, so cream and camel look warmer than they are. That's a problem for an app that judges colour.</li>
+  </ul>
+
+  <div class="gallery" id="gallery"></div>
+
+  <section class="pickbox" aria-labelledby="pick-title">
+    <h3 id="pick-title">My pick: Linen</h3>
+    <p>Linen fixes the clothes people own most of, and it misses only white and cream. A hairline outline fixes those for a few lines of CSS. Linen is also close to the light surface people photograph their pieces on, so cut-outs look the way they did on the table. If keeping the dark look matters most, choose Lightbox instead.</p>
+    <p>Whichever palette wins, I'd also make these changes:</p>
+    <ul>
+      <li>Stop dimming pieces that aren't selected. Size already shows which one is selected.</li>
+      <li>Give every piece a hairline outline in the palette's rim colour.</li>
+      <li>Keep the ground neutral, without a hue, so the tone matching isn't working against it.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+(() => {
+  // OKLab, for the measured visibility row.
+  const lin = (c) => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  const oklab = (h) => {
+    const [r, g, b] = [1, 3, 5].map((i) => lin(parseInt(h.slice(i, i + 2), 16)));
+    const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+    const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+    const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+    return [0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s, 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s];
+  };
+  const dist = (x, y) => { const a = oklab(x), b = oklab(y); return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]); };
+  const MISS = 0.15;
+
+  const SIL = {
+    shirt: 'M32 6 L43 3 Q50 10 57 3 L68 6 L84 20 L95 80 L84 84 L72 40 L72 97 L28 97 L28 40 L16 84 L5 80 L16 20 Z',
+    tee: 'M30 7 L42 3 Q50 11 58 3 L70 7 L93 24 L83 40 L72 34 L72 97 L28 97 L28 34 L17 40 L7 24 Z',
+    jeans: 'M27 3 L73 3 L80 97 L56 97 L50 34 L44 97 L20 97 Z',
+  };
+  // A typical wardrobe: mostly dark, a few light and saturated pieces.
+  const TOPS = [
+    ['Black tee', 'tee', '#17171a'], ['Navy shirt', 'shirt', '#1f3a5f'], ['Charcoal knit', 'shirt', '#2a2d3a'],
+    ['Rust knit', 'shirt', '#c46a2b'], ['Burgundy tee', 'tee', '#5b1a2e'], ['White shirt', 'shirt', '#f4f1e8'], ['Grey tee', 'tee', '#94a3b8'],
+  ];
+  const BOTS = [
+    ['Black jeans', 'jeans', '#111827'], ['Dark denim', 'jeans', '#23365a'], ['Brown chinos', 'jeans', '#3e2b22'],
+    ['Cream trousers', 'jeans', '#e3d3b8'], ['Olive cords', 'jeans', '#5a4a1e'], ['Grey trousers', 'jeans', '#8a9bb0'],
+  ];
+  const SEL_TOP = 3, SEL_BOT = 3;
+
+  const PALETTES = [
+    {
+      id: 'nocturne', name: 'Nocturne', badge: 'Now',
+      t: { bg: '#161826', stage: '#161826', text: '#e9e9ed', muted: '#9397ab', 'stage-muted': '#75798c', accent: '#9184d9', peg: '#75798c', line: '#b2b6ca', rim: '#595d6c', tab: '#161826', hair: '#3f424d', fig: 'radial-gradient(80% 60% at 50% 40%, #2b2741, #161826)' },
+      dim: 0.72, shadow: 'drop-shadow(0 6px 8px rgba(0,0,0,0.35))', rimW: 0.8,
+      sw: [['Ground', '#161826'], ['Surface', '#232532'], ['Text', '#e9e9ed'], ['Muted', '#9397ab'], ['Accent', '#9184d9']],
+      note: 'The current navy ground, with pieces dimmed and dark shadows, exactly as the app draws them today.',
+      good: 'Moody and distinctive. Saturated and light pieces glow.',
+      watch: 'Black, navy, charcoal, brown and denim nearly vanish, and those are most of a real wardrobe.',
+    },
+    {
+      id: 'linen', name: 'Linen', badge: 'My pick',
+      t: { bg: '#efeee9', stage: '#efeee9', text: '#1d1c22', muted: '#6c6a72', 'stage-muted': '#6c6a72', accent: '#4f3fc0', peg: '#a9a7ae', line: '#8b8992', rim: '#9a978f', tab: '#fbfaf7', hair: '#dddbd4', fig: '#fbfaf7' },
+      dim: 1, shadow: 'drop-shadow(0 3px 4px rgba(40,35,25,0.18))', rimW: 1.1,
+      sw: [['Ground', '#efeee9'], ['Surface', '#fbfaf7'], ['Ink', '#1d1c22'], ['Muted', '#6c6a72'], ['Accent', '#4f3fc0']],
+      note: 'A warm, almost colourless off-white, like the table pieces are photographed on, with ink text and a deeper violet accent.',
+      good: 'Every dark piece stands out sharply. It reads like a lookbook or a shop page.',
+      watch: 'White and cream pieces need the hairline outline shown here. It also changes the app\'s look the most.',
+    },
+    {
+      id: 'draping', name: 'Draping grey', badge: 'Most neutral',
+      t: { bg: '#8c8c8a', stage: '#8c8c8a', text: '#121212', muted: '#2f2f2f', 'stage-muted': '#2f2f2f', accent: '#2a1f7a', peg: '#5c5c5a', line: '#3d3d3c', rim: '#4a4a48', tab: '#7d7d7b', hair: '#767674', fig: '#979795' },
+      dim: 1, shadow: 'drop-shadow(0 4px 6px rgba(0,0,0,0.25))', rimW: 1,
+      sw: [['Ground', '#8c8c8a'], ['Surface', '#979795'], ['Ink', '#121212'], ['Muted', '#2f2f2f'], ['Accent', '#2a1f7a']],
+      note: 'The mid neutral grey that colour analysts drape clients in. It sits halfway between black and white, so neither end is lost.',
+      good: 'The fairest ground for judging colour. Black and white pieces both read well.',
+      watch: 'Grey pieces blend in, and so does rust by lightness, though its colour still shows. The whole app can feel flat.',
+    },
+    {
+      id: 'lightbox', name: 'Lightbox', badge: 'Keeps the dark look',
+      t: { bg: '#161826', stage: '#b5b4b0', text: '#e9e9ed', muted: '#9397ab', 'stage-muted': '#3a3a40', accent: '#9184d9', peg: '#6e6d6a', line: '#55545a', rim: '#6e6d6a', tab: '#161826', hair: '#3f424d', fig: '#b5b4b0' },
+      dim: 1, shadow: 'drop-shadow(0 4px 6px rgba(0,0,0,0.28))', rimW: 1,
+      sw: [['Chrome', '#161826'], ['Stage', '#b5b4b0'], ['Text', '#e9e9ed'], ['Stage ink', '#3a3a40'], ['Accent', '#9184d9']],
+      note: 'The Nocturne chrome stays. The two lines and the fitting figure hang on a lit, neutral panel, like a shop window at night.',
+      good: 'Keeps the brand you have while fixing the dark pieces. The smallest change to the rest of the app.',
+      watch: 'Grey and cream pieces sit close to the panel, and the dark-light-dark stacking is busier.',
+    },
+  ];
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const garment = (kind, color, p, w, h, opacity) => {
+    const d = SIL[kind];
+    return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMin meet" style="width:${w}px;height:${h}px;opacity:${opacity};filter:${p.shadow}" aria-hidden="true">
+      <path d="${d}" fill="${color}" stroke="${p.t.rim}" stroke-width="${p.rimW}" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+      <path d="${d}" fill="url(#shade)" opacity="0.3"/></svg>`;
+  };
+  const strip = (list, sel, p, cls, size) => {
+    const pieces = list.map(([name, kind, color], i) => {
+      const s = i === sel, w = s ? size.sw : size.w, h = s ? size.sh : size.h;
+      return `<div class="m-piece${s ? ' sel' : ''}" style="width:${w}px;height:${h}px" title="${name}"><span class="m-peg"></span>${garment(kind, color, p, w, h, s ? 1 : p.dim)}</div>`;
+    }).join('');
+    return `<div class="m-strip ${cls}"><svg class="rope" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 4 Q150 14 300 4" fill="none" stroke="${p.t.line}" stroke-width="1" vector-effect="non-scaling-stroke"/></svg><div class="m-track">${pieces}</div></div>`;
+  };
+
+  const all = [...TOPS, ...BOTS];
+  const gallery = document.getElementById('gallery');
+  for (const p of PALETTES) {
+    const vars = Object.entries(p.t).map(([k, v]) => `--p-${k}:${v}`).join(';');
+    const misses = all.map(([, , c]) => dist(c, p.t.stage) < MISS);
+    const nMiss = misses.filter(Boolean).length;
+    const top = TOPS[SEL_TOP], bot = BOTS[SEL_BOT];
+    const el = document.createElement('section');
+    el.className = 'opt';
+    el.setAttribute('aria-labelledby', `${p.id}-t`);
+    el.innerHTML = `
+      <div class="opt-head"><h2 id="${p.id}-t">${p.name}</h2><span class="badge${p.badge === 'My pick' ? ' pick' : ''}">${p.badge}</span></div>
+      <div class="phone"><div class="scr" style="${vars}" role="img" aria-label="Outfit screen in the ${p.name} palette">
+        <div class="m-head"><div><div class="m-date">Mon 12</div><div class="m-sub">17° overcast · True Autumn</div></div><button class="m-match" tabindex="-1">✦ Match me</button></div>
+        <div class="m-stage">
+          <div class="m-kick">Tops · 4 / 7</div>${strip(TOPS, SEL_TOP, p, 'top', { w: 44, h: 44, sw: 76, sh: 76 })}
+          <div class="m-kick">Bottoms · 4 / 6</div>${strip(BOTS, SEL_BOT, p, 'bot', { w: 36, h: 52, sw: 60, sh: 88 })}
+        </div>
+        <div class="m-card">
+          <div class="m-fig">${garment(top[1], top[2], p, 62, 62, 1).replace('<svg ', '<svg style="left:15px;top:6px" ')}${garment(bot[1], bot[2], p, 54, 64, 1).replace('<svg ', '<svg style="left:19px;top:54px" ')}</div>
+          <div class="m-info">
+            <div class="row"><i style="background:${top[2]}"></i><span><b>${top[0]}</b><em>True Autumn · in your tone</em></span></div>
+            <div class="row"><i style="background:${bot[2]}"></i><span><b>${bot[0]}</b><em>Soft Autumn · near your tone</em></span></div>
+          </div>
+        </div>
+        <div class="m-tabs"><span class="on">Outfit</span><span>Wardrobe</span><span class="add">+</span><span>Looks</span><span>Profile</span></div>
+      </div></div>
+      <div class="swatches">${p.sw.map(([n, h]) => `<span class="sw"><i style="background:${h}"></i>${n}<code>${h}</code></span>`).join('')}</div>
+      <div class="vis">
+        <div class="vis-head"><b>Hard to see</b><span class="n ${nMiss > 3 ? 'bad' : 'ok'}">${nMiss} of ${all.length} pieces</span></div>
+        <div class="chips" style="background:${p.t.stage}">${all.map(([n, , c], i) => `<span class="chip${misses[i] ? ' miss' : ''}" style="background:${c}" title="${n}: ${dist(c, p.t.stage).toFixed(2)} from the ground"></span>`).join('')}</div>
+        <small>Circled: ${all.filter((_, i) => misses[i]).map(([n]) => n.toLowerCase()).join(', ') || 'none'}.</small>
+      </div>
+      <div class="notes"><p>${p.note}</p><dl><dt>Good</dt><dd>${p.good}</dd><dt>Watch</dt><dd>${p.watch}</dd></dl></div>`;
+    gallery.appendChild(el);
+  }
+
+  // The shading gradient every garment uses (same as the app's #shade).
+  const defs = document.createElementNS(NS, 'svg');
+  defs.setAttribute('width', '0'); defs.setAttribute('height', '0'); defs.setAttribute('aria-hidden', 'true');
+  defs.style.position = 'absolute';
+  defs.innerHTML = '<defs><linearGradient id="shade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.25"/><stop offset="1" stop-color="#000" stop-opacity="0.6"/></linearGradient></defs>';
+  document.body.prepend(defs);
+})();
+</script>
