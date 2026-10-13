@@ -1,0 +1,474 @@
+<title>Clothesline Opening Screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: a short brief, then four live phone frames in a wrapping row, each with its own notes. Single dark world: Nocturne is a dark system. */
+:root {
+  color-scheme: dark;
+  --bg: #161826;          /* Nocturne ground */
+  --page: #11131d;        /* page behind the phones, a step darker */
+  --surface: #232532;
+  --text: #e9e9ed;
+  --muted: #9397ab;
+  --faint: #595d6c;
+  --hair: #3f424d;
+  --accent: #9184d9;
+  --accent-ink: #161826;
+  --accent-soft: #2b2741;
+  --flatlay: #d9d6cf;     /* the light surface pieces are photographed on */
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--page); color: var(--text); }
+body { font-family: var(--font); font-size: 15px; line-height: 1.55; padding: 0 16px; }
+.wrap { max-width: 1340px; margin: 0 auto; padding-block: 40px 64px; }
+
+/* ── Brief ───────────────────────────────────────────── */
+header.brief { display: grid; gap: 10px; max-width: 70ch; margin-bottom: 28px; }
+.eyebrow { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; margin: 0; text-wrap: balance; }
+.brief p { margin: 0; color: #c4c6d3; }
+.pick { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border-radius: 14px; padding: 14px 16px; box-shadow: 0 0 0 1px var(--hair); max-width: 70ch; margin-bottom: 36px; }
+.pick-dot { flex: none; width: 8px; height: 18px; border-radius: 2px; background: var(--accent); margin-top: 3px; }
+.pick strong { font-weight: 600; }
+.pick span { min-width: 0; }
+
+/* ── Gallery ─────────────────────────────────────────── */
+.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px 28px; justify-items: center; }
+.direction { width: 100%; max-width: 312px; display: grid; gap: 16px; align-content: start; }
+.dir-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.dir-head h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+.dir-head h2 .tag { font-family: var(--mono); font-size: 12px; color: var(--accent); margin-right: 8px; font-weight: 500; }
+.replay { font: 500 12px var(--font); color: var(--text); background: transparent; border: 1px solid var(--hair); border-radius: 999px; padding: 4px 11px; cursor: pointer; }
+.replay:hover { border-color: var(--muted); }
+.replay:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.notes { display: grid; gap: 8px; font-size: 13.5px; color: #c4c6d3; }
+.notes p { margin: 0; }
+.notes dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 4px 0 0; font-size: 13px; }
+.notes dt { color: var(--muted); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding-top: 2px; }
+.notes dd { margin: 0; min-width: 0; }
+
+/* ── Phone frame ─────────────────────────────────────── */
+.phone { width: 300px; max-width: 100%; aspect-ratio: 300 / 650; border-radius: 40px; padding: 7px; background: #05060a; box-shadow: 0 0 0 1px #2a2c38, 0 30px 60px rgba(0,0,0,0.5); }
+.screen { position: relative; width: 100%; height: 100%; border-radius: 33px; overflow: hidden; background: var(--bg); display: flex; flex-direction: column; }
+.screen::before { content: ""; position: absolute; top: 9px; left: 50%; width: 84px; height: 24px; margin-left: -42px; border-radius: 14px; background: #05060a; z-index: 10; }
+
+/* Shared app pieces, styled like the app (Nocturne) */
+.field-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.input { width: 100%; font: 400 15px var(--font); color: var(--text); background: var(--bg); border: 1px solid var(--hair); border-radius: 10px; padding: 11px 12px; }
+.input::placeholder { color: var(--faint); }
+.btn { font: 600 14px var(--font); border-radius: 10px; padding: 12px 14px; border: 0; cursor: pointer; width: 100%; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--hair); }
+.btn-text { background: transparent; color: var(--muted); padding: 8px; font-weight: 500; }
+.signin { display: grid; gap: 8px; }
+.sent { display: none; gap: 6px; align-content: start; }
+.sent strong { font-weight: 600; }
+.sent span { color: var(--muted); font-size: 13px; }
+.is-sent .signin { display: none; }
+.is-sent .sent { display: grid; }
+.meta { font-size: 12px; color: var(--muted); }
+.wordmark { font-weight: 600; letter-spacing: -0.035em; line-height: 1; }
+
+/* ── A · Hang it up ──────────────────────────────────── */
+.a-stage { margin-top: 56px; }
+.a-stage svg { display: block; width: 100%; height: auto; overflow: visible; }
+.a-line { stroke-dasharray: 440; stroke-dashoffset: 440; animation: draw 0.8s 0.15s cubic-bezier(.6,0,.3,1) forwards; }
+.a-drop { transform-box: fill-box; transform-origin: 50% 0; opacity: 0; animation: drop 0.55s cubic-bezier(.3,1.4,.5,1) forwards, sway 3.6s 1.6s ease-in-out infinite; }
+.a-drop.d1 { animation-delay: 0.75s, 1.6s; }
+.a-drop.d2 { animation-delay: 0.95s, 1.9s; }
+.a-drop.d3 { animation-delay: 1.15s, 2.2s; }
+.a-brand { padding: 4px 24px 0; display: grid; gap: 8px; opacity: 0; animation: fade 0.6s 1.35s forwards; }
+.a-brand .wordmark { font-size: 38px; }
+.a-brand p { margin: 0; color: var(--muted); font-size: 14px; max-width: 22ch; }
+.a-sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); border-radius: 22px 22px 0 0; padding: 18px 20px 22px; box-shadow: 0 -1px 0 var(--hair); transform: translateY(105%); animation: rise 0.55s 1.9s cubic-bezier(.2,.8,.2,1) forwards; display: grid; gap: 4px; }
+.a-sheet .grab { width: 36px; height: 4px; border-radius: 2px; background: var(--faint); margin: -6px auto 8px; }
+
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes drop { from { opacity: 0; transform: translateY(-28px) rotate(-4deg); } to { opacity: 1; transform: none; } }
+@keyframes sway { 0%,100% { transform: rotate(0); } 30% { transform: rotate(1.6deg); } 70% { transform: rotate(-1.2deg); } }
+@keyframes fade { to { opacity: 1; } }
+@keyframes rise { to { transform: none; } }
+
+/* ── B · Twelve tones ────────────────────────────────── */
+.b-top { padding: 52px 22px 0; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.b-top .wordmark { font-size: 16px; }
+.b-mark { width: 18px; height: 18px; }
+.b-lines { position: relative; height: 196px; margin-top: 18px; }
+.b-lines svg.rope { position: absolute; left: 0; width: 100%; height: 30px; }
+.swatch { position: absolute; width: 30px; height: 40px; margin-left: -15px; border-radius: 2px 2px 5px 5px; transform-origin: 50% 0; opacity: 0; animation: drop 0.5s cubic-bezier(.3,1.4,.5,1) forwards, sway 3.2s ease-in-out infinite; box-shadow: inset 0 -10px 14px rgba(0,0,0,0.18); }
+.swatch::before, .swatch::after { content: ""; position: absolute; top: -5px; width: 4px; height: 10px; border-radius: 1px; background: var(--muted); }
+.swatch::before { left: 5px; } .swatch::after { right: 5px; }
+.swatch.is-you::before, .swatch.is-you::after { background: var(--accent); }
+.season { position: absolute; left: 22px; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); font-weight: 600; }
+.b-copy { padding: 6px 22px 0; display: grid; gap: 8px; opacity: 0; animation: fade 0.6s 1.2s forwards; }
+.b-copy h3 { font-size: 30px; font-weight: 600; letter-spacing: -0.035em; line-height: 1.05; margin: 0; text-wrap: balance; }
+.b-copy p { margin: 0; color: var(--muted); font-size: 13.5px; }
+.b-actions { margin-top: auto; padding: 0 22px 26px; display: grid; gap: 8px; opacity: 0; animation: fade 0.6s 1.5s forwards; }
+
+/* ── C · Quiet luxe ──────────────────────────────────── */
+.c-body { flex: 1; display: flex; flex-direction: column; padding: 0 26px 26px; opacity: 0; animation: fade 1s 0.1s forwards; }
+.c-kicker { margin-top: 64px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.c-word { margin-top: 70px; font-size: 58px; }
+.c-word span { display: block; }
+.c-rule { position: relative; margin: 18px -26px 0; height: 40px; }
+.c-rule svg { width: 100%; height: 100%; display: block; }
+.c-peg { position: absolute; left: 63%; top: 10px; width: 5px; height: 13px; border-radius: 1.5px; background: var(--accent); transform-origin: 50% 0; animation: sway 4s 1s ease-in-out infinite; }
+.c-copy { margin: 18px 0 0; color: var(--muted); font-size: 14.5px; max-width: 24ch; }
+.c-form { margin-top: auto; display: grid; gap: 8px; }
+
+/* ── D · Three cards ─────────────────────────────────── */
+.d-top { padding: 46px 18px 0; display: flex; justify-content: space-between; align-items: center; }
+.d-top .wordmark { font-size: 15px; }
+.d-skip { font: 500 13px var(--font); color: var(--muted); background: none; border: 0; cursor: pointer; padding: 6px; }
+.d-view { flex: 1; overflow: hidden; }
+.d-track { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(.2,.8,.2,1); }
+.d-slide { flex: 0 0 100%; padding: 14px 22px 0; display: flex; flex-direction: column; gap: 14px; }
+.d-art { height: 236px; border-radius: 18px; background: var(--surface); position: relative; overflow: hidden; display: grid; place-items: center; }
+.d-slide h3 { font-size: 22px; font-weight: 600; letter-spacing: -0.025em; margin: 0; line-height: 1.15; }
+.d-slide p { margin: 0; color: var(--muted); font-size: 13.5px; }
+.d-foot { padding: 0 22px 24px; display: grid; gap: 14px; }
+.dots { display: flex; gap: 6px; justify-content: center; }
+.dot { width: 6px; height: 6px; border-radius: 3px; background: var(--faint); border: 0; padding: 0; cursor: pointer; transition: width 0.3s, background 0.3s; }
+.dot.on { width: 18px; background: var(--accent); }
+.flatlay { width: 150px; height: 170px; background: var(--flatlay); border-radius: 4px; display: grid; place-items: center; position: relative; }
+.corner { position: absolute; width: 22px; height: 22px; border: 2px solid var(--accent); }
+.corner.tl { top: 22px; left: 22px; border-right: 0; border-bottom: 0; border-radius: 6px 0 0 0; }
+.corner.tr { top: 22px; right: 22px; border-left: 0; border-bottom: 0; border-radius: 0 6px 0 0; }
+.corner.bl { bottom: 22px; left: 22px; border-right: 0; border-top: 0; border-radius: 0 0 0 6px; }
+.corner.br { bottom: 22px; right: 22px; border-left: 0; border-top: 0; border-radius: 0 0 6px 0; }
+.chipcol { display: grid; gap: 8px; }
+.chip { display: flex; align-items: center; gap: 8px; background: var(--bg); border-radius: 999px; padding: 5px 10px 5px 5px; font-size: 12px; }
+.chip i { width: 18px; height: 18px; border-radius: 50%; display: block; }
+.chip code { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.fit { font-size: 12px; display: grid; gap: 5px; }
+.fit-bar { height: 5px; border-radius: 3px; background: var(--hair); overflow: hidden; }
+.fit-bar b { display: block; height: 100%; width: 88%; background: var(--accent); border-radius: 3px; }
+.d-signin { display: grid; gap: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition: none !important; }
+}
+</style>
+
+<div class="wrap">
+  <header class="brief">
+    <span class="eyebrow">Clothesline · opening screens</span>
+    <h1>Four ways to open the app and ask for an email</h1>
+    <p>Each phone is live. Tap <b>Replay</b> to watch the opening again, or try the sign-in form. Sign-in stays optional in every version, because the app works on one device without an account. You only need one to add pieces.</p>
+  </header>
+
+  <div class="pick" role="note">
+    <span class="pick-dot" aria-hidden="true"></span>
+    <span><strong>My pick:</strong> open with A's clothesline animation (about 2 seconds, shown once), then settle into C's calm sign-in sheet. Returning users skip straight to their outfit. D's three cards could be added later if new users seem lost.</span>
+  </div>
+
+  <div class="gallery">
+
+    <!-- A -->
+    <section class="direction" aria-labelledby="a-title">
+      <div class="dir-head">
+        <h2 id="a-title"><span class="tag">A</span>Hang it up</h2>
+        <button type="button" class="replay" data-replay="a">Replay</button>
+      </div>
+      <div class="phone"><div class="screen" id="screen-a">
+        <div class="a-stage">
+          <svg viewBox="0 0 390 200" role="img" aria-label="A clothesline with three garments pegged to it">
+            <defs>
+              <linearGradient id="a-fade" x1="0" x2="1">
+                <stop offset="0" stop-color="#b2b6ca" stop-opacity="0"/>
+                <stop offset="0.15" stop-color="#b2b6ca" stop-opacity="0.9"/>
+                <stop offset="0.85" stop-color="#b2b6ca" stop-opacity="0.9"/>
+                <stop offset="1" stop-color="#b2b6ca" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="a-shade" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#fff" stop-opacity="0.25"/>
+                <stop offset="1" stop-color="#000" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+            <path class="a-line" d="M0 40 Q195 120 390 40" fill="none" stroke="url(#a-fade)" stroke-width="2"/>
+            <!-- y on the curve: 40 + 160·t(1−t) -->
+            <g transform="translate(36 63) scale(1.05)"><g class="a-drop d1">
+              <path d="M30 7 L42 3 Q50 11 58 3 L70 7 L93 24 L83 40 L72 34 L72 97 L28 97 L28 34 L17 40 L7 24 Z" fill="#2e6b5e" stroke="#595d6c" stroke-width="0.8" stroke-linejoin="round"/>
+              <path d="M30 7 L42 3 Q50 11 58 3 L70 7 L93 24 L83 40 L72 34 L72 97 L28 97 L28 34 L17 40 L7 24 Z" fill="url(#a-shade)" opacity="0.35"/>
+              <rect x="31" y="-4" width="5" height="12" rx="1.5" fill="#9184d9"/><rect x="64" y="-4" width="5" height="12" rx="1.5" fill="#9184d9"/>
+            </g></g>
+            <g transform="translate(145 78) scale(1.05)"><g class="a-drop d2">
+              <path d="M27 3 L73 3 L80 97 L56 97 L50 34 L44 97 L20 97 Z" fill="#c49a5a" stroke="#595d6c" stroke-width="0.8" stroke-linejoin="round"/>
+              <path d="M27 3 L73 3 L80 97 L56 97 L50 34 L44 97 L20 97 Z" fill="url(#a-shade)" opacity="0.35"/>
+              <rect x="29" y="-5" width="5" height="12" rx="1.5" fill="#9184d9"/><rect x="66" y="-5" width="5" height="12" rx="1.5" fill="#9184d9"/>
+            </g></g>
+            <g transform="translate(250 66) scale(1.05)"><g class="a-drop d3">
+              <path d="M32 6 L43 3 Q50 10 57 3 L68 6 L84 20 L95 80 L84 84 L72 40 L72 97 L28 97 L28 40 L16 84 L5 80 L16 20 Z" fill="#c46a2b" stroke="#595d6c" stroke-width="0.8" stroke-linejoin="round"/>
+              <path d="M32 6 L43 3 Q50 10 57 3 L68 6 L84 20 L95 80 L84 84 L72 40 L72 97 L28 97 L28 40 L16 84 L5 80 L16 20 Z" fill="url(#a-shade)" opacity="0.35"/>
+              <rect x="34" y="-4" width="5" height="12" rx="1.5" fill="#9184d9"/><rect x="61" y="-4" width="5" height="12" rx="1.5" fill="#9184d9"/>
+            </g></g>
+          </svg>
+        </div>
+        <div class="a-brand">
+          <span class="wordmark">Clothesline</span>
+          <p>Your wardrobe, matched to your colours.</p>
+        </div>
+        <div class="a-sheet">
+          <div class="grab" aria-hidden="true"></div>
+          <form class="signin" data-form>
+            <label class="field-label" for="a-email">Email</label>
+            <input id="a-email" class="input" type="email" placeholder="you@example.com" autocomplete="off" required>
+            <button class="btn btn-primary" type="submit">Email me a sign-in link</button>
+            <button class="btn btn-text" type="button">Continue without an account</button>
+          </form>
+          <div class="sent" role="status"><strong>Check your inbox</strong><span>We sent a sign-in link. Open it on this device.</span></div>
+        </div>
+      </div></div>
+      <div class="notes">
+        <p>The line draws itself, three pieces drop onto it and get pegged, and the name fades in. Then the sign-in sheet slides up.</p>
+        <dl><dt>Good</dt><dd>Unmistakably this app. It reuses the garment drawings and pegs the app already has.</dd>
+        <dt>Watch</dt><dd>Two seconds is fine once, but tiring every launch. Show it on first open only.</dd></dl>
+      </div>
+    </section>
+
+    <!-- B -->
+    <section class="direction" aria-labelledby="b-title">
+      <div class="dir-head">
+        <h2 id="b-title"><span class="tag">B</span>Twelve tones</h2>
+        <button type="button" class="replay" data-replay="b">Replay</button>
+      </div>
+      <div class="phone"><div class="screen" id="screen-b">
+        <div class="b-top">
+          <svg class="b-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M6 14 Q32 24 58 14" fill="none" stroke="#9397ab" stroke-width="3"/><path d="M20 18 L27 16 Q32 21 37 16 L44 18 L52 27 L46 33 L42 30 L42 52 L22 52 L22 30 L18 33 L12 27 Z" fill="#b4643c"/><rect x="31" y="14" width="3" height="6" rx="1" fill="#9184d9"/></svg>
+          <span class="wordmark">Clothesline</span>
+        </div>
+        <div class="b-lines" id="b-lines" role="img" aria-label="Twelve colour swatches, one per tone, pegged on two lines"></div>
+        <div class="b-copy">
+          <h3>Dress in your colours.</h3>
+          <p>Twelve tones. Every piece you own, scored against yours.</p>
+        </div>
+        <div class="b-actions">
+          <form class="signin" data-form>
+            <input id="b-email" class="input" type="email" placeholder="Email address" aria-label="Email" autocomplete="off" required>
+            <button class="btn btn-primary" type="submit">Get a sign-in link</button>
+            <button class="btn btn-text" type="button">Look around first</button>
+          </form>
+          <div class="sent" role="status"><strong>Check your inbox</strong><span>We sent a sign-in link. Open it on this device.</span></div>
+        </div>
+      </div></div>
+      <div class="notes">
+        <p>The twelve tone colours hang on two lines, one for each season pair. Your tone's pegs turn violet after the quiz. The headline sells the colour matching.</p>
+        <dl><dt>Good</dt><dd>Leads with what makes the app different from a plain closet app.</dd>
+        <dt>Watch</dt><dd>The tone colours are placeholders until TCI licensing is sorted.</dd></dl>
+      </div>
+    </section>
+
+    <!-- C -->
+    <section class="direction" aria-labelledby="c-title">
+      <div class="dir-head">
+        <h2 id="c-title"><span class="tag">C</span>Quiet luxe</h2>
+        <button type="button" class="replay" data-replay="c">Replay</button>
+      </div>
+      <div class="phone"><div class="screen" id="screen-c">
+        <div class="c-body">
+          <span class="c-kicker">A wardrobe in your tone</span>
+          <span class="wordmark c-word"><span>Clothes</span><span>line</span></span>
+          <div class="c-rule" aria-hidden="true">
+            <svg viewBox="0 0 300 40" preserveAspectRatio="none"><path d="M0 6 Q150 30 300 6" fill="none" stroke="#9397ab" stroke-width="1" vector-effect="non-scaling-stroke"/></svg>
+            <span class="c-peg"></span>
+          </div>
+          <p class="c-copy">Hang up everything you own. Wear the pieces that suit you.</p>
+          <div class="c-form">
+            <form class="signin" data-form>
+              <input id="c-email" class="input" type="email" placeholder="Email address" aria-label="Email" autocomplete="off" required>
+              <button class="btn btn-primary" type="submit">Continue with email</button>
+              <button class="btn btn-text" type="button">Not now</button>
+            </form>
+            <div class="sent" role="status"><strong>Check your inbox</strong><span>We sent a sign-in link. Open it on this device.</span></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="notes">
+        <p>A large name, one sagging hairline, one peg and one sentence. The only motion is a fade and a slow sway of the peg.</p>
+        <dl><dt>Good</dt><dd>Loads instantly, ages well, and keeps the form in thumb reach.</dd>
+        <dt>Watch</dt><dd>Says little about what the app does. Best for people who already know it.</dd></dl>
+      </div>
+    </section>
+
+    <!-- D -->
+    <section class="direction" aria-labelledby="d-title">
+      <div class="dir-head">
+        <h2 id="d-title"><span class="tag">D</span>Three cards</h2>
+        <button type="button" class="replay" data-replay="d">Replay</button>
+      </div>
+      <div class="phone"><div class="screen" id="screen-d">
+        <div class="d-top">
+          <span class="wordmark">Clothesline</span>
+          <button type="button" class="d-skip" data-goto="3">Skip</button>
+        </div>
+        <div class="d-view"><div class="d-track" id="d-track">
+          <div class="d-slide">
+            <div class="d-art">
+              <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+              <div class="flatlay"><svg viewBox="0 0 100 100" width="104" aria-hidden="true"><path d="M30 7 L42 3 Q50 11 58 3 L70 7 L93 24 L83 40 L72 34 L72 97 L28 97 L28 34 L17 40 L7 24 Z" fill="#2e6b5e"/></svg></div>
+            </div>
+            <h3>Lay it flat, take a photo</h3>
+            <p>On a plain, light surface. We cut it out and keep its real colour.</p>
+          </div>
+          <div class="d-slide">
+            <div class="d-art" style="grid-template-columns: auto auto; gap: 18px; place-content: center;">
+              <svg viewBox="0 0 100 100" width="96" aria-hidden="true"><path d="M30 7 L42 3 Q50 11 58 3 L70 7 L93 24 L83 40 L72 34 L72 97 L28 97 L28 34 L17 40 L7 24 Z" fill="#c46a2b"/></svg>
+              <div class="chipcol">
+                <span class="chip"><i style="background:#c46a2b"></i><code>#C46A2B</code></span>
+                <span class="chip"><i style="background:#b4643c"></i>True Autumn</span>
+                <div class="fit"><span>Tone fit <b>9/10</b></span><span class="fit-bar"><b></b></span></div>
+              </div>
+            </div>
+            <h3>We find its tone</h3>
+            <p>Each piece is placed in one of 12 tones and scored against yours.</p>
+          </div>
+          <div class="d-slide">
+            <div class="d-art">
+              <svg viewBox="0 0 260 220" width="100%" aria-hidden="true">
+                <path d="M0 30 Q130 52 260 30" fill="none" stroke="#9397ab" stroke-width="1.2"/>
+                <path d="M0 128 Q130 150 260 128" fill="none" stroke="#9397ab" stroke-width="1.2"/>
+                <g transform="translate(18 34) scale(0.6)" opacity="0.45"><path d="M30 7 L42 3 Q50 11 58 3 L70 7 L93 24 L83 40 L72 34 L72 97 L28 97 L28 34 L17 40 L7 24 Z" fill="#6b7a2a"/></g>
+                <g transform="translate(95 38) scale(0.72)"><path d="M32 6 L43 3 Q50 10 57 3 L68 6 L84 20 L95 80 L84 84 L72 40 L72 97 L28 97 L28 40 L16 84 L5 80 L16 20 Z" fill="#c46a2b"/><rect x="47" y="-6" width="6" height="14" rx="1.5" fill="#9184d9"/></g>
+                <g transform="translate(184 34) scale(0.6)" opacity="0.45"><path d="M30 7 L42 3 Q50 11 58 3 L70 7 L93 24 L83 40 L72 34 L72 97 L28 97 L28 34 L17 40 L7 24 Z" fill="#2e6b5e"/></g>
+                <g transform="translate(24 132) scale(0.55)" opacity="0.45"><path d="M24 3 L76 3 L85 58 L56 62 L50 30 L44 62 L15 58 Z" fill="#8b4513"/></g>
+                <g transform="translate(98 136) scale(0.66)"><path d="M27 3 L73 3 L80 97 L56 97 L50 34 L44 97 L20 97 Z" fill="#3e2b22"/><rect x="47" y="-6" width="6" height="14" rx="1.5" fill="#9184d9"/></g>
+                <g transform="translate(186 132) scale(0.55)" opacity="0.45"><path d="M32 3 L68 3 L86 78 Q50 88 14 78 Z" fill="#d4a056"/></g>
+              </svg>
+            </div>
+            <h3>Flip the lines</h3>
+            <p>Swipe tops and bottoms to build an outfit, or let Match me choose for an occasion.</p>
+          </div>
+          <div class="d-slide">
+            <div class="d-art" style="place-items: stretch; padding: 18px; align-content: center;">
+              <form class="d-signin signin" data-form>
+                <span class="field-label">Keep your wardrobe safe</span>
+                <p style="margin:0 0 4px;font-size:13px;color:var(--muted)">Back up your pieces, use them on other devices, and add new ones. No password needed.</p>
+                <input id="d-email" class="input" type="email" placeholder="you@example.com" aria-label="Email" autocomplete="off" required>
+                <button class="btn btn-primary" type="submit">Email me a sign-in link</button>
+              </form>
+              <div class="sent" role="status"><strong>Check your inbox</strong><span>We sent a sign-in link. Open it on this device.</span></div>
+            </div>
+            <h3>Save your wardrobe</h3>
+            <p>Or skip this and try the app on this device first.</p>
+          </div>
+        </div></div>
+        <div class="d-foot">
+          <div class="dots" id="d-dots">
+            <button type="button" class="dot on" aria-label="Card 1" data-goto="0"></button>
+            <button type="button" class="dot" aria-label="Card 2" data-goto="1"></button>
+            <button type="button" class="dot" aria-label="Card 3" data-goto="2"></button>
+            <button type="button" class="dot" aria-label="Sign in" data-goto="3"></button>
+          </div>
+          <button type="button" class="btn btn-ghost" id="d-next">Next</button>
+        </div>
+      </div></div>
+      <div class="notes">
+        <p>Three short cards explain photos, tones and the lines, then ask for an email. They advance on their own here; in the app they'd swipe.</p>
+        <dl><dt>Good</dt><dd>Teaches flat-lay photos before the first one fails.</dd>
+        <dt>Watch</dt><dd>The most taps before the app. First launch only, with Skip always visible.</dd></dl>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // B: twelve tone swatches on two lines (palette[0] of each tone, placeholder hexes).
+  const tones = [
+    ['Light Spring', '#f7dcc0'], ['True Spring', '#f2a23c'], ['Bright Spring', '#ff6f61'],
+    ['Bright Winter', '#e0115f'], ['True Winter', '#1e3a8a'], ['Dark Winter', '#5b1a2e'],
+    ['Dark Autumn', '#6b2d1a'], ['True Autumn', '#c46a2b'], ['Soft Autumn', '#c9a27e'],
+    ['Soft Summer', '#8a9bb0'], ['True Summer', '#5b7fb3'], ['Light Summer', '#b8cde8'],
+  ];
+  function buildB() {
+    const host = document.getElementById('b-lines');
+    host.innerHTML = '';
+    [[0, 'Spring · Winter'], [1, 'Autumn · Summer']].forEach(([row, label]) => {
+      const top = row * 96 + 8;
+      const rope = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      rope.setAttribute('class', 'rope');
+      rope.setAttribute('viewBox', '0 0 300 30');
+      rope.setAttribute('preserveAspectRatio', 'none');
+      rope.style.top = top + 'px';
+      rope.innerHTML = '<path d="M0 4 Q150 26 300 4" fill="none" stroke="#9397ab" stroke-width="1" vector-effect="non-scaling-stroke"/>';
+      host.appendChild(rope);
+      const tag = document.createElement('span');
+      tag.className = 'season';
+      tag.textContent = label;
+      tag.style.top = (top + 66) + 'px';
+      host.appendChild(tag);
+      for (let i = 0; i < 6; i++) {
+        const [name, hex] = tones[row * 6 + i];
+        const x = 34 + i * 46.4;              // centre, in a 300-wide frame
+        const t = x / 300;
+        const y = 4 + 44 * t * (1 - t);       // quadratic sag, matches the rope path
+        const s = document.createElement('span');
+        s.className = 'swatch' + (name === 'True Autumn' ? ' is-you' : '');
+        s.title = name;
+        s.style.left = (x / 300 * 100) + '%';
+        s.style.top = (top + y + 2) + 'px';
+        s.style.background = hex;
+        const k = row * 6 + i;
+        s.style.animationDelay = (0.15 + k * 0.06) + 's, ' + (1 + (k % 4) * 0.3) + 's';
+        host.appendChild(s);
+      }
+    });
+  }
+  buildB();
+
+  // D: cards advance on their own, loop, and respond to dots / Next / Skip.
+  let d = 0, dTimer = null;
+  const track = document.getElementById('d-track');
+  const dots = [...document.querySelectorAll('#d-dots .dot')];
+  const next = document.getElementById('d-next');
+  function goD(i) {
+    d = i;
+    track.style.transform = `translateX(${-100 * i}%)`;
+    dots.forEach((el, j) => el.classList.toggle('on', j === i));
+    next.textContent = i === 3 ? 'Continue without an account' : 'Next';
+  }
+  function autoD() {
+    clearInterval(dTimer);
+    if (reduce) return;
+    dTimer = setInterval(() => goD((d + 1) % 4), 2800);
+  }
+  document.getElementById('screen-d').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-goto]');
+    if (b) { goD(+b.dataset.goto); clearInterval(dTimer); }
+  });
+  next.addEventListener('click', () => { clearInterval(dTimer); goD(d === 3 ? 0 : d + 1); });
+  autoD();
+
+  // Sign-in forms: show the "Check your inbox" state.
+  document.addEventListener('submit', (e) => {
+    const f = e.target.closest('[data-form]');
+    if (!f) return;
+    e.preventDefault();
+    f.parentElement.classList.add('is-sent');
+    if (f.closest('#screen-d')) clearInterval(dTimer);
+  });
+
+  // Replay: swap each screen for a fresh copy so CSS animations restart.
+  document.querySelectorAll('[data-replay]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = 'screen-' + btn.dataset.replay;
+      if (id === 'screen-d') {
+        document.querySelectorAll('#screen-d .is-sent').forEach((el) => el.classList.remove('is-sent'));
+        goD(0); autoD();
+        return;
+      }
+      const old = document.getElementById(id);
+      const fresh = old.cloneNode(true);
+      fresh.querySelectorAll('.is-sent').forEach((el) => el.classList.remove('is-sent'));
+      old.replaceWith(fresh);
+      if (id === 'screen-b') buildB();
+    });
+  });
+})();
+</script>
