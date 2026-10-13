@@ -63,4 +63,9 @@ describe('normaliseTags', () => {
   it('keeps a kind that belongs to its category only', () => {
     expect(normaliseTags({ ...TAGS, category: 'top', kind: 'skirt' })!.kind).toBe('tee')
   })
+
+  it('reads dresses and jumpsuits as their own category', () => {
+    expect(normaliseTags({ ...TAGS, category: 'dress', kind: 'jumpsuit' })).toMatchObject({ category: 'dress', kind: 'jumpsuit' })
+    expect(normaliseTags({ ...TAGS, category: 'dress', kind: 'tee' })!.kind).toBe('dress')
+  })
 })

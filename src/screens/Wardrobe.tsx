@@ -9,6 +9,7 @@ const FILTERS: [Filter, string][] = [
   ['tone', 'In my tone'],
   ['tops', 'Tops'],
   ['bottoms', 'Bottoms'],
+  ['dresses', 'Dresses'],
 ]
 
 function Row({ it, onOpen }: { it: RatedItem; onOpen: () => void }) {
@@ -29,7 +30,7 @@ function Row({ it, onOpen }: { it: RatedItem; onOpen: () => void }) {
 }
 
 export function Wardrobe() {
-  const { state, set, go, rated, tops, bots, openItem } = useApp()
+  const { state, set, go, rated, tops, bots, dresses, openItem } = useApp()
   const f = state.filter
 
   let groups: { label: string; rows: RatedItem[] }[]
@@ -42,13 +43,13 @@ export function Wardrobe() {
       { label: 'In your tone', rows: inn },
       { label: 'Near your tone', rows: near },
     ].filter((g) => g.rows.length)
-  } else if (f === 'all') {
-    groups = [
-      { label: 'Tops', rows: tops },
-      { label: 'Bottoms', rows: bots },
-    ]
   } else {
-    groups = [f === 'tops' ? { label: 'Tops', rows: tops } : { label: 'Bottoms', rows: bots }]
+    const all = [
+      { label: 'Tops', rows: tops, f: 'tops' },
+      { label: 'Bottoms', rows: bots, f: 'bottoms' },
+      { label: 'Dresses', rows: dresses, f: 'dresses' },
+    ]
+    groups = f === 'all' ? all : all.filter((g) => g.f === f)
   }
 
   return (
@@ -57,6 +58,7 @@ export function Wardrobe() {
         <h1 className="display">Wardrobe</h1>
         <span className="sub">
           {rated.length} pieces · {tops.length} tops · {bots.length} bottoms
+          {dresses.length > 0 && ` · ${dresses.length} ${dresses.length === 1 ? 'dress' : 'dresses'}`}
         </span>
       </header>
       {rated.length === 0 && (
@@ -69,7 +71,7 @@ export function Wardrobe() {
       )}
       {rated.length > 0 && (
         <div className="pad top-6 chips">
-          {FILTERS.map(([v, label]) => (
+          {FILTERS.filter(([v]) => v !== 'dresses' || dresses.length > 0).map(([v, label]) => (
             <button key={v} type="button" aria-pressed={f === v} className={`btn btn-sm ${f === v ? 'btn-primary' : 'btn-ghost'}`} onClick={() => set({ filter: v })}>
               {label}
             </button>

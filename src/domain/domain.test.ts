@@ -2,6 +2,7 @@ import { describe as suite, expect, it } from 'vitest'
 import { classifyHex, colourName, oklch } from './color'
 import { PRESETS, formatWhen, occasionFor, occasionFromAi, parseOccasion, withWeather } from './occasions'
 import { quizResult, shortlist } from './quiz'
+import { migrateDress } from './tags'
 import { bestPartners, contrastLabel, describe, lookTitle, rankLooks, rate, scoreLook, toneFit } from './scoring'
 import { FIXTURE_ITEMS } from './fixtures'
 import { TONES, matchOf, nearestTone, rankTones, toneDesc, toneIndex } from './tones'
@@ -180,6 +181,50 @@ suite('your call on tone', () => {
     const t = { ...byId('t1') }
     const b = rate([{ ...FIXTURE_ITEMS.find((i) => i.id === 'b1')!, matchOverride: 'near' }], SOFT_AUTUMN)[0]
     expect(describe(t, b, PRESETS.today, 1, SOFT_AUTUMN)[1].v).toContain('you rate indigo close enough to work')
+  })
+})
+
+suite('dresses', () => {
+  const dress = (extra = {}) => rate([{ ...FIXTURE_ITEMS[0], id: 'd1', cat: 'dress' as const, kind: 'dress' as const, name: 'Floral sundress', colorName: 'Cream', fabric: 'Cotton', f: 3, ...extra }], SOFT_AUTUMN)[0]
+
+  it('ranks a dress on its own alongside top and bottom pairs', () => {
+    const looks = rankLooks([...rated, dress()], PRESETS.holiday, 3, Infinity)
+    const d = looks.find((l) => l.t.id === 'd1')!
+    expect(d.b).toBeNull()
+    expect(looks).toHaveLength(7 * 6 + 1)
+    expect(lookTitle(d.t, d.b)).toBe('Floral sundress')
+  })
+
+  it('needs only a dress to make a look', () => {
+    expect(rankLooks([dress()], PRESETS.today, 1)).toHaveLength(1)
+    expect(rankLooks([byId('t1')], PRESETS.today, 1)).toHaveLength(0)
+  })
+
+  it('scores tone fit on the dress alone', () => {
+    expect(toneFit(dress(), null)).toBe(100)
+  })
+
+  it('never pairs a dress with anything', () => {
+    expect(bestPartners(dress(), [...rated, dress()], PRESETS.today)).toEqual([])
+    expect(bestPartners(byId('t1'), [...rated, dress()], PRESETS.today).every((p) => p.b.cat === 'bottom')).toBe(true)
+  })
+
+  it('writes reason copy for one piece', () => {
+    const [occ, tone, weather] = describe(dress(), null, PRESETS.holiday, 3, SOFT_AUTUMN)
+    expect(occ.v).toContain('The cotton floral sundress does the dressing up.')
+    expect(tone.v).toBe('Cream sits in your Soft Autumn palette, head to toe.')
+    // A light dress for an evening party.
+    expect(weather.v).toBe('Bring a warm layer.')
+  })
+
+  it('moves dresses that were filed as tops, and nothing else', () => {
+    const top = FIXTURE_ITEMS[0]
+    expect(migrateDress({ ...top, name: 'Floral sundress' }, 5)).toMatchObject({ cat: 'dress', kind: 'dress', updatedAt: 5 })
+    expect(migrateDress({ ...top, name: 'Denim jumpsuit' }, 5)).toMatchObject({ cat: 'dress', kind: 'jumpsuit' })
+    const shirt = { ...top, name: 'Dress shirt' }
+    expect(migrateDress(shirt, 5)).toBe(shirt)
+    const trousers = { ...FIXTURE_ITEMS[8], name: 'Dress trousers' }
+    expect(migrateDress(trousers, 5)).toBe(trousers)
   })
 })
 

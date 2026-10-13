@@ -23,15 +23,15 @@ export function Match() {
     return (
       <>
         {back}
-        <p className="pad top-8 muted">Add at least one top and one bottom to get a match.</p>
+        <p className="pad top-8 muted">Add a top and a bottom, or a dress, to get a match.</p>
       </>
     )
   }
 
   const { t, b } = look
   const tm = itemMatch(t)
-  const bm = itemMatch(b)
-  const saved = isSaved(t.id, b.id)
+  const bm = b && itemMatch(b)
+  const saved = isSaved(t.id, b?.id ?? null)
   const cap = (x = '') => x.charAt(0).toUpperCase() + x.slice(1)
   const tags = [CODES[code - 1], cap(occ.when.split(' · ').pop()), occ.setting.split(',')[0]]
 
@@ -64,25 +64,27 @@ export function Match() {
       <div className="stage stage--match" {...swipe}>
         <div className="glow-bg" />
         <Line sag={22} width={1.2} style={{ top: 0 }} />
-        <div className="match-top">
-          <Pins />
+        <div className={b ? 'match-top' : 'match-dress'}>
+          <Pins inset={b ? '28%' : '34%'} />
           <Garment item={t} className="fill" />
         </div>
-        <Garment item={b} className="match-bot" align="center" />
-        <div className="callout callout--right">
+        {b && <Garment item={b} className="match-bot" align="center" />}
+        <div className={`callout callout--right ${b ? '' : 'callout--dress'}`}>
           <span className="callout-rule" />
           <span className="callout-text">
             <span className="strong">{t.name}</span>
             <span style={{ color: tm.color }}>{tm.short}</span>
           </span>
         </div>
-        <div className="callout callout--left">
-          <span className="callout-rule" />
-          <span className="callout-text">
-            <span className="strong">{b.name}</span>
-            <span style={{ color: bm.color }}>{bm.short}</span>
-          </span>
-        </div>
+        {b && bm && (
+          <div className="callout callout--left">
+            <span className="callout-rule" />
+            <span className="callout-text">
+              <span className="strong">{b.name}</span>
+              <span style={{ color: bm.color }}>{bm.short}</span>
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="pad top-4 stack-3">
@@ -113,14 +115,14 @@ export function Match() {
           aria-label={saved ? 'Unsave look' : 'Save look'}
           aria-pressed={saved}
           style={{ color: saved ? 'var(--color-accent-300)' : undefined }}
-          onClick={() => toggleSaved(t.id, b.id, occ.label)}
+          onClick={() => toggleSaved(t.id, b?.id ?? null, occ.label)}
         >
           <Heart size={18} weight={saved ? 'fill' : 'regular'} />
         </button>
         <button type="button" className="btn btn-secondary btn-tall" onClick={() => set({ lookI: (i + 1) % n })}>
           Another look
         </button>
-        <button type="button" className="btn btn-primary btn-tall" onClick={() => go('outfit', { topId: t.id, botId: b.id })}>
+        <button type="button" className="btn btn-primary btn-tall" onClick={() => go('outfit', b ? { topId: t.id, botId: b.id } : { topId: t.id })}>
           Hang this look
         </button>
       </div>

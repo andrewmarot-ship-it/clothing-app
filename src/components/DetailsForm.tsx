@@ -1,5 +1,5 @@
 import { CODES } from '../domain/occasions'
-import { KINDS, KIND_LABELS, defaultKind } from '../domain/tags'
+import { CATEGORY_LABELS, KINDS, KIND_LABELS, defaultKind } from '../domain/tags'
 import type { Category, Kind } from '../domain/types'
 
 /** The editable facts about a piece (colour and tone come from the photo). */
@@ -25,10 +25,10 @@ export function DetailsForm({ value, onChange }: { value: Details; onChange: (d:
         </label>
         <input id="piece-name" className="input input-lg" value={value.name} onChange={(e) => patch({ name: e.target.value })} />
       </div>
-      <div className="actions-2 gap-2" role="radiogroup" aria-label="Category">
-        {(['top', 'bottom'] as Category[]).map((c) => (
+      <div className="actions-3" role="radiogroup" aria-label="Category">
+        {(['top', 'bottom', 'dress'] as Category[]).map((c) => (
           <button key={c} type="button" role="radio" aria-checked={value.cat === c} className={`btn ${value.cat === c ? 'btn-primary' : 'btn-ghost'}`} style={{ minHeight: 40 }} onClick={() => setCat(c)}>
-            {c === 'top' ? 'Top' : 'Bottom'}
+            {CATEGORY_LABELS[c]}
           </button>
         ))}
       </div>

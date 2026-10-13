@@ -82,4 +82,9 @@ describe('mergeProfile', () => {
     const prof = { ...p(1), topId: 'gone', saved: [{ id: 's', topId: 'a', botId: 'gone', occ: 'Today' }] }
     expect(pruneProfile(prof, [item('a', 1)])).toMatchObject({ topId: null, saved: [] })
   })
+
+  it('keeps a dress look, which has no bottom', () => {
+    const prof = { ...p(1), saved: [{ id: 's', topId: 'd', botId: null, occ: 'Today' }], wearLog: [{ date: '2026-10-13', topId: 'd', botId: null }] }
+    expect(pruneProfile(prof, [item('d', 1, { cat: 'dress', kind: 'dress' })])).toMatchObject({ saved: [{ id: 's' }], wearLog: [{ topId: 'd' }] })
+  })
 })
