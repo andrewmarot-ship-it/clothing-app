@@ -193,7 +193,7 @@ h1 { margin: 0; }
   border: 0;
   background: none;
   cursor: pointer;
-  opacity: 0.72;
+  opacity: var(--hanging-dim);
   transition:
     width 0.35s cubic-bezier(0.34, 1.5, 0.5, 1),
     height 0.35s cubic-bezier(0.34, 1.5, 0.5, 1),
@@ -201,8 +201,8 @@ h1 { margin: 0; }
 }
 .hanging:hover { opacity: 0.9; }
 .hanging.is-selected { opacity: 1; }
-.hanging .fill { filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.35)); }
-.hanging.is-selected .fill { filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.5)); }
+.hanging .fill { filter: drop-shadow(0 6px 8px color-mix(in srgb, var(--color-shadow) 35%, transparent)); }
+.hanging.is-selected .fill { filter: drop-shadow(0 10px 14px color-mix(in srgb, var(--color-shadow) 50%, transparent)); }
 .hanging-pin { position: absolute; left: 50%; top: -5px; width: 5px; height: 11px; margin-left: -2.5px; border-radius: 1.5px; z-index: 2; background: var(--color-neutral-500); transition: background 0.3s; }
 .hanging.is-selected .hanging-pin { background: var(--color-accent); width: 6px; height: 14px; margin-left: -3px; top: -7px; }
 .hanging-dot { position: absolute; left: 50%; bottom: -14px; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; }
@@ -219,7 +219,7 @@ h1 { margin: 0; }
   box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
-.fitting-top { position: absolute; left: 22px; top: 10px; width: 92px; height: 92px; z-index: 2; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.45)); }
+.fitting-top { position: absolute; left: 22px; top: 10px; width: 92px; height: 92px; z-index: 2; filter: drop-shadow(0 8px 10px color-mix(in srgb, var(--color-shadow) 45%, transparent)); }
 .fitting-bot { position: absolute; left: 26px; top: 88px; width: 84px; height: 100px; }
 .fitting-info { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
 .piece {
@@ -295,8 +295,8 @@ h1 { margin: 0; }
 }
 .stage--item .glow-bg { top: -30px; width: 300px; height: 300px; margin-left: -150px; opacity: 0.7; }
 .pin { position: absolute; border-radius: 2px; background: var(--color-accent); z-index: 2; }
-.match-top { position: absolute; left: 50%; top: 12px; width: 128px; height: 128px; margin-left: -64px; z-index: 2; filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.5)); }
-.match-bot { position: absolute; left: 50%; top: 116px; width: 136px; height: 150px; margin-left: -68px; filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.5)); }
+.match-top { position: absolute; left: 50%; top: 12px; width: 128px; height: 128px; margin-left: -64px; z-index: 2; filter: drop-shadow(0 12px 16px color-mix(in srgb, var(--color-shadow) 50%, transparent)); }
+.match-bot { position: absolute; left: 50%; top: 116px; width: 136px; height: 150px; margin-left: -68px; filter: drop-shadow(0 12px 16px color-mix(in srgb, var(--color-shadow) 50%, transparent)); }
 .callout { position: absolute; display: flex; align-items: flex-start; gap: var(--space-2); }
 .callout--right { left: calc(50% + 74px); top: 56px; }
 .callout--left { right: calc(50% + 76px); top: 186px; flex-direction: row-reverse; text-align: right; }
@@ -332,7 +332,7 @@ h1 { margin: 0; }
 .hidden-note { font-size: 12px; color: var(--color-neutral-500); display: flex; align-items: center; gap: var(--space-2); }
 
 /* — item — */
-.item-figure { position: absolute; left: 50%; top: 22px; width: 210px; height: 210px; margin-left: -105px; filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.5)); }
+.item-figure { position: absolute; left: 50%; top: 22px; width: 210px; height: 210px; margin-left: -105px; filter: drop-shadow(0 14px 18px color-mix(in srgb, var(--color-shadow) 50%, transparent)); }
 .match-row { display: flex; align-items: center; gap: var(--space-2); font-size: 13px; }
 .dots { display: flex; gap: 3px; }
 .dots span { width: 6px; height: 6px; border-radius: 50%; }
@@ -360,7 +360,7 @@ h1 { margin: 0; }
 .corner--bl { left: 14px; bottom: 14px; border-left-width: 1.5px; border-bottom-width: 1.5px; border-bottom-left-radius: 6px; }
 .corner--br { right: 14px; bottom: 14px; border-right-width: 1.5px; border-bottom-width: 1.5px; border-bottom-right-radius: 6px; }
 .viewfinder-photo { position: absolute; inset: 12%; }
-.viewfinder-demo { width: 58%; height: 58%; transition: opacity 0.4s; filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.5)); }
+.viewfinder-demo { width: 58%; height: 58%; transition: opacity 0.4s; filter: drop-shadow(0 12px 18px color-mix(in srgb, var(--color-shadow) 50%, transparent)); }
 .viewfinder-idle { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); color: var(--color-neutral-500); font-size: 13px; }
 .scan-line {
   position: absolute;
@@ -493,7 +493,7 @@ h1 { margin: 0; }
 .seg-grid--3 { grid-template-columns: repeat(3, 1fr); }
 /* A faint rim, like the silhouettes' outline, so dark garments stay visible on the dark page. */
 .cutout .garment-photo, .garment-photo.cutout { filter: drop-shadow(0 0 0.5px var(--color-neutral-500)) drop-shadow(0 0 0.5px var(--color-neutral-600)); }
-.garment-photo.cutout-shadow { filter: drop-shadow(0 0 0.5px var(--color-neutral-500)) drop-shadow(0 12px 18px rgba(0, 0, 0, 0.5)); }
+.garment-photo.cutout-shadow { filter: drop-shadow(0 0 0.5px var(--color-neutral-500)) drop-shadow(0 12px 18px color-mix(in srgb, var(--color-shadow) 50%, transparent)); }
 
 /* — first run & wear — */
 .setup { gap: var(--space-3); padding: var(--space-4); box-shadow: var(--shadow-sm); }

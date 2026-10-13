@@ -77,6 +77,67 @@
   --shadow-sm: 0 0 0 1px #3f424d;
   --shadow-md: 0 0 0 1px #595d6c, 0 6px 18px rgba(0,0,0,0.55);
   --shadow-lg: 0 0 0 1px #9397ab, 0 16px 40px rgba(0,0,0,0.65);
+
+  /* Garment drop shadows and dimming of pieces off the centre of a line. */
+  --color-shadow: #000;
+  --hanging-dim: 0.72;
+  color-scheme: dark;
+}
+
+/* Linen: the light theme. A warm, nearly colourless off-white close to the
+   surface pieces are photographed on, so dark clothes (most of a wardrobe)
+   stand out and colours read true. The ramps run the other way from
+   Nocturne's: a step keeps its role (500 is muted text, 800 a faint fill),
+   so the components need no changes. */
+:root[data-theme="light"] {
+  --color-bg: #efeee9;
+  --color-surface: #fbfaf7;
+  --color-text: #1d1c22;
+  --color-accent: #4f3fc0;
+  --color-accent-2: #5b54a8;
+  --color-divider: color-mix(in srgb, #1d1c22 14%, transparent);
+
+  --color-neutral-100: #1d1c22;
+  --color-neutral-200: #2c2b31;
+  --color-neutral-300: #403e45;
+  --color-neutral-400: #57555c;
+  --color-neutral-500: #6c6a72;
+  --color-neutral-600: #8b8992;
+  --color-neutral-700: #a9a7ae;
+  --color-neutral-800: #dcdad3;
+  --color-neutral-900: #e7e5df;
+
+  --color-accent-100: #1f1747;
+  --color-accent-200: #2f2470;
+  --color-accent-300: #3e3096;
+  --color-accent-400: #4f3fc0;
+  --color-accent-500: #6a5bd6;
+  --color-accent-600: #8f84e3;
+  --color-accent-700: #b4acee;
+  --color-accent-800: #dcd8f6;
+  --color-accent-900: #f1f0f4;
+
+  --color-accent-2-100: #1f1c40;
+  --color-accent-2-200: #2e2a5e;
+  --color-accent-2-300: #403a80;
+  --color-accent-2-400: #5b54a8;
+  --color-accent-2-500: #7770c0;
+  --color-accent-2-600: #9690d2;
+  --color-accent-2-700: #b6b1e2;
+  --color-accent-2-800: #dad7f1;
+  --color-accent-2-900: #efeef6;
+
+  --color-section: #e3e1f4;
+  --color-section-glow: #d4d0ef;
+  --color-section-ghost: #b9b3e3;
+
+  --shadow-sm: 0 0 0 1px #dcdad3;
+  --shadow-md: 0 0 0 1px #d0cec7, 0 6px 18px rgba(40, 35, 25, 0.1);
+  --shadow-lg: 0 0 0 1px #c2c0b9, 0 16px 40px rgba(40, 35, 25, 0.14);
+
+  --color-shadow: #6b6253;
+  --hanging-dim: 1;
+  color-scheme: light;
 }
 
 body {
