@@ -1,35 +1,49 @@
 import { describe, expect, it } from 'vitest'
 import { rate } from '../domain/scoring'
 import type { Item } from '../domain/types'
-import type { AppState } from './context'
-import { currentOutfit, hangPatch } from './outfit'
+import { currentOutfit, hangPatch, lookPatch, migratePicks, shapesAvailable, type Picks } from './outfit'
 
 const piece = (id: string, cat: Item['cat']): Item => ({ id, cat, name: id, kind: cat === 'top' ? 'tee' : cat === 'bottom' ? 'jeans' : 'dress', color: '#b4643c', colorName: 'Rust', fabric: 'Cotton', tone: 7, f: 1, w: 1, wears: 0 })
-const items = [piece('t1', 'top'), piece('t2', 'top'), piece('b1', 'bottom'), piece('d1', 'dress')]
+const items = [piece('t1', 'top'), piece('t2', 'top'), piece('b1', 'bottom'), piece('d1', 'dress'), piece('d2', 'dress')]
 const rated = rate(items, 7)
-const state = (topId: string | null, botId: string | null) => ({ items, topId, botId }) as AppState
+const picks = (p: Partial<Picks> = {}): Picks => ({ topId: null, botId: null, dressId: null, shape: 'separates', ...p })
 const ids = (o: ReturnType<typeof currentOutfit>) => o && [o.t.id, o.b?.id ?? null]
 
-describe('the outfit on the line', () => {
-  it('is the chosen dress on its own', () => {
-    expect(ids(currentOutfit(rated, 'd1', 'b1'))).toEqual(['d1', null])
+describe('the outfit on the Stage', () => {
+  it('follows the shape, keeping the picks of the other', () => {
+    const p = picks({ topId: 't2', botId: 'b1', dressId: 'd2' })
+    expect(ids(currentOutfit(rated, p))).toEqual(['t2', 'b1'])
+    expect(ids(currentOutfit(rated, { ...p, shape: 'dress' }))).toEqual(['d2', null])
   })
 
-  it('is the chosen top and bottom, falling back to the first of each', () => {
-    expect(ids(currentOutfit(rated, 't2', 'b1'))).toEqual(['t2', 'b1'])
-    expect(ids(currentOutfit(rated, null, null))).toEqual(['t1', 'b1'])
+  it('falls back to the first of each kind', () => {
+    expect(ids(currentOutfit(rated, picks()))).toEqual(['t1', 'b1'])
+    expect(ids(currentOutfit(rated, picks({ shape: 'dress' })))).toEqual(['d1', null])
   })
 
-  it('falls back to a dress when there are no bottoms, and to nothing without one', () => {
+  it('uses the other shape when this one cannot be made', () => {
     const noBottoms = rated.filter((i) => i.cat !== 'bottom')
-    expect(ids(currentOutfit(noBottoms, 't1', null))).toEqual(['d1', null])
-    expect(currentOutfit(noBottoms.filter((i) => i.cat !== 'dress'), 't1', null)).toBeNull()
+    expect(ids(currentOutfit(noBottoms, picks()))).toEqual(['d1', null])
+    const noDresses = rated.filter((i) => i.cat !== 'dress')
+    expect(ids(currentOutfit(noDresses, picks({ shape: 'dress' })))).toEqual(['t1', 'b1'])
+    expect(currentOutfit(rated.filter((i) => i.cat === 'top'), picks())).toBeNull()
   })
 
-  it('swaps a dress for a top when a bottom goes on', () => {
-    expect(hangPatch(state('d1', null), 'b1')).toEqual({ botId: 'b1', topId: 't1' })
-    expect(hangPatch(state('t2', null), 'b1')).toEqual({ botId: 'b1', topId: 't2' })
-    expect(hangPatch(state('t1', 'b1'), 'd1')).toEqual({ topId: 'd1' })
-    expect(hangPatch(state('t1', 'b1'), 'gone')).toEqual({})
+  it('switches shape when a piece is hung', () => {
+    expect(hangPatch({ items }, 'd2')).toEqual({ dressId: 'd2', shape: 'dress' })
+    expect(hangPatch({ items }, 'b1')).toEqual({ botId: 'b1', shape: 'separates' })
+    expect(hangPatch({ items }, 'gone')).toEqual({})
+    expect(lookPatch('t1', 'b1')).toEqual({ topId: 't1', botId: 'b1', shape: 'separates' })
+    expect(lookPatch('d1', null)).toEqual({ dressId: 'd1', shape: 'dress' })
+  })
+
+  it('knows which shapes the wardrobe can make', () => {
+    expect(shapesAvailable(items)).toEqual({ separates: true, dress: true })
+    expect(shapesAvailable(items.filter((i) => i.cat !== 'bottom'))).toEqual({ separates: false, dress: true })
+  })
+
+  it('moves a dress stored as the top to the dress pick', () => {
+    expect(migratePicks(picks({ topId: 'd1', botId: 'b1' }), items)).toEqual(picks({ topId: null, botId: 'b1', dressId: 'd1', shape: 'dress' }))
+    expect(migratePicks(picks({ topId: 't1' }), items)).toEqual(picks({ topId: 't1' }))
   })
 })

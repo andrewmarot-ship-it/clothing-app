@@ -1,6 +1,6 @@
 # Clothesline
 
-A virtual wardrobe that matches outfits to your colour tone. Photograph your clothes, hang them on closet rails (tops, bottoms and dresses), and flip through them to build outfits: a top with a bottom, or a dress on its own. Every piece is placed in one of the **TCI 12 Tones** and scored against yours. **Match me** recommends outfits for an occasion you type or pick.
+A virtual wardrobe that matches outfits to your colour tone. Photograph your clothes, hang them on ring clotheslines (tops, bottoms and dresses), and spin them to build outfits: a top with a bottom, or a dress on its own. Every piece is placed in one of the **TCI 12 Tones** and scored against yours. **Cast** spins the rings onto the best outfit for an occasion you type or pick.
 
 Mobile-first web app built with React, TypeScript and Vite, styled with the Nocturne design system. There are two themes: **Linen** (light, the default) and **Nocturne** (dark). People switch between them, or follow their device, under Profile → Appearance; the choice is kept on the device (`src/state/theme.ts`, tokens in `src/styles/nocturne.css`). The glow behind garments takes the clothes' own colours by default; Appearance can switch it to the accent violet or off.
 
@@ -44,7 +44,7 @@ GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests and the build on ev
 
 | Tab | Screen |
 |---|---|
-| **Outfit** (home) | A first-run checklist, then closet rails: swipe, tap a hanger or use the arrows. A Separates · Dress switch when you own both. The page takes on the outfit's colour. Under the rails: the pieces, "I wore this today", a tone-fit ring, the weather with a warmth note and an 18-hour chart, and quick occasions with Match me. Shuffle and Save sit in the header |
+| **Stage** (home) | A first-run checklist, then 3D ring clotheslines seen from slightly above: swipe or tap a piece and the ring turns the shorter way. A **Separates · Dress** switch (tap the active side, or long-press the stage, for the body picker and "Let Cast choose the shape"). The stage takes on the outfit's colour, with its colour names as ghost words. Tone fit, Spin, Save and "I wore this today" on the right; occasion chips and **Dress me for…** at the bottom open **Cast** |
 | **Wardrobe** | Every piece, filterable by tops, bottoms or "in my tone" |
 | **Add** | Take or upload a photo; the app reads its colour, places it in a tone and hangs it on the line |
 | **Looks** | Saved outfits |
@@ -52,7 +52,7 @@ GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests and the build on ev
 
 On a device's first launch, a **Welcome** screen draws a clothesline, pegs three pieces to it, and offers sign-in or "Continue without an account". It doesn't come back after that, and opening a sign-in link skips it.
 
-Pushed screens: **Occasion** → **Match** (Match me results), **Item** detail → **Edit** (details, or retake the photo), the 3-question **Quiz** to find your tone, and **All 12 tones**.
+Navigation is a floating dock; the active tab widens to show its label, and Add sits in a turning ring of your palette. **Cast** is a bottom sheet over the Stage: say what it's for (typed text is read by Claude when signed in), cast, and the rings spin onto the best look with ticks and a chime, then the reasons fade in. With "Let Cast choose" it weighs dresses against separates and switches shape before spinning. Pushed screens: **Item** detail → **Edit** (details, or retake the photo), the 3-question **Quiz** to find your tone, and **All 12 tones**.
 
 The app starts empty: there's no demo wardrobe.
 
@@ -100,10 +100,10 @@ Sign-in is passwordless: Supabase emails a magic link. Signed out, the app works
 
 Supabase setup (once): under Authentication → URL Configuration, set the Site URL to the deployed URL and add `http://localhost:5173/**` to Redirect URLs. The built-in email sender only delivers to the project's team members, a few emails an hour; configure custom SMTP (for example Resend) before inviting other people.
 
-## Match me: occasions and weather
+## Cast: occasions and weather
 
 - **Occasions:** type anything ("work holiday party friday"). Keywords give an instant reading, and once you pause, signed-in users get Claude's reading from `POST /api/occasion`. It returns the dress code, date (relative dates resolved), time of day, setting, indoor or outdoor, contrast and accessories, which are normalised defensively in `occasionFromAi`. Readings are cached per text. Signed out, offline or on any error, the keyword reading stays.
-- **Weather:** live from [Open-Meteo](https://open-meteo.com), no key, called from the browser. Location is asked only when you tap "Add your location", rounded to about 1km and kept on this device. The forecast for the occasion's day sets the weather line and the warmth target (`src/domain/weather.ts`). The Outfit header shows current conditions. Open-Meteo's free tier is non-commercial; `src/state/weather.ts` is the one file to swap for a paid provider.
+- **Weather:** live from [Open-Meteo](https://open-meteo.com), no key, called from the browser. Location is asked only when you tap "Add your location for weather" in Cast, rounded to about 1km and kept on this device. The forecast for the occasion's day sets the weather line and the warmth target (`src/domain/weather.ts`). The Stage header shows current conditions. Open-Meteo's free tier is non-commercial; `src/state/weather.ts` is the one file to swap for a paid provider.
 
 ## What's real and what's simulated
 

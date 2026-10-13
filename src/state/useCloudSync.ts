@@ -52,6 +52,9 @@ export const profileOf = (s: AppState): ProfileData => ({
   wearLog: s.wearLog,
   topId: s.topId,
   botId: s.botId,
+  dressId: s.dressId,
+  shape: s.shape,
+  bodyPref: s.bodyPref,
 })
 
 /** What a full sync decided to send. */

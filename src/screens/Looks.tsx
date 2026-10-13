@@ -4,7 +4,7 @@ import { lookTitle, toneFit } from '../domain/scoring'
 import { useApp } from '../state/context'
 
 export function Looks() {
-  const { state, set, go, byId } = useApp()
+  const { state, set, go, byId, wear } = useApp()
   const looks = state.saved.flatMap((l) => {
     const t = byId(l.topId)
     const b = l.botId ? byId(l.botId) : null
@@ -39,7 +39,10 @@ export function Looks() {
               </span>
             </div>
             <div className="look-actions">
-              <button type="button" className="btn btn-secondary btn-sm" onClick={() => go('outfit', l.b ? { topId: l.t.id, botId: l.b.id } : { topId: l.t.id })}>
+              <button type="button" className="btn btn-secondary btn-sm" onClick={() => {
+                  wear(l.t.id, l.b?.id ?? null)
+                  go('outfit')
+                }}>
                 Wear
               </button>
               <button

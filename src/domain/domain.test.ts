@@ -192,7 +192,21 @@ suite('dresses', () => {
     const d = looks.find((l) => l.t.id === 'd1')!
     expect(d.b).toBeNull()
     expect(looks).toHaveLength(7 * 6 + 1)
-    expect(lookTitle(d.t, d.b)).toBe('Floral sundress')
+    expect(lookTitle(d.t, d.b)).toBe('Cream floral sundress')
+    expect(lookTitle({ ...d.t, name: 'Camel wrap dress', colorName: 'Camel' }, null)).toBe('Camel wrap dress')
+  })
+
+  it('ranks only the shape asked for', () => {
+    const all = [...rated, dress()]
+    expect(rankLooks(all, PRESETS.today, 1, Infinity, 'dress').map((l) => l.t.id)).toEqual(['d1'])
+    expect(rankLooks(all, PRESETS.today, 1, Infinity, 'separates').every((l) => l.b)).toBe(true)
+  })
+
+  it('weighs a dress up for a date and down for a garden walk', () => {
+    const d = dress()
+    const diff = scoreLook(d, null, PRESETS.date, 3) - scoreLook(d, null, { ...PRESETS.date, dressBias: 0 }, 3)
+    expect(diff).toBeCloseTo(0.04, 5)
+    expect(PRESETS.garden.dressBias).toBeLessThan(0)
   })
 
   it('needs only a dress to make a look', () => {
@@ -212,7 +226,7 @@ suite('dresses', () => {
   it('writes reason copy for one piece', () => {
     const [occ, tone, weather] = describe(dress(), null, PRESETS.holiday, 3, SOFT_AUTUMN)
     expect(occ.v).toContain('The cotton floral sundress does the dressing up.')
-    expect(tone.v).toBe('Cream sits in your Soft Autumn palette, head to toe.')
+    expect(tone.v).toBe('Cream is core Soft Autumn: one piece, head to hem, in your palette.')
     // A light dress for an evening party.
     expect(weather.v).toBe('Bring a warm layer.')
   })

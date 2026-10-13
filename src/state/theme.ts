@@ -115,3 +115,6 @@ export function washFill(pref: GlowPref, colour: string): string {
   if (pref !== 'tone') return 'none'
   return `radial-gradient(80% 55% at 50% 0%, color-mix(in oklch, ${colour} 32%, transparent), transparent)`
 }
+
+/** The user's palette as a conic gradient, for the aura blobs and the Add ring. */
+export const paletteConic = (palette: string[]) => `conic-gradient(from 0deg, ${[...palette, palette[0]].join(', ')})`

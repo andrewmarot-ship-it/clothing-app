@@ -4,6 +4,7 @@
  * deletions travel as tombstones, and the rest of the profile is one record
  * where the newest change wins.
  */
+import type { BodyPref, Shape } from './categories.ts'
 import type { Item, SavedLook } from './types.ts'
 
 /** The synced fields of a piece: everything except runtime-only display state. */
@@ -23,6 +24,9 @@ export interface ProfileData {
   wearLog: { date: string; topId: string; botId: string | null }[]
   topId: string | null
   botId: string | null
+  dressId?: string | null
+  shape?: Shape
+  bodyPref?: BodyPref
 }
 
 export interface ProfileRow {
@@ -115,6 +119,7 @@ export function pruneProfile(p: ProfileData, items: Item[]): ProfileData {
     wearLog: p.wearLog.filter(pair),
     topId: p.topId && ids.has(p.topId) ? p.topId : null,
     botId: p.botId && ids.has(p.botId) ? p.botId : null,
+    dressId: p.dressId && ids.has(p.dressId) ? p.dressId : null,
   }
 }
 
