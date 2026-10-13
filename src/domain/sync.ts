@@ -20,7 +20,7 @@ export interface ProfileData {
   tone: number | null
   myColours: string[]
   saved: SavedLook[]
-  wearLog: { date: string; topId: string; botId: string }[]
+  wearLog: { date: string; topId: string; botId: string | null }[]
   topId: string | null
   botId: string | null
 }
@@ -108,7 +108,7 @@ export function mergeProfile(local: ProfileData, localUpdatedAt: number, remote:
 /** Drop saved looks, wear entries and outfit picks that point at pieces that no longer exist. */
 export function pruneProfile(p: ProfileData, items: Item[]): ProfileData {
   const ids = new Set(items.map((i) => i.id))
-  const pair = (l: { topId: string; botId: string }) => ids.has(l.topId) && ids.has(l.botId)
+  const pair = lookExists(ids)
   return {
     ...p,
     saved: p.saved.filter(pair),
@@ -117,6 +117,9 @@ export function pruneProfile(p: ProfileData, items: Item[]): ProfileData {
     botId: p.botId && ids.has(p.botId) ? p.botId : null,
   }
 }
+
+/** Does every piece of a saved or worn look still exist? A dress look has no bottom. */
+export const lookExists = (ids: Set<string>) => (l: { topId: string; botId?: string | null }) => ids.has(l.topId) && (l.botId == null || ids.has(l.botId))
 
 /** Storage path for a stored image: one private folder per user. */
 export const photoPath = (userId: string, key: string) => `${userId}/${key}`

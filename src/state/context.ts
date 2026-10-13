@@ -6,7 +6,7 @@ import type { CloudState } from './useCloudSync'
 
 export type Tab = 'outfit' | 'wardrobe' | 'add' | 'looks' | 'profile'
 export type Screen = Tab | 'occasion' | 'match' | 'item' | 'edit' | 'quiz' | 'tones'
-export type Filter = 'all' | 'tone' | 'tops' | 'bottoms'
+export type Filter = 'all' | 'tone' | 'tops' | 'bottoms' | 'dresses'
 
 export const TABS: Tab[] = ['outfit', 'wardrobe', 'add', 'looks', 'profile']
 
@@ -14,8 +14,10 @@ export const TABS: Tab[] = ['outfit', 'wardrobe', 'add', 'looks', 'profile']
 export interface Wear {
   /** Local date, YYYY-MM-DD. */
   date: string
+  /** The top, or the dress. */
   topId: string
-  botId: string
+  /** The bottom; null for a dress. */
+  botId: string | null
 }
 
 export interface AppState {
@@ -25,7 +27,7 @@ export interface AppState {
   /** Index into TONES; null until the user finds or picks one. */
   tone: number | null
   items: Item[]
-  /** The outfit on the line; null until there's a piece in that category. */
+  /** The outfit on the line: the top or dress, and the bottom (unused while a dress is on). */
   topId: string | null
   botId: string | null
   saved: SavedLook[]
@@ -53,6 +55,13 @@ export interface AppState {
 
 export type Patch = Partial<AppState>
 
+export interface Outfit {
+  /** The top, or the dress. */
+  t: RatedItem
+  /** The bottom; null for a dress. */
+  b: RatedItem | null
+}
+
 export interface Images {
   photo?: Blob | null
   original?: Blob | null
@@ -71,12 +80,15 @@ export interface AppContext {
   rated: RatedItem[]
   tops: RatedItem[]
   bots: RatedItem[]
-  top: RatedItem | undefined
-  bot: RatedItem | undefined
+  dresses: RatedItem[]
+  /** The outfit on the line: a top and bottom, or a dress (b is null). Null until one is possible. */
+  outfit: Outfit | null
   byId: (id: string | null) => RatedItem | undefined
-  isSaved: (topId: string, botId: string) => boolean
-  toggleSaved: (topId: string, botId: string, occ: string) => void
+  isSaved: (topId: string, botId: string | null) => boolean
+  toggleSaved: (topId: string, botId: string | null, occ: string) => void
   openItem: (id: string) => void
+  /** Put a piece on the line, swapping out whatever it replaces. */
+  hang: (id: string) => void
   /** Add a piece, storing its images, and hang it on the line. */
   addItem: (item: Item, images: Images) => void
   /** Change a piece; new images replace (and delete) the old ones. */
@@ -84,9 +96,9 @@ export interface AppContext {
   /** Remove a piece, its saved looks and its stored images. */
   removeItem: (id: string) => void
   /** Was this outfit worn today? */
-  wornToday: (topId: string, botId: string) => boolean
+  wornToday: (topId: string, botId: string | null) => boolean
   /** Log (or undo) wearing this outfit today. */
-  toggleWorn: (topId: string, botId: string) => void
+  toggleWorn: (topId: string, botId: string | null) => void
   /** Sign-in and sync. */
   cloud: CloudState
 }

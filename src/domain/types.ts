@@ -1,5 +1,6 @@
-export type Category = 'top' | 'bottom'
-export type Kind = 'shirt' | 'tee' | 'tank' | 'jeans' | 'shorts' | 'skirt'
+/** A dress is a whole outfit on its own; tops and bottoms pair up. */
+export type Category = 'top' | 'bottom' | 'dress'
+export type Kind = 'shirt' | 'tee' | 'tank' | 'jeans' | 'shorts' | 'skirt' | 'dress' | 'jumpsuit'
 export type Match = 'in' | 'near' | 'out'
 
 /** 1 Casual · 2 Smart · 3 Dressy · 4 Formal */
@@ -54,7 +55,9 @@ export interface RatedItem extends Item {
 
 export interface SavedLook {
   id: string
+  /** The top, or the dress. */
   topId: string
-  botId: string
+  /** The bottom; null for a dress. */
+  botId: string | null
   occ: string
 }

@@ -8,8 +8,8 @@ const MODEL = process.env.TAG_MODEL || 'claude-haiku-5-5'
 
 const Tags = z.object({
   isGarment: z.boolean().describe('True only if the photo shows one clothing item.'),
-  category: z.enum(['top', 'bottom', 'other']).describe('"other" for dresses, outerwear, shoes, bags, accessories.'),
-  kind: z.enum(['shirt', 'tee', 'tank', 'jeans', 'shorts', 'skirt', 'other']),
+  category: z.enum(['top', 'bottom', 'dress', 'other']).describe('"dress" for dresses and jumpsuits; "other" for outerwear, shoes, bags, accessories.'),
+  kind: z.enum(['shirt', 'tee', 'tank', 'jeans', 'shorts', 'skirt', 'dress', 'jumpsuit', 'other']),
   name: z.string().describe('2–3 word everyday name, e.g. "Striped shirt", "Wide jeans".'),
   fabric: z.string().describe('Most likely fabric in one or two words, e.g. "Cotton", "Denim", "Wool knit".'),
   colourName: z.string().describe('Plain colour name of the main colour, e.g. "Rust", "Navy", "Cream".'),
@@ -21,7 +21,8 @@ const Tags = z.object({
 const SYSTEM = `You tag clothing for a wardrobe app. The user photographs one garment laid flat on a surface.
 Look only at the garment, not the surface. Describe what you can see; when unsure, pick the most common option.
 Kinds: shirt = any long-sleeved or button-up top, knits and blouses included; tee = short-sleeved top; tank = sleeveless top;
-jeans = any full-length trousers (denim, chinos, cords); shorts; skirt.`
+jeans = any full-length trousers (denim, chinos, cords); shorts; skirt;
+dress = any dress, whatever the length; jumpsuit = jumpsuits, playsuits and rompers.`
 
 const FORMALITY = { casual: 1, smart: 2, dressy: 3, formal: 4 } as const
 const WARMTH = { light: 1, mid: 2, warm: 3 } as const

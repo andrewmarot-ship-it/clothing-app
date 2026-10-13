@@ -17,7 +17,7 @@ export function Profile() {
   // Wear: most worn, and pieces not worn in the last 30 days (never-worn first).
   const lastWorn = new Map<string, string>()
   for (const w of state.wearLog)
-    for (const id of [w.topId, w.botId]) if ((lastWorn.get(id) ?? '') < w.date) lastWorn.set(id, w.date)
+    for (const id of [w.topId, w.botId]) if (id && (lastWorn.get(id) ?? '') < w.date) lastWorn.set(id, w.date)
   const mostWorn = [...rated].filter((i) => i.wears > 0).sort((a, b) => b.wears - a.wears).slice(0, 3)
   const waiting = rated
     .filter((i) => (lastWorn.get(i.id) ?? '') < cutoff)

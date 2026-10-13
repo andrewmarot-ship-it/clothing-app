@@ -5,11 +5,12 @@ import { Garment, Line, Pins } from '../components/Garment'
 import { ToneOverride } from '../components/ToneOverride'
 import { CODES, PRESETS } from '../domain/occasions'
 import { bestPartners, toneFit } from '../domain/scoring'
+import { CATEGORY_LABELS } from '../domain/tags'
 import { TONES } from '../domain/tones'
 import { useApp } from '../state/context'
 
 export function ItemDetail() {
-  const { state, go, byId, rated, removeItem } = useApp()
+  const { state, go, hang, byId, rated, removeItem } = useApp()
   const item = byId(state.itemId)
   const backTo = state.from === 'outfit' ? 'outfit' : 'wardrobe'
   const [confirming, setConfirming] = useState(false)
@@ -69,7 +70,7 @@ export function ItemDetail() {
         </div>
       </div>
       <div className="pad top-4 stack-2">
-        <Kicker>{item.cat === 'top' ? 'Top' : 'Bottom'}</Kicker>
+        <Kicker>{CATEGORY_LABELS[item.cat]}</Kicker>
         <h1 className="title">{item.name}</h1>
         <ToneOverride item={item} />
       </div>
@@ -107,7 +108,14 @@ export function ItemDetail() {
         <button type="button" className={`btn btn-ghost btn-tall ${confirming ? 'btn-danger' : 'btn-quiet'}`} onClick={remove}>
           {confirming ? 'Tap again to remove' : 'Remove'}
         </button>
-        <button type="button" className="btn btn-primary btn-tall" onClick={() => go('outfit', item.cat === 'top' ? { topId: item.id } : { botId: item.id })}>
+        <button
+          type="button"
+          className="btn btn-primary btn-tall"
+          onClick={() => {
+            hang(item.id)
+            go('outfit')
+          }}
+        >
           Put on the line
         </button>
       </div>
