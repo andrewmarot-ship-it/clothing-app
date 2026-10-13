@@ -1,5 +1,5 @@
 import { CaretRight, X } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { Kicker } from '../components/Chrome'
 import { AccountCard } from '../components/SignIn'
 import { Garment } from '../components/Garment'
@@ -8,11 +8,12 @@ import { TONES, chromaLabel, hueLabel, toneDesc, valueLabel, type Tone } from '.
 import { useApp } from '../state/context'
 import { SwitchRow } from '../components/Switch'
 import { fx, setFeedback, useFeedback } from '../state/feedback'
-import { useGlowPref, useThemePref, type GlowPref, type ThemePref } from '../state/theme'
+import { paletteConic, useGlowPref, useThemePref, type GlowPref, type ThemePref } from '../state/theme'
 
 const pos = (x: number) => `${Math.round(x * 84 + 8)}%`
 
-export function Profile() {
+/** Aura: your colour profile, how your wardrobe fits it, and your settings. */
+export function Aura() {
   const { state, set, go, userTone, hasTone, rated } = useApp()
   const T = TONES[userTone]
   const [cutoff] = useState(() => new Date(Date.now() - 30 * 864e5).toLocaleDateString('en-CA'))
@@ -31,7 +32,8 @@ export function Profile() {
   const nOut = rated.length - nIn - nNear
 
   return (
-    <>
+    <div className="aura-screen" style={{ '--aura': paletteConic(T.palette) } as CSSProperties}>
+      <div className="aura-blob" aria-hidden="true" />
       <header className="pad top-8 col">
         <Kicker>Colour profile · TCI 12 Tones</Kicker>
         <h1 className="tone-hero top-3">{hasTone ? T.name : 'Not set yet'}</h1>
@@ -42,7 +44,6 @@ export function Profile() {
           </button>
         )}
       </header>
-      <AccountCard />
       {hasTone && <ToneDetail tone={T} />}
       {hasTone && rated.length > 0 && <WardrobeFit nIn={nIn} nNear={nNear} nOut={nOut} />}
       {state.myColours.length > 0 && (
@@ -70,7 +71,6 @@ export function Profile() {
           onOpen={(id) => go('item', { itemId: id })}
         />
       )}
-      <Appearance />
       <div className="pad top-6 col">
         <button type="button" className="link-row" onClick={() => go('quiz', { quizStep: 0, quiz: [null, null, null] })}>
           <span>Find your tone in 3 questions</span>
@@ -82,7 +82,9 @@ export function Profile() {
         </button>
       </div>
       <Feedback />
-    </>
+      <Appearance />
+      <AccountCard />
+    </div>
   )
 }
 

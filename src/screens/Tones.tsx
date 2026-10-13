@@ -6,7 +6,7 @@ export function Tones() {
   const { go, userTone } = useApp()
   return (
     <>
-      <BackRow label="Profile" onBack={() => go('profile')} />
+      <BackRow label="Aura" onBack={() => go('profile')} />
       <div className="pad top-6 stack-2">
         <h1 className="title">All 12 tones</h1>
         <span className="sub">Neighbouring tones share colours, so “near” pieces still work.</span>

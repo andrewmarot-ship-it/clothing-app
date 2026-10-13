@@ -15,8 +15,11 @@ import { SignInForm } from '../components/SignIn'
 import type { Category, Item } from '../domain/types'
 import { useApp } from '../state/context'
 import { fx } from '../state/feedback'
+import { CATEGORIES } from '../domain/categories'
 
-const STEPS = ['Finding the garment', 'Removing the background', 'Reading its colour', 'Placing it in a TCI tone']
+const STEPS = ['Finding the garment', 'Removing the background', 'Reading its colour', 'Detecting the category', 'Placing it in a TCI tone']
+/** Pipeline stages (domain/photo.ts) to step indices: the category arrives with the cut-out, so it's done by the last stage. */
+const stepOf = (s: Stage) => (s === 3 ? 4 : s)
 /** Keep the steps on screen long enough to read, even when the network is fast. */
 const MIN_SCAN_MS = 1400
 
@@ -71,7 +74,7 @@ export function AddPiece() {
     setStep('scan')
     const started = Date.now()
     try {
-      const r = await analysePhoto(p, (s: Stage) => setScanI(s), ctrl.signal)
+      const r = await analysePhoto(p, (s: Stage) => setScanI(stepOf(s)), ctrl.signal)
       await new Promise((ok) => setTimeout(ok, Math.max(0, MIN_SCAN_MS - (Date.now() - started))))
       if (ctrl.signal.aborted) return
       const t = r.tags
@@ -256,6 +259,12 @@ export function AddPiece() {
                 {WARNINGS[w]}
               </p>
             ))}
+            {!retaking && result?.tags && result.tags.category !== 'other' && (
+              <span className="tag tag-accent detect-tag">
+                {CATEGORIES[result.tags.category].label}
+                {result.tags.confidence != null && ` · ${Math.round(result.tags.confidence * 100)}% sure`}
+              </span>
+            )}
             <DetailsForm value={details} onChange={setDetails} />
             <div className="row gap-3 body-13">
               <span className="swatch" style={{ background: color }} />

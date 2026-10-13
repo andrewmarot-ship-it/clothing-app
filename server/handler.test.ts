@@ -64,6 +64,12 @@ describe('normaliseTags', () => {
     expect(normaliseTags({ ...TAGS, category: 'top', kind: 'skirt' })!.kind).toBe('tee')
   })
 
+  it('keeps how sure the model is of the category, clamped to 0–1', () => {
+    expect(normaliseTags({ ...TAGS, confidence: 0.94 })!.confidence).toBe(0.94)
+    expect(normaliseTags({ ...TAGS, confidence: 7 })!.confidence).toBe(1)
+    expect(normaliseTags({ ...TAGS, confidence: 'very' })!.confidence).toBeNull()
+  })
+
   it('reads dresses and jumpsuits as their own category', () => {
     expect(normaliseTags({ ...TAGS, category: 'dress', kind: 'jumpsuit' })).toMatchObject({ category: 'dress', kind: 'jumpsuit' })
     expect(normaliseTags({ ...TAGS, category: 'dress', kind: 'tee' })!.kind).toBe('dress')

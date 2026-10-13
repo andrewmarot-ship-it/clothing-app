@@ -1,5 +1,7 @@
 import { CODES } from '../domain/occasions'
-import { CATEGORY_LABELS, KINDS, KIND_LABELS, defaultKind } from '../domain/tags'
+import { CATEGORY_LIST } from '../domain/categories'
+import { KINDS, KIND_LABELS, defaultKind } from '../domain/tags'
+import { CategoryIcon } from './CategoryIcon'
 import type { Category, Kind } from '../domain/types'
 
 /** The editable facts about a piece (colour and tone come from the photo). */
@@ -25,10 +27,11 @@ export function DetailsForm({ value, onChange }: { value: Details; onChange: (d:
         </label>
         <input id="piece-name" className="input input-lg" value={value.name} onChange={(e) => patch({ name: e.target.value })} />
       </div>
-      <div className="actions-3" role="radiogroup" aria-label="Category">
-        {(['top', 'bottom', 'dress'] as Category[]).map((c) => (
-          <button key={c} type="button" role="radio" aria-checked={value.cat === c} className={`btn ${value.cat === c ? 'btn-primary' : 'btn-ghost'}`} style={{ minHeight: 40 }} onClick={() => setCat(c)}>
-            {CATEGORY_LABELS[c]}
+      <div className="cat-grid" role="radiogroup" aria-label="Category">
+        {CATEGORY_LIST.map((c) => (
+          <button key={c.id} type="button" role="radio" aria-checked={value.cat === c.id} className="cat-tile" onClick={() => setCat(c.id)}>
+            <CategoryIcon cat={c.id} size={22} weight={value.cat === c.id ? 'regular' : 'light'} />
+            {c.label}
           </button>
         ))}
       </div>

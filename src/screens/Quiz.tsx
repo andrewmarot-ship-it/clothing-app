@@ -30,7 +30,7 @@ export function Quiz() {
 
   return (
     <>
-      <BackRow label={home === 'outfit' ? 'Outfit' : 'Profile'} onBack={back} right={asking ? `${step + 1} of 3` : 'Result'} />
+      <BackRow label={home === 'outfit' ? 'Stage' : 'Aura'} onBack={back} right={asking ? `${step + 1} of 3` : 'Result'} />
       <div className="pad top-4 quiz-bars" aria-hidden="true">
         {QUIZ.map((_, i) => (
           <span key={i} className={i < step || (i === step && answers[i] != null) || !asking ? 'is-on' : ''} />

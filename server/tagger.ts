@@ -9,6 +9,7 @@ const MODEL = process.env.TAG_MODEL || 'claude-haiku-5-5'
 const Tags = z.object({
   isGarment: z.boolean().describe('True only if the photo shows one clothing item.'),
   category: z.enum(['top', 'bottom', 'dress', 'other']).describe('"dress" for dresses and jumpsuits; "other" for outerwear, shoes, bags, accessories.'),
+  confidence: z.number().describe('How sure you are of the category, from 0 to 1.'),
   kind: z.enum(['shirt', 'tee', 'tank', 'jeans', 'shorts', 'skirt', 'dress', 'jumpsuit', 'other']),
   name: z.string().describe('2–3 word everyday name, e.g. "Striped shirt", "Wide jeans".'),
   fabric: z.string().describe('Most likely fabric in one or two words, e.g. "Cotton", "Denim", "Wool knit".'),
