@@ -6,6 +6,8 @@ import { contrastLabel, toneFit } from '../domain/scoring'
 import { TONES } from '../domain/tones'
 import type { Category, RatedItem } from '../domain/types'
 import { useApp } from '../state/context'
+import { useWeather } from '../state/weather'
+import { currentLine } from '../domain/weather'
 
 /** Piece sizes on the line. Bottoms get taller boxes because trousers are tall. */
 const SIZES: Record<Category, { w: number; h: number; selW: number; selH: number }> = {
@@ -200,6 +202,7 @@ function Setup() {
 
 export function Outfit() {
   const { go, set, tops, bots, top, bot, userTone, hasTone } = useApp()
+  const weather = useWeather()
   const [date] = useState(() => {
     const now = new Date()
     return `${now.toLocaleDateString('en-GB', { weekday: 'short' })} ${now.getDate()}`
@@ -211,7 +214,10 @@ export function Outfit() {
       <header className="outfit-head">
         <div className="col">
           <h1 className="display">{date}</h1>
-          <span className="sub">17° overcast · {hasTone ? TONES[userTone].name : 'Tone not set'}</span>
+          <span className="sub">
+            {weather.current ? `${currentLine(weather.current)} · ` : ''}
+            {hasTone ? TONES[userTone].name : 'Tone not set'}
+          </span>
         </div>
         {top && bot && (
           <button type="button" className="btn btn-primary btn-tall glow" onClick={() => go('occasion')}>

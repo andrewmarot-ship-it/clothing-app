@@ -132,10 +132,11 @@ export function describe(t: RatedItem, b: RatedItem, occ: Occasion, code: number
   }
 
   const mw = Math.max(t.w, b.w)
+  const prefix = occ.weather ? `${occ.weather}. ` : ''
   const wTxt =
-    mw < occ.warmth - 0.4 ? `${occ.weather}. Bring a warm layer.`
-    : mw > occ.warmth + 0.6 ? `${occ.weather}. This runs warm, fine indoors.`
-    : `${occ.weather}. Right weight for it.`
+    mw < occ.warmth - 0.4 ? `${prefix}Bring a warm layer.`
+    : mw > occ.warmth + 0.6 ? `${prefix}This runs warm, fine indoors.`
+    : `${prefix}Right weight for it.`
 
   return [
     { k: 'Occasion', v: occTxt },

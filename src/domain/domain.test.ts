@@ -1,6 +1,6 @@
 import { describe as suite, expect, it } from 'vitest'
 import { classifyHex, colourName, oklch } from './color'
-import { PRESETS, occasionFor, parseOccasion } from './occasions'
+import { PRESETS, formatWhen, occasionFor, occasionFromAi, parseOccasion, withWeather } from './occasions'
 import { quizResult, shortlist } from './quiz'
 import { bestPartners, contrastLabel, describe, lookTitle, rankLooks, rate, scoreLook, toneFit } from './scoring'
 import { FIXTURE_ITEMS } from './fixtures'
@@ -70,6 +70,45 @@ suite('occasions', () => {
   })
 })
 
+suite('occasions from Claude', () => {
+  const TODAY = '2026-10-12'
+  const good = { label: 'Work holiday party', code: 'dressy', date: '2026-10-16', timeOfDay: 'evening', setting: 'Office party, then drinks', indoor: true, contrast: 'none', line: 'Festive but still work-appropriate.', finish: [{ name: 'Gold hoops', colour: '#c9a24a' }] }
+
+  it('normalises a well-formed answer', () => {
+    expect(occasionFromAi(good, 'work holiday party friday', TODAY)).toMatchObject({ label: 'Work holiday party', code: 3, date: '2026-10-16', time: 'evening', indoor: true, when: 'Fri 16 Oct · evening', contrast: undefined, finish: [['Gold hoops', '#c9a24a']] })
+  })
+
+  it('falls back safely on bad or missing values', () => {
+    const o = occasionFromAi({ code: 9, date: 'friday', timeOfDay: 'noonish', finish: [{ name: 'x', colour: 'red' }, 'junk'] }, 'beach day', TODAY)!
+    expect(o).toMatchObject({ label: 'Beach day', code: 4, date: null, time: 'daytime', when: 'Today · daytime', finish: PRESETS.today.finish })
+    expect(occasionFromAi(null, 'x', TODAY)).toBeNull()
+  })
+
+  it('caps accessories at three and trims long text', () => {
+    const many = Array.from({ length: 6 }, (_, i) => ({ name: `Thing ${i}`, colour: '#123456' }))
+    const o = occasionFromAi({ ...good, finish: many, line: 'x'.repeat(500) }, '', TODAY)!
+    expect(o.finish).toHaveLength(3)
+    expect(o.line.length).toBeLessThanOrEqual(140)
+  })
+
+  it('leaves an already-normalised occasion unchanged (server then client)', () => {
+    const once = occasionFromAi(good, 'party', TODAY)!
+    expect(occasionFromAi(once, 'party', TODAY)).toEqual(once)
+  })
+
+  it('says today and tomorrow in words', () => {
+    expect(formatWhen(null, 'morning', TODAY)).toBe('Today · morning')
+    expect(formatWhen('2026-10-13', 'late', TODAY)).toBe('Tomorrow · late evening')
+  })
+
+  it('takes weather and warmth from the forecast for the right day', () => {
+    const days = [{ date: '2026-10-16', tMax: 5, tMin: 0, code: 71, rain: 80 }]
+    const party = occasionFromAi(good, '', TODAY)!
+    expect(withWeather(party, days, TODAY)).toMatchObject({ weather: '2° out, snow', warmth: 2.5 })
+    expect(withWeather(PRESETS.garden, days, TODAY).weather).toBe('')
+  })
+})
+
 suite('scoring', () => {
   it('weights the top more in tone fit', () => {
     // Linen shirt (in) + midi skirt (near): 100·0.6 + 72·0.4
@@ -110,7 +149,7 @@ suite('scoring', () => {
     const [occ, tone, weather] = describe(byId('t1'), byId('b4'), PRESETS.holiday, 3, SOFT_AUTUMN)
     expect(occ.v).toBe('Dressed up enough for a party, relaxed enough for a work crowd. The satin midi skirt does the dressing up.')
     expect(tone.v).toBe('Cream is core Soft Autumn; slate borrows from Soft Summer next door, so it still flatters. Strong light–dark contrast.')
-    expect(weather.v).toBe('4° out, warm inside. Bring a warm layer.')
+    expect(weather.v).toBe('Bring a warm layer.')
   })
 
   it('does not repeat the fabric when the name contains it', () => {
