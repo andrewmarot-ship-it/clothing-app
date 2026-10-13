@@ -1,4 +1,4 @@
-import { rankTones } from './tones'
+import { rankTones } from './tones.ts'
 
 export type QuizAnswers = [h: number | null, v: number | null, c: number | null]
 

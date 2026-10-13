@@ -2,7 +2,7 @@
  * Pure image maths for the photo pipeline. Everything works on plain RGBA
  * buffers so it runs (and is tested) without a DOM.
  */
-import { linearToOklab, linearToSrgb, oklabToHex, rgbHex, srgbToLinear, type Oklab } from './color'
+import { linearToOklab, linearToSrgb, oklabToHex, rgbHex, srgbToLinear, type Oklab } from './color.ts'
 
 export interface Pixels {
   width: number

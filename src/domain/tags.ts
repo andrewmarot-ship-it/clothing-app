@@ -1,4 +1,4 @@
-import type { Category, Kind } from './types'
+import type { Category, Kind } from './types.ts'
 
 /** What the vision model tells us about a garment, normalised to the app's scales. */
 export interface GarmentTags {
