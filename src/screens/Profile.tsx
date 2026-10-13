@@ -1,6 +1,7 @@
 import { CaretRight, X } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Kicker } from '../components/Chrome'
+import { AccountCard } from '../components/SignIn'
 import { Garment } from '../components/Garment'
 import type { RatedItem } from '../domain/types'
 import { TONES, chromaLabel, hueLabel, toneDesc, valueLabel, type Tone } from '../domain/tones'
@@ -38,6 +39,7 @@ export function Profile() {
           </button>
         )}
       </header>
+      <AccountCard />
       {hasTone && <ToneDetail tone={T} />}
       {hasTone && rated.length > 0 && <WardrobeFit nIn={nIn} nNear={nNear} nOut={nOut} />}
       {state.myColours.length > 0 && (

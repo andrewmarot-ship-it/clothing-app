@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react'
 import type { OccasionKey } from '../domain/occasions'
 import type { QuizAnswers } from '../domain/quiz'
 import type { DressCode, Item, RatedItem, SavedLook } from '../domain/types'
+import type { CloudState } from './useCloudSync'
 
 export type Tab = 'outfit' | 'wardrobe' | 'add' | 'looks' | 'profile'
 export type Screen = Tab | 'occasion' | 'match' | 'item' | 'edit' | 'quiz' | 'tones'
@@ -31,6 +32,10 @@ export interface AppState {
   wearLog: Wear[]
   /** Colours the user says suit them; pieces close to one count as in tone. */
   myColours: string[]
+  /** Pieces deleted here that the cloud hasn't been told about yet: id → time. */
+  deleted: Record<string, number>
+  /** Client time (ms) of the last change to tone, colours, looks, wear log or outfit. */
+  profileUpdatedAt: number
   filter: Filter
   itemId: string | null
   /** When set, the Add screen retakes the photo of this piece instead of adding a new one. */
@@ -80,6 +85,8 @@ export interface AppContext {
   wornToday: (topId: string, botId: string) => boolean
   /** Log (or undo) wearing this outfit today. */
   toggleWorn: (topId: string, botId: string) => void
+  /** Sign-in and sync. */
+  cloud: CloudState
 }
 
 export const Ctx = createContext<AppContext | null>(null)

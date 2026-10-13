@@ -2,7 +2,7 @@
  * The flat-lay photo pipeline (browser side). Pixel maths lives in
  * pixels.ts; this file handles canvases, the network call and ordering.
  */
-import { RateLimitedError, requestProcessing } from '../state/processPhoto'
+import { RateLimitedError, SignInRequiredError, requestProcessing } from '../state/processPhoto'
 import {
   alphaBBox,
   applyGains,
@@ -167,7 +167,7 @@ export async function analysePhoto(prepared: PreparedPhoto, onStage: (s: Stage) 
     server = await requestProcessing(upload, signal)
   } catch (e) {
     // A limit is worth telling the user about; any other failure falls back to a drawn piece.
-    if (signal?.aborted || e instanceof RateLimitedError) throw e
+    if (signal?.aborted || e instanceof RateLimitedError || e instanceof SignInRequiredError) throw e
   }
   const tags = server?.tags ?? null
   if (tags && !tags.isGarment) throw new PhotoError('no_garment')

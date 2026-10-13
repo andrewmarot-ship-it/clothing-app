@@ -10,7 +10,8 @@ import { PhotoError, analysePhoto, preparePhoto, type AnalysedPhoto, type Prepar
 import type { QualityIssue } from '../domain/pixels'
 import { KINDS, defaultKind } from '../domain/tags'
 import { TONES, matchOf } from '../domain/tones'
-import { RateLimitedError } from '../state/processPhoto'
+import { RateLimitedError, SignInRequiredError } from '../state/processPhoto'
+import { SignInForm } from '../components/SignIn'
 import type { Category, Item } from '../domain/types'
 import { useApp } from '../state/context'
 
@@ -34,7 +35,9 @@ const WARNINGS: Record<Warning, string> = {
 type Step = 'idle' | 'check' | 'scan' | 'done'
 
 export function AddPiece() {
-  const { state, go, userTone, addItem, updateItem, byId } = useApp()
+  const { state, go, userTone, addItem, updateItem, byId, cloud } = useApp()
+  // Photos are processed on paid services, so adding needs an account when sign-in is set up.
+  const needsSignIn = cloud.enabled && !cloud.user
   const retaking = byId(state.retakeId)
   const [step, setStep] = useState<Step>('idle')
   const [scanI, setScanI] = useState(0)
@@ -95,7 +98,9 @@ export function AddPiece() {
           ? 'We couldn’t find a garment in that photo. Lay one piece flat on a plain surface and try again.'
           : e instanceof RateLimitedError
             ? 'You’ve added a lot of photos in the last hour. Try again a bit later.'
-            : 'Something went wrong reading that photo. Try another one.',
+            : e instanceof SignInRequiredError
+              ? 'Your sign-in has expired. Sign in again on Profile, then retake the photo.'
+              : 'Something went wrong reading that photo. Try another one.',
       )
     }
   }
@@ -191,7 +196,13 @@ export function AddPiece() {
           </p>
         )}
 
-        {step === 'idle' && (
+        {step === 'idle' && needsSignIn && (
+          <div className="top-6">
+            <SignInForm intro="Sign in to add pieces. We cut out and tag each photo on our servers, and keep your wardrobe backed up. No password needed." />
+          </div>
+        )}
+
+        {step === 'idle' && !needsSignIn && (
           <>
             <div className="actions-2 top-6">
               <button type="button" className="btn btn-primary btn-tall" onClick={() => camRef.current?.click()}>
