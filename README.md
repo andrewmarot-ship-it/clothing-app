@@ -2,7 +2,7 @@
 
 A virtual wardrobe that matches outfits to your colour tone. Photograph your clothes, hang them on clotheslines (tops, bottoms and dresses), and flip through them to build outfits: a top with a bottom, or a dress on its own. Every piece is placed in one of the **TCI 12 Tones** and scored against yours. **Match me** recommends outfits for an occasion you type or pick.
 
-Mobile-first web app built with React, TypeScript and Vite, styled with the Nocturne design system.
+Mobile-first web app built with React, TypeScript and Vite, styled with the Nocturne design system. There are two themes: **Linen** (light, the default) and **Nocturne** (dark). People switch between them, or follow their device, under Profile → Appearance; the choice is kept on the device (`src/state/theme.ts`, tokens in `src/styles/nocturne.css`).
 
 ## Getting started
 

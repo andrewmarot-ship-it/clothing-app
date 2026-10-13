@@ -15,6 +15,7 @@ import { Wardrobe } from './screens/Wardrobe'
 import { Welcome } from './screens/Welcome'
 import { TABS, useApp, type Screen, type Tab } from './state/context'
 import { AppProvider } from './state/store'
+import { useThemePref } from './state/theme'
 import { shouldWelcome } from './state/welcome'
 
 const SCREENS: Record<Screen, () => JSX.Element> = {
@@ -33,6 +34,7 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
 
 function Shell() {
   const { state } = useApp()
+  useThemePref()
   const [welcome, setWelcome] = useState(shouldWelcome)
   const done = useCallback(() => setWelcome(false), [])
   if (welcome) return <Welcome onDone={done} />

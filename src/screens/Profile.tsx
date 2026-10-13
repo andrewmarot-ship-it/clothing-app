@@ -6,6 +6,7 @@ import { Garment } from '../components/Garment'
 import type { RatedItem } from '../domain/types'
 import { TONES, chromaLabel, hueLabel, toneDesc, valueLabel, type Tone } from '../domain/tones'
 import { useApp } from '../state/context'
+import { useThemePref, type ThemePref } from '../state/theme'
 
 const pos = (x: number) => `${Math.round(x * 84 + 8)}%`
 
@@ -67,6 +68,7 @@ export function Profile() {
           onOpen={(id) => go('item', { itemId: id })}
         />
       )}
+      <Appearance />
       <div className="pad top-6 col">
         <button type="button" className="link-row" onClick={() => go('quiz', { quizStep: 0, quiz: [null, null, null] })}>
           <span>Find your tone in 3 questions</span>
@@ -78,6 +80,36 @@ export function Profile() {
         </button>
       </div>
     </>
+  )
+}
+
+const THEMES: { value: ThemePref; label: string }[] = [
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'system', label: 'Match device' },
+]
+
+/** Light (Linen) or dark (Nocturne). Kept on this device only. */
+function Appearance() {
+  const [theme, setTheme] = useThemePref()
+  return (
+    <section className="pad top-6 stack-3">
+      <span className="kicker">Appearance</span>
+      <div className="seg-grid seg-grid--3" role="radiogroup" aria-label="Appearance">
+        {THEMES.map((t) => (
+          <button
+            key={t.value}
+            type="button"
+            role="radio"
+            aria-checked={theme === t.value}
+            className={`btn ${theme === t.value ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => setTheme(t.value)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -101,7 +133,7 @@ function WearList({ title, items, detail, onOpen }: { title: string; items: Rate
 function ToneDetail({ tone: T }: { tone: Tone }) {
   const dims = [
     { k: 'Hue', v: hueLabel(T.t), a: 'Cool', b: 'Warm', pos: pos((T.t + 1) / 2), track: 'linear-gradient(90deg, #6f86b8, var(--color-neutral-600), #c98a4b)' },
-    { k: 'Value', v: valueLabel(T.v), a: 'Light', b: 'Dark', pos: pos(T.v), track: 'linear-gradient(90deg, var(--color-neutral-200), var(--color-neutral-900))' },
+    { k: 'Value', v: valueLabel(T.v), a: 'Light', b: 'Dark', pos: pos(T.v), track: 'linear-gradient(90deg, #e4e7f5, #292b31)' },
     { k: 'Chroma', v: chromaLabel(T.c), a: 'Soft', b: 'Bright', pos: pos(T.c), track: 'linear-gradient(90deg, #9c8f84, #e2683a)' },
   ]
   return (
