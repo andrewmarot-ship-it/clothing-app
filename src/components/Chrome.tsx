@@ -1,6 +1,7 @@
 import { CaretLeft, Dresser, Heart, Plus, TShirt, User, type Icon } from '@phosphor-icons/react'
 import type { ReactNode } from 'react'
 import { TABS, useApp, type Tab } from '../state/context'
+import { fx } from '../state/feedback'
 
 /** The back row that replaces the tab bar on pushed screens. */
 export function BackRow({ label, onBack, right }: { label: string; onBack: () => void; right?: ReactNode }) {
@@ -41,7 +42,10 @@ export function TabBar() {
             aria-label={label}
             aria-current={active ? 'page' : undefined}
             className={`tab ${k === 'add' ? 'tab--add' : ''} ${active ? 'is-active' : ''}`}
-            onClick={() => go(k, k === 'add' ? { retakeId: null } : {})}
+            onClick={() => {
+              fx('tap')
+              go(k, k === 'add' ? { retakeId: null } : {})
+            }}
           >
             <span className="tab-icon">
               <TabIcon size={20} />

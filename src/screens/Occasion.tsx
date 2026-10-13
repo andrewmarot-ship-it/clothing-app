@@ -6,6 +6,7 @@ import { TONES } from '../domain/tones'
 import type { DressCode } from '../domain/types'
 import { today, useApp } from '../state/context'
 import { readOccasion } from '../state/occasionApi'
+import { fx } from '../state/feedback'
 import { useOccasion } from '../state/useOccasion'
 import { askForLocation, type WeatherState } from '../state/weather'
 
@@ -78,7 +79,10 @@ export function Occasion() {
             type="button"
             className={`chip ${state.occKey === k ? 'is-active' : ''}`}
             aria-pressed={state.occKey === k}
-            onClick={() => set({ occText: PRESETS[k].label, occKey: k, code: null })}
+            onClick={() => {
+              fx('tap')
+              set({ occText: PRESETS[k].label, occKey: k, code: null })
+            }}
           >
             {PRESETS[k].label}
           </button>
@@ -118,7 +122,15 @@ export function Occasion() {
         </div>
       </div>
       <div className="pad top-8 stack-3">
-        <button type="button" className="btn btn-primary btn-block btn-tall glow" disabled={!outfit} onClick={() => go('match', { lookI: 0 })}>
+        <button
+          type="button"
+          className="btn btn-primary btn-block btn-tall glow"
+          disabled={!outfit}
+          onClick={() => {
+            fx('match')
+            go('match', { lookI: 0 })
+          }}
+        >
           <Sparkle size={16} />
           Find my outfit
         </button>

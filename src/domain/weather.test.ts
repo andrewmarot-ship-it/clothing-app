@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { currentLine, forecastFor, warmthFor, weatherLine, weatherWords, type DayForecast } from './weather'
+import { currentLine, forecastFor, tempBars, timeOfDay, warmthFor, warmthNote, weatherLine, weatherWords, type DayForecast } from './weather'
 
 const day = (tMax: number, tMin: number, code = 3, rain = 0): DayForecast => ({ date: '2026-10-17', tMax, tMin, code, rain })
 
@@ -32,5 +32,24 @@ describe('weather', () => {
   it('finds the forecast for a date, or nothing past the horizon', () => {
     expect(forecastFor([day(1, 0)], '2026-10-17')).not.toBeNull()
     expect(forecastFor([day(1, 0)], '2026-11-30')).toBeNull()
+  })
+})
+
+describe('outfit weather card', () => {
+  it('charts every third hour, scaled between 4 and 18px', () => {
+    const hours = [10, 11, 12, 14, 15, 16, 18, 18, 17, 16, 15, 14, 12, 11, 10, 9, 9, 8]
+    expect(tempBars(hours)).toEqual([6, 12, 18, 15, 9, 4])
+    expect(tempBars([5, 5, 5, 5])).toEqual([11, 11])
+    expect(tempBars([])).toEqual([])
+  })
+
+  it('says whether the outfit is warm enough', () => {
+    expect(warmthNote(1, 2)).toBe('bring a layer')
+    expect(warmthNote(2, 2)).toBe('right weight')
+    expect(warmthNote(3, 2)).toBe('warm enough')
+  })
+
+  it('names the part of the day', () => {
+    expect([7, 13, 19, 23].map(timeOfDay)).toEqual(['morning', 'daytime', 'evening', 'late'])
   })
 })

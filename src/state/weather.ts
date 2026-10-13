@@ -13,6 +13,8 @@ export interface WeatherState {
   status: WeatherStatus
   current: CurrentWeather | null
   days: DayForecast[]
+  /** Temperatures for the next 18 hours, hour by hour. */
+  hours: number[]
 }
 
 interface Place {
@@ -32,7 +34,7 @@ function savedPlace(): Place | null {
   }
 }
 
-let state: WeatherState = { status: savedPlace() ? 'loading' : 'off', current: null, days: [] }
+let state: WeatherState = { status: savedPlace() ? 'loading' : 'off', current: null, days: [], hours: [] }
 let fetchedAt = 0
 let inFlight: Promise<void> | null = null
 const listeners = new Set<() => void>()
@@ -44,6 +46,7 @@ function setState(next: Partial<WeatherState>) {
 
 interface OpenMeteo {
   current?: { temperature_2m: number; weather_code: number }
+  hourly?: { temperature_2m: (number | null)[] }
   daily?: { time: string[]; temperature_2m_max: number[]; temperature_2m_min: number[]; weather_code: number[]; precipitation_probability_max: (number | null)[] }
 }
 
@@ -53,8 +56,10 @@ async function load(place: Place): Promise<void> {
     longitude: String(place.lon),
     current: 'temperature_2m,weather_code',
     daily: 'temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max',
+    hourly: 'temperature_2m',
     timezone: 'auto',
     forecast_days: '16',
+    forecast_hours: '18',
   })
   try {
     const res = await fetch(`https://api.open-meteo.com/v1/forecast?${q}`)
@@ -65,8 +70,9 @@ async function load(place: Place): Promise<void> {
       ? d.time.map((date, i) => ({ date, tMax: d.temperature_2m_max[i], tMin: d.temperature_2m_min[i], code: d.weather_code[i], rain: d.precipitation_probability_max[i] ?? 0 }))
       : []
     const current = data.current ? { temp: data.current.temperature_2m, code: data.current.weather_code } : null
+    const hours = (data.hourly?.temperature_2m ?? []).filter((t): t is number => typeof t === 'number')
     fetchedAt = Date.now()
-    setState({ status: 'ready', current, days })
+    setState({ status: 'ready', current, days, hours })
   } catch {
     setState({ status: state.days.length ? 'ready' : 'error' })
   }

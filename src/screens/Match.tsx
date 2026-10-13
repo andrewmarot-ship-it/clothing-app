@@ -7,16 +7,22 @@ import { CODES } from '../domain/occasions'
 import { useOccasion } from '../state/useOccasion'
 import { describe, lookTitle, rankLooks, toneFit } from '../domain/scoring'
 import { useApp } from '../state/context'
+import { fx } from '../state/feedback'
+import { glowFill, outfitColour, useGlowPref } from '../state/theme'
 
 export function Match() {
   const { state, set, go, rated, userTone, isSaved, toggleSaved } = useApp()
   const { occ } = useOccasion()
+  const [glow] = useGlowPref()
   const code = state.code ?? occ.code
   const looks = rankLooks(rated, occ, code)
   const n = looks.length
   const i = n ? state.lookI % n : 0
   const look = looks[i]
-  const swipe = useSwipe((dir) => set({ lookI: (i + dir + n) % n }), 40)
+  const swipe = useSwipe((dir) => {
+    fx('tick')
+    set({ lookI: (i + dir + n) % n })
+  }, 40)
 
   const back = <BackRow label="Occasion" onBack={() => go('occasion')} right={n ? `Look ${i + 1} of ${n}` : undefined} />
   if (!look) {
@@ -62,7 +68,7 @@ export function Match() {
       </div>
 
       <div className="stage stage--match" {...swipe}>
-        <div className="glow-bg" />
+        <div className="glow-bg" style={{ background: glowFill(glow, outfitColour(t.color, b?.color), 70), opacity: 0.85 }} />
         <Line sag={22} width={1.2} style={{ top: 0 }} />
         <div className={b ? 'match-top' : 'match-dress'}>
           <Pins inset={b ? '28%' : '34%'} />
@@ -115,14 +121,27 @@ export function Match() {
           aria-label={saved ? 'Unsave look' : 'Save look'}
           aria-pressed={saved}
           style={{ color: saved ? 'var(--color-accent-300)' : undefined }}
-          onClick={() => toggleSaved(t.id, b?.id ?? null, occ.label)}
+          onClick={() => {
+            fx('peg')
+            toggleSaved(t.id, b?.id ?? null, occ.label)
+          }}
         >
           <Heart size={18} weight={saved ? 'fill' : 'regular'} />
         </button>
-        <button type="button" className="btn btn-secondary btn-tall" onClick={() => set({ lookI: (i + 1) % n })}>
+        <button
+          type="button"
+          className="btn btn-secondary btn-tall"
+          onClick={() => {
+            fx('tick')
+            set({ lookI: (i + 1) % n })
+          }}
+        >
           Another look
         </button>
-        <button type="button" className="btn btn-primary btn-tall" onClick={() => go('outfit', b ? { topId: t.id, botId: b.id } : { topId: t.id })}>
+        <button type="button" className="btn btn-primary btn-tall" onClick={() => {
+            fx('match')
+            go('outfit', b ? { topId: t.id, botId: b.id } : { topId: t.id })
+          }}>
           Hang this look
         </button>
       </div>

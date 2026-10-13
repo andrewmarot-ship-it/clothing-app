@@ -38,6 +38,23 @@ export function weatherWords(code: number): string {
   return 'mixed weather'
 }
 
+/** The part of the day an hour (0–23) falls in. */
+export const timeOfDay = (hour: number): TimeOfDay => (hour < 11 ? 'morning' : hour < 17 ? 'daytime' : hour < 21 ? 'evening' : 'late')
+
+/** How an outfit's warmth (1 light … 3 warm) sits against the target. Same thresholds as the Match reasons. */
+export function warmthNote(outfitWarmth: number, target: number): 'bring a layer' | 'right weight' | 'warm enough' {
+  return outfitWarmth < target - 0.4 ? 'bring a layer' : outfitWarmth > target + 0.6 ? 'warm enough' : 'right weight'
+}
+
+/** A mini temperature chart: every third hour, six bars, scaled to 4–18px tall. */
+export function tempBars(hours: number[]): number[] {
+  const picked = hours.filter((_, i) => i % 3 === 0).slice(0, 6)
+  if (!picked.length) return []
+  const lo = Math.min(...picked)
+  const span = Math.max(...picked) - lo
+  return picked.map((t) => (span ? Math.round(4 + ((t - lo) / span) * 14) : 11))
+}
+
 /** The temperature that matters for when you'll be out: evenings run cooler. */
 export function feelsLike(f: DayForecast, time: TimeOfDay): number {
   if (time === 'evening' || time === 'late') return f.tMin * 0.6 + f.tMax * 0.4

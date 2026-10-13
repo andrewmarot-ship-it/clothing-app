@@ -14,6 +14,7 @@ import { RateLimitedError, SignInRequiredError } from '../state/processPhoto'
 import { SignInForm } from '../components/SignIn'
 import type { Category, Item } from '../domain/types'
 import { useApp } from '../state/context'
+import { fx } from '../state/feedback'
 
 const STEPS = ['Finding the garment', 'Removing the background', 'Reading its colour', 'Placing it in a TCI tone']
 /** Keep the steps on screen long enough to read, even when the network is fast. */
@@ -143,6 +144,7 @@ export function AddPiece() {
       wears: 0,
     }
     addItem(item, images)
+    fx('peg')
     go('outfit')
   }
 
