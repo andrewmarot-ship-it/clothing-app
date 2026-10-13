@@ -557,3 +557,24 @@ h1 { margin: 0; }
 .signin-sent .btn { grid-column: 2; justify-self: start; padding-inline: 0; }
 .signin-sent .strong { color: var(--color-text); }
 .sync-error, .sync-offline { color: var(--color-accent-300); }
+
+/* — welcome (first launch) — */
+.welcome { display: flex; flex-direction: column; padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom)); background: var(--color-bg); }
+.welcome-stage { display: block; width: 100%; height: auto; margin-top: calc(48px + env(safe-area-inset-top)); overflow: visible; }
+.welcome-line { stroke-dasharray: 440; stroke-dashoffset: 440; animation: welcome-draw 0.8s 0.15s cubic-bezier(0.6, 0, 0.3, 1) forwards; }
+.welcome-drop { transform-box: fill-box; transform-origin: 50% 0; opacity: 0; animation: welcome-drop 0.55s cubic-bezier(0.3, 1.4, 0.5, 1) forwards, welcome-sway 3.6s ease-in-out infinite; }
+.welcome-drop--1 { animation-delay: 0.75s, 1.6s; }
+.welcome-drop--2 { animation-delay: 0.95s, 1.9s; }
+.welcome-drop--3 { animation-delay: 1.15s, 2.2s; }
+.welcome-brand { margin-top: var(--space-2); opacity: 0; animation: welcome-fade 0.6s 1.35s forwards; }
+.welcome-word { font-size: 40px; font-weight: 600; letter-spacing: -0.035em; line-height: 1; margin: 0; }
+.welcome-tag { margin: var(--space-3) 0 0; color: var(--color-neutral-500); max-width: 22ch; }
+.welcome-form { margin-top: auto; padding-top: var(--space-8); display: flex; flex-direction: column; gap: var(--space-3); opacity: 0; animation: welcome-fade 0.7s 1.9s forwards; }
+@keyframes welcome-draw { to { stroke-dashoffset: 0; } }
+@keyframes welcome-drop { from { opacity: 0; transform: translateY(-28px) rotate(-4deg); } to { opacity: 1; transform: none; } }
+@keyframes welcome-sway { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(1.6deg); } 70% { transform: rotate(-1.2deg); } }
+@keyframes welcome-fade { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  /* Everything in place at once: no draw, drop or delay. */
+  .welcome-line, .welcome-drop, .welcome-brand, .welcome-form { animation: none !important; opacity: 1; stroke-dashoffset: 0; }
+}

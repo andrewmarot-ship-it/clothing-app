@@ -48,6 +48,8 @@ GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests and the build on ev
 | **Looks** | Saved outfits |
 | **Profile** | Your tone, its palette, how much of your wardrobe fits it, and your most-worn and waiting-to-be-worn pieces |
 
+On a device's first launch, a **Welcome** screen draws a clothesline, pegs three pieces to it, and offers sign-in or "Continue without an account". It doesn't come back after that, and opening a sign-in link skips it.
+
 Pushed screens: **Occasion** → **Match** (Match me results), **Item** detail → **Edit** (details, or retake the photo), the 3-question **Quiz** to find your tone, and **All 12 tones**.
 
 The app starts empty: there's no demo wardrobe.
