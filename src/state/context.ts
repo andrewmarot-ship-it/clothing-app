@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { BodyPref, Shape } from '../domain/categories'
+import type { BodyPref, CategoryInfo, Shape } from '../domain/categories'
 import type { Occasion, OccasionKey } from '../domain/occasions'
 import type { QuizAnswers } from '../domain/quiz'
 import type { DressCode, Item, RatedItem, SavedLook } from '../domain/types'
@@ -7,7 +7,7 @@ import type { CloudState } from './useCloudSync'
 
 export type Tab = 'outfit' | 'wardrobe' | 'add' | 'looks' | 'profile'
 export type Screen = Tab | 'item' | 'edit' | 'quiz' | 'tones'
-export type Filter = 'all' | 'tone' | 'tops' | 'bottoms' | 'dresses'
+export type Filter = 'all' | 'tone' | CategoryInfo['filter']
 
 export const TABS: Tab[] = ['outfit', 'wardrobe', 'add', 'looks', 'profile']
 

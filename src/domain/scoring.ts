@@ -99,6 +99,16 @@ export function bestPartners(item: RatedItem, items: RatedItem[], everyday: Occa
     .slice(0, limit)
 }
 
+/** The dresses closest in colour to this one that still suit you (in or near your tone). */
+export function similarDresses(item: RatedItem, items: RatedItem[], limit = 3): RatedItem[] {
+  return items
+    .filter((o) => o.cat === 'dress' && o.id !== item.id && o.match !== 'out')
+    .map((o) => ({ o, d: colourDistance(o.color, item.color) }))
+    .sort((a, b) => a.d - b.d)
+    .slice(0, limit)
+    .map((x) => x.o)
+}
+
 /** "Cream & slate" for separates; "Camel wrap dress" for a dress (its colour leads, unless the name already says it). */
 export function lookTitle(t: Item, b: Item | null): string {
   if (b) return `${t.colorName} & ${b.colorName.toLowerCase()}`

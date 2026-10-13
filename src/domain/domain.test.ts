@@ -3,7 +3,7 @@ import { classifyHex, colourName, oklch } from './color'
 import { PRESETS, formatWhen, occasionFor, occasionFromAi, parseOccasion, withWeather } from './occasions'
 import { quizResult, shortlist } from './quiz'
 import { migrateDress } from './tags'
-import { bestPartners, contrastLabel, describe, lookTitle, rankLooks, rate, scoreLook, toneFit } from './scoring'
+import { bestPartners, contrastLabel, describe, lookTitle, rankLooks, rate, scoreLook, similarDresses, toneFit } from './scoring'
 import { FIXTURE_ITEMS } from './fixtures'
 import { TONES, matchOf, nearestTone, rankTones, toneDesc, toneIndex } from './tones'
 
@@ -216,6 +216,13 @@ suite('dresses', () => {
 
   it('scores tone fit on the dress alone', () => {
     expect(toneFit(dress(), null)).toBe(100)
+  })
+
+  it('finds similar dresses by colour, in or near your tone', () => {
+    const mk = (id: string, color: string, tone: number) => rate([{ ...FIXTURE_ITEMS[0], id, cat: 'dress' as const, kind: 'dress' as const, color, tone }], SOFT_AUTUMN)[0]
+    const camel = mk('d1', '#b8946a', SOFT_AUTUMN)
+    const all = [camel, mk('d2', '#c09a70', SOFT_AUTUMN), mk('d3', '#5a5c66', SOFT_AUTUMN), mk('d4', '#bb966c', toneIndex('Bright Winter')), mk('d5', '#e6dcc6', SOFT_AUTUMN)]
+    expect(similarDresses(camel, all).map((d) => d.id)).toEqual(['d2', 'd5', 'd3'])
   })
 
   it('never pairs a dress with anything', () => {

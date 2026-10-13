@@ -6,10 +6,10 @@ import { EditItem } from './screens/EditItem'
 import { ItemDetail } from './screens/ItemDetail'
 import { Looks } from './screens/Looks'
 import { Stage } from './screens/Stage'
-import { Profile } from './screens/Profile'
+import { Aura } from './screens/Aura'
 import { Quiz } from './screens/Quiz'
 import { Tones } from './screens/Tones'
-import { Wardrobe } from './screens/Wardrobe'
+import { Spectrum } from './screens/Spectrum'
 import { Welcome } from './screens/Welcome'
 import { TABS, useApp, type Screen, type Tab } from './state/context'
 import { AppProvider } from './state/store'
@@ -18,10 +18,10 @@ import { shouldWelcome } from './state/welcome'
 
 const SCREENS: Record<Screen, () => JSX.Element> = {
   outfit: Stage,
-  wardrobe: Wardrobe,
+  wardrobe: Spectrum,
   add: AddPiece,
   looks: Looks,
-  profile: Profile,
+  profile: Aura,
   item: ItemDetail,
   edit: EditItem,
   quiz: Quiz,

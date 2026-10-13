@@ -5,14 +5,14 @@ import { Garment, Line, Pins } from '../components/Garment'
 import { pegsFor } from '../domain/frame'
 import { ToneOverride } from '../components/ToneOverride'
 import { CODES, PRESETS } from '../domain/occasions'
-import { bestPartners, toneFit } from '../domain/scoring'
-import { CATEGORY_LABELS } from '../domain/tags'
+import { bestPartners, similarDresses, toneFit } from '../domain/scoring'
+import { CATEGORIES } from '../domain/categories'
 import { TONES } from '../domain/tones'
 import { useApp } from '../state/context'
 import { glowFill, useGlowPref } from '../state/theme'
 
 export function ItemDetail() {
-  const { state, go, hang, wear, byId, rated, removeItem } = useApp()
+  const { state, go, hang, wear, openItem, byId, rated, removeItem } = useApp()
   const item = byId(state.itemId)
   const backTo = state.from === 'outfit' ? 'outfit' : 'wardrobe'
   const [confirming, setConfirming] = useState(false)
@@ -28,7 +28,7 @@ export function ItemDetail() {
       Edit
     </button>
   )
-  const back = <BackRow label={backTo === 'outfit' ? 'Outfit' : 'Wardrobe'} onBack={() => go(backTo)} right={editButton} />
+  const back = <BackRow label={backTo === 'outfit' ? 'Stage' : 'Spectrum'} onBack={() => go(backTo)} right={editButton} />
 
   if (!item) {
     return (
@@ -40,6 +40,8 @@ export function ItemDetail() {
   }
 
   const partners = bestPartners(item, rated, PRESETS.today)
+  const similar = item.cat === 'dress' ? similarDresses(item, rated) : []
+  const isDress = item.cat === 'dress'
   const lastWorn = state.wearLog
     .filter((w) => w.topId === item.id || w.botId === item.id)
     .reduce<string | null>((latest, w) => (!latest || w.date > latest ? w.date : latest), null)
@@ -64,16 +66,16 @@ export function ItemDetail() {
   return (
     <>
       {back}
-      <div className="stage stage--item">
+      <div className={`stage stage--item ${isDress ? 'stage--item-dress' : ''}`}>
         <div className="glow-bg" style={{ background: glowFill(glow, item.color, 70), opacity: 0.8 }} />
         <Line sag={22} width={1.2} style={{ top: 8 }} />
-        <div className="item-figure">
-          <Pins inset={pegsFor(item, 1)} top="-3%" width="3.5%" height="9%" />
+        <div className={`item-figure ${isDress ? 'item-figure--dress' : ''}`}>
+          <Pins inset={pegsFor(item, isDress ? 1.6 : 1)} top="-3%" width="3.5%" height={isDress ? '6%' : '9%'} />
           <Garment item={item} className="fill" />
         </div>
       </div>
       <div className="pad top-4 stack-2">
-        <Kicker>{CATEGORY_LABELS[item.cat]}</Kicker>
+        <Kicker>{CATEGORIES[item.cat].label}</Kicker>
         <h1 className="title">{item.name}</h1>
         <ToneOverride item={item} />
       </div>
@@ -107,6 +109,20 @@ export function ItemDetail() {
                 </button>
               )
             })}
+          </div>
+        </div>
+      )}
+      {similar.length > 0 && (
+        <div className="pad top-6 stack-3">
+          <Kicker>Similar dresses</Kicker>
+          <div className="grid-3">
+            {similar.map((d) => (
+              <button key={d.id} type="button" className="card partner" onClick={() => openItem(d.id)}>
+                <Garment item={d} stroke={1.5} shade={false} align="center" fit="tight" className="partner-img" />
+                <span className="partner-name">{d.name}</span>
+                <span className="meta">Fit {toneFit(d, null)}</span>
+              </button>
+            ))}
           </div>
         </div>
       )}

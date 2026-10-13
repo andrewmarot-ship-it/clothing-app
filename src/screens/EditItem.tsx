@@ -16,7 +16,7 @@ export function EditItem() {
   if (!item || !details) {
     return (
       <>
-        <BackRow label="Wardrobe" onBack={() => go('wardrobe')} />
+        <BackRow label="Spectrum" onBack={() => go('wardrobe')} />
         <p className="pad top-8 muted">This piece is no longer in your wardrobe.</p>
       </>
     )

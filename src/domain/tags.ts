@@ -6,6 +6,8 @@ export interface GarmentTags {
   isGarment: boolean
   /** 'other' covers what the app can't hang yet (outerwear, shoes, bags). */
   category: Category | 'other'
+  /** How sure the model is of the category, 0–1; null when it didn't say. */
+  confidence: number | null
   kind: Kind
   /** Short display name, e.g. "Striped shirt". */
   name: string
@@ -23,8 +25,6 @@ export const KINDS: Record<Category, Kind[]> = {
   bottom: ['jeans', 'shorts', 'skirt'],
   dress: ['dress', 'jumpsuit'],
 }
-
-export const CATEGORY_LABELS: Record<Category, string> = { top: 'Top', bottom: 'Bottom', dress: 'Dress' }
 
 export const KIND_LABELS: Record<Kind, string> = {
   shirt: 'Shirt',
@@ -57,6 +57,7 @@ export function normaliseTags(raw: unknown): GarmentTags | null {
   return {
     isGarment: r.isGarment !== false,
     category,
+    confidence: typeof r.confidence === 'number' && Number.isFinite(r.confidence) ? Math.min(1, Math.max(0, r.confidence)) : null,
     kind,
     name: capitalise(str(r.name, 'New piece', 32)),
     fabric: capitalise(str(r.fabric, 'Cotton', 24)),

@@ -1,4 +1,4 @@
-import { CaretLeft, CoatHanger, Dresser, Heart, Plus, User, type Icon } from '@phosphor-icons/react'
+import { CaretLeft, CoatHanger, Heart, Palette, Plus, Sun, type Icon } from '@phosphor-icons/react'
 import type { CSSProperties, ReactNode } from 'react'
 import { TONES } from '../domain/tones'
 import { TABS, useApp, type Tab } from '../state/context'
@@ -24,10 +24,10 @@ export function Kicker({ children, className }: { children: ReactNode; className
 
 const TAB_INFO: Record<Tab, { label: string; icon: Icon }> = {
   outfit: { label: 'Stage', icon: CoatHanger },
-  wardrobe: { label: 'Wardrobe', icon: Dresser },
+  wardrobe: { label: 'Spectrum', icon: Palette },
   add: { label: 'Add', icon: Plus },
   looks: { label: 'Looks', icon: Heart },
-  profile: { label: 'Profile', icon: User },
+  profile: { label: 'Aura', icon: Sun },
 }
 
 /**
