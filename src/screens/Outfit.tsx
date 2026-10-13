@@ -2,23 +2,27 @@ import { CaretLeft, CaretRight, Check, Sparkle } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import { Garment, Line } from '../components/Garment'
 import { itemMatch } from '../components/match'
-import { contrastLabel, toneFit } from '../domain/scoring'
+import { PRESETS } from '../domain/occasions'
+import { contrastLabel, rankLooks, toneFit } from '../domain/scoring'
 import { TONES } from '../domain/tones'
 import type { Category, RatedItem } from '../domain/types'
-import { useApp } from '../state/context'
+import { useApp, type Outfit as Look } from '../state/context'
 import { useWeather } from '../state/weather'
 import { currentLine } from '../domain/weather'
 
-/** Piece sizes on the line. Bottoms get taller boxes because trousers are tall. */
+/** Piece sizes on the line. Bottoms and dresses get taller boxes because they're tall. */
 const SIZES: Record<Category, { w: number; h: number; selW: number; selH: number }> = {
   top: { w: 64, h: 64, selW: 104, selH: 104 },
   bottom: { w: 52, h: 72, selW: 84, selH: 120 },
+  dress: { w: 52, h: 84, selW: 84, selH: 136 },
 }
 const GAP = 14
 
-function Strip({ label, cat, list, current, onSelect }: { label: string; cat: Category; list: RatedItem[]; current: RatedItem; onSelect: (id: string) => void }) {
+/** One line of pieces. `current` is the piece being worn from this line, if any. */
+function Strip({ label, cat, list, current, onSelect }: { label: string; cat: Category; list: RatedItem[]; current: RatedItem | null; onSelect: (id: string) => void }) {
   const n = list.length
-  const idx = Math.max(0, list.findIndex((i) => i.id === current.id))
+  const worn = list.findIndex((i) => i.id === current?.id)
+  const idx = Math.max(0, worn)
   const size = SIZES[cat]
   const select = (i: number) => onSelect(list[(i + n) % n].id)
   const scroller = useRef<HTMLDivElement>(null)
@@ -35,13 +39,13 @@ function Strip({ label, cat, list, current, onSelect }: { label: string; cat: Ca
     <section className="strip">
       <div className="strip-head">
         <span className="kicker">
-          {label} · {idx + 1} / {n}
+          {worn >= 0 ? `${label} · ${idx + 1} / ${n}` : `${label} · ${n}`}
         </span>
         <div className="strip-nav">
-          <button type="button" className="btn btn-ghost btn-icon" aria-label={`Previous ${label.toLowerCase()}`} onClick={() => select(idx - 1)} disabled={n < 2}>
+          <button type="button" className="btn btn-ghost btn-icon" aria-label={`Previous ${label.toLowerCase()}`} onClick={() => select(worn >= 0 ? idx - 1 : 0)} disabled={n < 2 && worn >= 0}>
             <CaretLeft size={18} />
           </button>
-          <button type="button" className="btn btn-ghost btn-icon" aria-label={`Next ${label.toLowerCase()}`} onClick={() => select(idx + 1)} disabled={n < 2}>
+          <button type="button" className="btn btn-ghost btn-icon" aria-label={`Next ${label.toLowerCase()}`} onClick={() => select(worn >= 0 ? idx + 1 : 0)} disabled={n < 2 && worn >= 0}>
             <CaretRight size={18} />
           </button>
         </div>
@@ -50,7 +54,7 @@ function Strip({ label, cat, list, current, onSelect }: { label: string; cat: Ca
         <div className="strip-track" style={{ gap: GAP, paddingInline: `calc(50% - ${size.selW / 2}px)` }}>
           <Line sag={10} style={{ top: 4 }} />
           {list.map((it, i) => {
-            const sel = i === idx
+            const sel = i === worn
             return (
               <button
                 key={it.id}
@@ -73,32 +77,37 @@ function Strip({ label, cat, list, current, onSelect }: { label: string; cat: Ca
   )
 }
 
-function Fitting({ top, bot }: { top: RatedItem; bot: RatedItem }) {
-  const { set, tops, bots, isSaved, toggleSaved, openItem, wornToday, toggleWorn } = useApp()
-  const dl = Math.abs(top.L - bot.L)
-  const fit = toneFit(top, bot)
-  const saved = isSaved(top.id, bot.id)
-  const worn = wornToday(top.id, bot.id)
+function Fitting({ look }: { look: Look }) {
+  const { rated, set, isSaved, toggleSaved, openItem, wornToday, toggleWorn } = useApp()
+  const { t, b } = look
+  const fit = toneFit(t, b)
+  const saved = isSaved(t.id, b?.id ?? null)
+  const worn = wornToday(t.id, b?.id ?? null)
+  const dl = b ? Math.abs(t.L - b.L) : 0
 
+  // Any other look you could put together, dresses included.
+  const options = rankLooks(rated, PRESETS.today, 1, Infinity)
   const shuffle = () => {
-    const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)]
-    let t: RatedItem, b: RatedItem
-    do {
-      t = pick(tops)
-      b = pick(bots)
-    } while (t.id === top.id && b.id === bot.id && tops.length * bots.length > 1)
-    set({ topId: t.id, botId: b.id })
+    const others = options.filter((o) => o.t.id !== t.id || o.b?.id !== b?.id)
+    const next = others[Math.floor(Math.random() * others.length)]
+    if (next) set(next.b ? { topId: next.t.id, botId: next.b.id } : { topId: next.t.id })
   }
 
   return (
     <>
       <section className="fitting pad">
         <div className="fitting-figure">
-          <Garment item={top} className="fitting-top" />
-          <Garment item={bot} className="fitting-bot" align="center" />
+          {b ? (
+            <>
+              <Garment item={t} className="fitting-top" />
+              <Garment item={b} className="fitting-bot" align="center" />
+            </>
+          ) : (
+            <Garment item={t} className="fitting-dress" align="center" />
+          )}
         </div>
         <div className="fitting-info">
-          {[top, bot].map((p) => {
+          {(b ? [t, b] : [t]).map((p) => {
             const m = itemMatch(p)
             return (
               <button key={p.id} type="button" className="piece" onClick={() => openItem(p.id)}>
@@ -112,14 +121,18 @@ function Fitting({ top, bot }: { top: RatedItem; bot: RatedItem }) {
             )
           })}
           <div className="meters">
-            <div className="meter-head">
-              <span>Contrast</span>
-              <span className="meter-val">{contrastLabel(top, bot)}</span>
-            </div>
-            <div className="meter meter--contrast">
-              <span className="meter-mark" style={{ left: `${Math.min(96, Math.round((dl / 0.6) * 100))}%` }} />
-            </div>
-            <div className="meter-head" style={{ marginTop: 'var(--space-2)' }}>
+            {b && (
+              <>
+                <div className="meter-head">
+                  <span>Contrast</span>
+                  <span className="meter-val">{contrastLabel(t, b)}</span>
+                </div>
+                <div className="meter meter--contrast">
+                  <span className="meter-mark" style={{ left: `${Math.min(96, Math.round((dl / 0.6) * 100))}%` }} />
+                </div>
+              </>
+            )}
+            <div className="meter-head" style={b ? { marginTop: 'var(--space-2)' } : undefined}>
               <span>Tone fit</span>
               <span className="meter-val">{fit}</span>
             </div>
@@ -131,7 +144,7 @@ function Fitting({ top, bot }: { top: RatedItem; bot: RatedItem }) {
       </section>
 
       <div className="actions-2 pad">
-        <button type="button" className="btn btn-secondary btn-tall" onClick={shuffle}>
+        <button type="button" className="btn btn-secondary btn-tall" onClick={shuffle} disabled={options.length < 2}>
           Shuffle
         </button>
         <button
@@ -139,7 +152,7 @@ function Fitting({ top, bot }: { top: RatedItem; bot: RatedItem }) {
           className="btn btn-secondary btn-tall"
           aria-pressed={saved}
           style={{ color: saved ? 'var(--color-accent-300)' : undefined }}
-          onClick={() => toggleSaved(top.id, bot.id, 'Today')}
+          onClick={() => toggleSaved(t.id, b?.id ?? null, 'Today')}
         >
           {saved ? 'Saved ♥' : 'Save look'}
         </button>
@@ -149,7 +162,7 @@ function Fitting({ top, bot }: { top: RatedItem; bot: RatedItem }) {
           type="button"
           className={`btn btn-block btn-tall ${worn ? 'btn-secondary worn' : 'btn-primary'}`}
           aria-pressed={worn}
-          onClick={() => toggleWorn(top.id, bot.id)}
+          onClick={() => toggleWorn(t.id, b?.id ?? null)}
         >
           {worn ? (
             <>
@@ -165,20 +178,21 @@ function Fitting({ top, bot }: { top: RatedItem; bot: RatedItem }) {
   )
 }
 
-/** First-run checklist: a tone, then at least one top and one bottom. */
+/** First-run checklist: a tone, then something to wear: a top and a bottom, or a dress. */
 function Setup() {
-  const { go, hasTone, tops, bots } = useApp()
+  const { go, hasTone, tops, bots, dresses } = useApp()
   const steps = [
     { done: hasTone, label: 'Find your colour tone', hint: 'Three quick questions', on: () => go('quiz', { quizStep: 0, quiz: [null, null, null] }) },
-    { done: tops.length > 0, label: 'Add a top', hint: 'Lay it flat and take a photo', on: () => go('add') },
-    { done: bots.length > 0, label: 'Add a bottom', hint: 'Jeans, trousers, a skirt…', on: () => go('add') },
+    { done: tops.length > 0 || dresses.length > 0, label: 'Add a top or a dress', hint: 'Lay it flat and take a photo', on: () => go('add') },
+    // A dress is a whole outfit, so bottoms are optional once there is one.
+    ...(dresses.length ? [] : [{ done: bots.length > 0, label: 'Add a bottom', hint: 'Jeans, trousers, a skirt…', on: () => go('add') }]),
   ]
   const fresh = !steps.some((st) => st.done)
   return (
     <section className="pad top-6">
       <div className="card setup">
         <span className="card-kicker">{fresh ? 'Welcome to Clothesline' : 'Almost there'}</span>
-        <span className="setup-title">{fresh ? 'Set up your line in three steps' : 'Finish setting up to start matching'}</span>
+        <span className="setup-title">{fresh ? `Set up your line in ${steps.length} steps` : 'Finish setting up to start matching'}</span>
         <ol className="setup-steps">
           {steps.map((st) => (
             <li key={st.label}>
@@ -201,13 +215,16 @@ function Setup() {
 }
 
 export function Outfit() {
-  const { go, set, tops, bots, top, bot, userTone, hasTone } = useApp()
+  const { go, hang, tops, bots, dresses, outfit, userTone, hasTone } = useApp()
   const weather = useWeather()
   const [date] = useState(() => {
     const now = new Date()
     return `${now.toLocaleDateString('en-GB', { weekday: 'short' })} ${now.getDate()}`
   })
-  const ready = hasTone && !!top && !!bot
+  const ready = hasTone && !!outfit
+  // Highlight what's being worn: a top and bottom, or a dress.
+  const wornTop = outfit?.b ? outfit.t : null
+  const wornDress = outfit && !outfit.b ? outfit.t : null
 
   return (
     <>
@@ -219,7 +236,7 @@ export function Outfit() {
             {hasTone ? TONES[userTone].name : 'Tone not set'}
           </span>
         </div>
-        {top && bot && (
+        {outfit && (
           <button type="button" className="btn btn-primary btn-tall glow" onClick={() => go('occasion')}>
             <Sparkle size={16} />
             Match me
@@ -228,9 +245,10 @@ export function Outfit() {
       </header>
 
       {!ready && <Setup />}
-      {top && <Strip label="Tops" cat="top" list={tops} current={top} onSelect={(id) => set({ topId: id })} />}
-      {bot && <Strip label="Bottoms" cat="bottom" list={bots} current={bot} onSelect={(id) => set({ botId: id })} />}
-      {top && bot && <Fitting top={top} bot={bot} />}
+      {tops.length > 0 && <Strip label="Tops" cat="top" list={tops} current={wornTop} onSelect={hang} />}
+      {bots.length > 0 && <Strip label="Bottoms" cat="bottom" list={bots} current={outfit?.b ?? null} onSelect={hang} />}
+      {dresses.length > 0 && <Strip label="Dresses" cat="dress" list={dresses} current={wornDress} onSelect={hang} />}
+      {outfit && <Fitting look={outfit} />}
     </>
   )
 }

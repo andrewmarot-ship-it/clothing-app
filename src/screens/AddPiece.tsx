@@ -29,7 +29,7 @@ const WARNINGS: Record<Warning, string> = {
   cut_off: 'Part of it may be out of frame. Retake from a little further back for a cleaner cut-out.',
   no_cutout: 'We couldn’t cut it out this time, so it’s drawn for now. Your photo is saved.',
   no_tags: 'We couldn’t tag it automatically. Check the details below.',
-  not_supported: 'Dresses, outerwear and shoes aren’t on the line yet. Pick Top or Bottom to hang it anyway.',
+  not_supported: 'Outerwear and shoes aren’t on the line yet. Pick Top, Bottom or Dress to hang it anyway.',
 }
 
 type Step = 'idle' | 'check' | 'scan' | 'done'
@@ -80,7 +80,7 @@ export function AddPiece() {
         // A retake keeps what the user already set; only the photo and colour change.
         setDetails({ name: retaking.name, cat: retaking.cat, kind: retaking.kind, fabric: retaking.fabric, f: retaking.f, w: retaking.w })
       } else {
-        const cat: Category = t?.category === 'bottom' ? 'bottom' : 'top'
+        const cat: Category = t && t.category !== 'other' ? t.category : 'top'
         setDetails({
           name: t?.name ?? 'New piece',
           cat,

@@ -1,6 +1,6 @@
 import { colourDistance, oklch } from './color.ts'
 import type { Occasion } from './occasions.ts'
-import { TONES, matchOf } from './tones.ts'
+import { TONES, matchOf, type Tone } from './tones.ts'
 import type { Item, Match, MatchSource, RatedItem } from './types.ts'
 
 const FIT: Record<Match, number> = { in: 100, near: 72, out: 38 }
@@ -31,9 +31,9 @@ export function rate(items: Item[], userTone: number, myColours: string[] = []):
   })
 }
 
-/** Tone fit, 0–100. The top weighs more because it sits near the face. */
-export function toneFit(top: RatedItem, bot: RatedItem): number {
-  return Math.round(FIT[top.match] * 0.6 + FIT[bot.match] * 0.4)
+/** Tone fit, 0–100. The top weighs more because it sits near the face; a dress is the whole look. */
+export function toneFit(top: RatedItem, bot: RatedItem | null): number {
+  return bot ? Math.round(FIT[top.match] * 0.6 + FIT[bot.match] * 0.4) : FIT[top.match]
 }
 
 export type ContrastLabel = 'Low' | 'Medium' | 'High'
@@ -43,41 +43,53 @@ export function contrastLabel(top: RatedItem, bot: RatedItem): ContrastLabel {
   return dl > 0.3 ? 'High' : dl < 0.12 ? 'Low' : 'Medium'
 }
 
-/** Overall suitability of a pair for an occasion, roughly 0–1. */
-export function scoreLook(t: RatedItem, b: RatedItem, occ: Occasion, code: number): number {
-  const tone = (MATCH_SCORE[t.match] * 0.6 + MATCH_SCORE[b.match] * 0.4) / 2
-  let form = 1 - Math.abs((t.f + b.f) / 2 - code) / 3
+/** Overall suitability of a look (a top and bottom, or a dress with b = null) for an occasion, roughly 0–1. */
+export function scoreLook(t: RatedItem, b: RatedItem | null, occ: Occasion, code: number): number {
+  const pieces = b ? [t, b] : [t]
+  const fs = pieces.map((p) => p.f)
+  const tone = b ? (MATCH_SCORE[t.match] * 0.6 + MATCH_SCORE[b.match] * 0.4) / 2 : MATCH_SCORE[t.match] / 2
+  let form = 1 - Math.abs(fs.reduce((a, f) => a + f, 0) / fs.length - code) / 3
   // A dressy event needs at least one dressy piece.
-  if (code >= 3 && Math.max(t.f, b.f) < code) form -= 0.5
-  if (code <= 1 && Math.min(t.f, b.f) > 2) form -= 0.3
-  const warm = 1 - Math.abs(Math.max(t.w, b.w) - occ.warmth) / 2
-  const dl = Math.abs(t.L - b.L)
+  if (code >= 3 && Math.max(...fs) < code) form -= 0.5
+  if (code <= 1 && Math.min(...fs) > 2) form -= 0.3
+  const warm = 1 - Math.abs(Math.max(...pieces.map((p) => p.w)) - occ.warmth) / 2
+  // Contrast is between two pieces; a dress sits in the middle.
+  const dl = b ? Math.abs(t.L - b.L) : 0
   const con =
-    occ.contrast === 'high' ? Math.min(1, dl / 0.35)
+    !b ? 0.75
+    : occ.contrast === 'high' ? Math.min(1, dl / 0.35)
     : occ.contrast === 'medium' ? 1 - Math.abs(dl - 0.2) / 0.3
     : dl > 0.08 && dl < 0.4 ? 1 : 0.5
   return tone * 0.45 + form * 0.35 + warm * 0.15 + con * 0.05
 }
 
+/** A look: a top with a bottom, or a dress on its own (b is null). */
 export interface Look {
   t: RatedItem
-  b: RatedItem
+  b: RatedItem | null
   score: number
 }
 
-/** Every top × bottom pair, best first. */
+export interface Pair extends Look {
+  b: RatedItem
+}
+
+/** Every top × bottom pair and every dress, best first. */
 export function rankLooks(items: RatedItem[], occ: Occasion, code: number, limit = 5): Look[] {
   const tops = items.filter((i) => i.cat === 'top')
   const bots = items.filter((i) => i.cat === 'bottom')
   const out: Look[] = []
   for (const t of tops) for (const b of bots) out.push({ t, b, score: scoreLook(t, b, occ, code) })
+  for (const d of items) if (d.cat === 'dress') out.push({ t: d, b: null, score: scoreLook(d, null, occ, code) })
   return out.sort((a, b) => b.score - a.score).slice(0, limit)
 }
 
-/** Best partners for an item from the other category, for an everyday occasion. */
-export function bestPartners(item: RatedItem, items: RatedItem[], everyday: Occasion, limit = 3): Look[] {
+/** Best partners for a top or bottom from the other category, for an everyday occasion. A dress needs none. */
+export function bestPartners(item: RatedItem, items: RatedItem[], everyday: Occasion, limit = 3): Pair[] {
+  if (item.cat === 'dress') return []
+  const other = item.cat === 'top' ? 'bottom' : 'top'
   return items
-    .filter((o) => o.cat !== item.cat)
+    .filter((o) => o.cat === other)
     .map((o) => {
       const [t, b] = item.cat === 'top' ? [item, o] : [o, item]
       return { t, b, score: scoreLook(t, b, everyday, 1) }
@@ -86,7 +98,7 @@ export function bestPartners(item: RatedItem, items: RatedItem[], everyday: Occa
     .slice(0, limit)
 }
 
-export const lookTitle = (t: Item, b: Item) => `${t.colorName} & ${b.colorName.toLowerCase()}`
+export const lookTitle = (t: Item, b: Item | null) => (b ? `${t.colorName} & ${b.colorName.toLowerCase()}` : t.name)
 
 export interface Reason {
   k: 'Occasion' | 'Tone' | 'Weather'
@@ -94,12 +106,9 @@ export interface Reason {
 }
 
 /** Generated copy explaining why a look works. */
-export function describe(t: RatedItem, b: RatedItem, occ: Occasion, code: number, userTone: number): Reason[] {
+export function describe(t: RatedItem, b: RatedItem | null, occ: Occasion, code: number, userTone: number): Reason[] {
   const T = TONES[userTone]
-  const dl = Math.abs(t.L - b.L)
-  const conTxt = dl > 0.3 ? 'Strong light–dark contrast.' : dl < 0.12 ? 'Tonal and low-contrast.' : 'Medium contrast, easy to wear.'
-
-  const dressier = t.f >= b.f ? t : b
+  const dressier = !b || t.f >= b.f ? t : b
   const dn = dressier.name.toLowerCase()
   const df = dressier.fabric.toLowerCase()
   const dLabel = dn.includes(df) ? dn : `${df} ${dn}`
@@ -113,6 +122,32 @@ export function describe(t: RatedItem, b: RatedItem, occ: Occasion, code: number
         ? 'Nothing here needs fussing over.'
         : 'Smart enough to sit down to, relaxed enough to stay in all day.')
 
+  const mw = b ? Math.max(t.w, b.w) : t.w
+  const prefix = occ.weather ? `${occ.weather}. ` : ''
+  const wTxt =
+    mw < occ.warmth - 0.4 ? `${prefix}Bring a warm layer.`
+    : mw > occ.warmth + 0.6 ? `${prefix}This runs warm, fine indoors.`
+    : `${prefix}Right weight for it.`
+
+  return [
+    { k: 'Occasion', v: occTxt },
+    { k: 'Tone', v: b ? pairToneText(t, b, T) : pieceToneText(t, T) },
+    { k: 'Weather', v: wTxt },
+  ]
+}
+
+function pieceToneText(d: RatedItem, T: Tone): string {
+  if (d.match === 'in') return `${d.colorName} sits in your ${T.name} palette, head to toe.`
+  if (d.match === 'near')
+    return d.matchSource === 'tone'
+      ? `${d.colorName} borrows from ${TONES[d.tone].name}, next door to ${T.name}, so it still flatters.`
+      : `You rate ${d.colorName.toLowerCase()} close enough to ${T.name} to work.`
+  return `${d.colorName} sits outside your tone. Wear an in-tone scarf or necklace near your face.`
+}
+
+function pairToneText(t: RatedItem, b: RatedItem, T: Tone): string {
+  const dl = Math.abs(t.L - b.L)
+  const conTxt = dl > 0.3 ? 'Strong light–dark contrast.' : dl < 0.12 ? 'Tonal and low-contrast.' : 'Medium contrast, easy to wear.'
   let toneTxt: string
   if (t.match === 'in' && b.match === 'in') {
     toneTxt = `${t.colorName} and ${b.colorName.toLowerCase()} both sit in your ${T.name} palette. ${conTxt}`
@@ -130,17 +165,5 @@ export function describe(t: RatedItem, b: RatedItem, occ: Occasion, code: number
   } else {
     toneTxt = `Neither piece is in your tone. It works for the occasion, but it won’t flatter you as much. ${conTxt}`
   }
-
-  const mw = Math.max(t.w, b.w)
-  const prefix = occ.weather ? `${occ.weather}. ` : ''
-  const wTxt =
-    mw < occ.warmth - 0.4 ? `${prefix}Bring a warm layer.`
-    : mw > occ.warmth + 0.6 ? `${prefix}This runs warm, fine indoors.`
-    : `${prefix}Right weight for it.`
-
-  return [
-    { k: 'Occasion', v: occTxt },
-    { k: 'Tone', v: toneTxt },
-    { k: 'Weather', v: wTxt },
-  ]
+  return toneTxt
 }
