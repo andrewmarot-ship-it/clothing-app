@@ -4,7 +4,7 @@
  * deletions travel as tombstones, and the rest of the profile is one record
  * where the newest change wins.
  */
-import type { Item, SavedLook } from './types'
+import type { Item, SavedLook } from './types.ts'
 
 /** The synced fields of a piece: everything except runtime-only display state. */
 export type StoredItem = Omit<Item, 'photo'>

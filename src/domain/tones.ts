@@ -1,4 +1,4 @@
-import type { Match } from './types'
+import type { Match } from './types.ts'
 
 export type Season = 'Spring' | 'Summer' | 'Autumn' | 'Winter'
 

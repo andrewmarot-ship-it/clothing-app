@@ -1,7 +1,7 @@
-import { colourDistance, oklch } from './color'
-import type { Occasion } from './occasions'
-import { TONES, matchOf } from './tones'
-import type { Item, Match, MatchSource, RatedItem } from './types'
+import { colourDistance, oklch } from './color.ts'
+import type { Occasion } from './occasions.ts'
+import { TONES, matchOf } from './tones.ts'
+import type { Item, Match, MatchSource, RatedItem } from './types.ts'
 
 const FIT: Record<Match, number> = { in: 100, near: 72, out: 38 }
 const MATCH_SCORE: Record<Match, number> = { in: 2, near: 1, out: 0 }
@@ -132,10 +132,11 @@ export function describe(t: RatedItem, b: RatedItem, occ: Occasion, code: number
   }
 
   const mw = Math.max(t.w, b.w)
+  const prefix = occ.weather ? `${occ.weather}. ` : ''
   const wTxt =
-    mw < occ.warmth - 0.4 ? `${occ.weather}. Bring a warm layer.`
-    : mw > occ.warmth + 0.6 ? `${occ.weather}. This runs warm, fine indoors.`
-    : `${occ.weather}. Right weight for it.`
+    mw < occ.warmth - 0.4 ? `${prefix}Bring a warm layer.`
+    : mw > occ.warmth + 0.6 ? `${prefix}This runs warm, fine indoors.`
+    : `${prefix}Right weight for it.`
 
   return [
     { k: 'Occasion', v: occTxt },

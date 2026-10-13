@@ -1,4 +1,4 @@
-import { nearestTone } from './tones'
+import { nearestTone } from './tones.ts'
 
 export interface Oklch {
   L: number

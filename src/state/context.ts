@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { OccasionKey } from '../domain/occasions'
+import type { Occasion, OccasionKey } from '../domain/occasions'
 import type { QuizAnswers } from '../domain/quiz'
 import type { DressCode, Item, RatedItem, SavedLook } from '../domain/types'
 import type { CloudState } from './useCloudSync'
@@ -42,6 +42,8 @@ export interface AppState {
   retakeId: string | null
   occText: string
   occKey: OccasionKey
+  /** Claude's reading of `text`, when it has answered for the text currently typed. */
+  occAi: { text: string; occasion: Occasion } | null
   /** Dress-code override; null follows the occasion. */
   code: DressCode | null
   lookI: number

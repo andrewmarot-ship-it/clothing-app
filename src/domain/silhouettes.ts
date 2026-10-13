@@ -1,4 +1,4 @@
-import type { Kind } from './types'
+import type { Kind } from './types.ts'
 
 /** Placeholder garment silhouettes (100×100 viewBox), drawn until a real cut-out exists. */
 export const SILHOUETTES: Record<Kind, string> = {

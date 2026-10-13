@@ -558,6 +558,11 @@ h1 { margin: 0; }
 .signin-sent .strong { color: var(--color-text); }
 .sync-error, .sync-offline { color: var(--color-accent-300); }
 
+/* — occasion reading & weather — */
+.kicker-spark { display: inline-block; margin-left: 6px; vertical-align: -1px; color: var(--color-accent-300); }
+.kv-row.is-reading span:last-child { opacity: 0.45; transition: opacity 0.2s; }
+.weather-ask { gap: 6px; padding-inline: 0; justify-content: flex-start; color: var(--color-accent-300); }
+
 /* — welcome (first launch) — */
 .welcome { display: flex; flex-direction: column; padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom)); background: var(--color-bg); }
 .welcome-stage { display: block; width: 100%; height: auto; margin-top: calc(48px + env(safe-area-inset-top)); overflow: visible; }

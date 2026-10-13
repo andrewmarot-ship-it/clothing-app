@@ -40,6 +40,7 @@ function blankState(): AppState {
     retakeId: null,
     occText: '',
     occKey: 'today',
+    occAi: null,
     code: null,
     lookI: 0,
     quizStep: 0,
