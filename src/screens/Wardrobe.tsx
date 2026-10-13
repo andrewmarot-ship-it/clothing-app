@@ -16,7 +16,7 @@ function Row({ it, onOpen }: { it: RatedItem; onOpen: () => void }) {
   return (
     <button type="button" className="w-row" onClick={onOpen}>
       <span className="w-tile">
-        <Garment item={it} stroke={2} shade={false} align="center" className="w-thumb" />
+        <Garment item={it} stroke={2} shade={false} align="center" fit="tight" className="w-thumb" />
       </span>
       <span className="col gap-2px">
         <span className="w-name">{it.name}</span>

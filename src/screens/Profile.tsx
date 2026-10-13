@@ -166,7 +166,7 @@ function WearList({ title, items, detail, onOpen }: { title: string; items: Rate
       {items.map((i) => (
         <button key={i.id} type="button" className="w-row" onClick={() => onOpen(i.id)}>
           <span className="w-tile">
-            <Garment item={i} stroke={2} shade={false} align="center" className="w-thumb" />
+            <Garment item={i} stroke={2} shade={false} align="center" fit="tight" className="w-thumb" />
           </span>
           <span className="w-name">{i.name}</span>
           <span className="meta">{detail(i)}</span>

@@ -1,9 +1,10 @@
 import type { CSSProperties } from 'react'
+import { tightLayout } from '../domain/frame'
 import { SILHOUETTES } from '../domain/silhouettes'
 import type { Item } from '../domain/types'
 
 interface Props {
-  item: Pick<Item, 'kind' | 'color' | 'name' | 'photo' | 'cutout'>
+  item: Pick<Item, 'kind' | 'color' | 'name' | 'photo' | 'cutout' | 'frame'>
   className?: string
   style?: CSSProperties
   /** Outline width in viewBox units. */
@@ -12,13 +13,37 @@ interface Props {
   shade?: boolean
   /** Pin the drawing to the top of its box (hanging) or centre it. */
   align?: 'top' | 'center'
+  /**
+   * frame: show the whole standard canvas, so pieces of a kind match in size.
+   * tight: fill the box with the garment itself, for thumbnails.
+   */
+  fit?: 'frame' | 'tight'
 }
 
 /**
  * A garment: the user's photo when there is one (normally a transparent
  * cut-out), otherwise a placeholder silhouette filled with the item colour.
  */
-export function Garment({ item, className, style, stroke = 0.8, shade = true, align = 'top' }: Props) {
+export function Garment({ item, className, style, stroke = 0.8, shade = true, align = 'top', fit = 'frame' }: Props) {
+  if (item.photo && fit === 'tight' && item.frame) {
+    const t = tightLayout(item.frame)
+    return (
+      <div className={`garment-tight ${item.cutout ? 'cutout' : ''} ${className ?? ''}`} style={style}>
+        <div
+          role="img"
+          aria-label={item.name}
+          className="garment-photo garment-photo--fill"
+          style={{
+            backgroundImage: `url("${item.photo}")`,
+            width: `${t.width}cqmin`,
+            height: `${t.height}cqmin`,
+            left: `calc(50cqw + ${t.left}cqmin)`,
+            top: `calc(50cqh + ${t.top}cqmin)`,
+          }}
+        />
+      </div>
+    )
+  }
   if (item.photo) {
     // Raw photos blend in with .lighten so a dark backdrop falls away. A real
     // cut-out already has transparency, and lighten would make dark garments

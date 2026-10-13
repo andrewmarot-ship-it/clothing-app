@@ -19,7 +19,9 @@ import {
   type Pixels,
   type QualityIssue,
 } from './pixels.ts'
+import { keepGarment, measureShape, placeGarment, type Frame } from './frame.ts'
 import type { GarmentTags } from './tags.ts'
+import type { Category } from './types.ts'
 
 /** Upload and working size. Big enough for the item screen at 2×, small enough to send quickly. */
 const WORK_SIDE = 1024
@@ -152,9 +154,37 @@ async function normaliseCutout(px: Pixels, angle: number): Promise<Blob> {
   const out = canvas(Math.round(sw * scale), Math.round(sh * scale))
   out.ctx.drawImage(rot.c, sx, sy, sw, sh, 0, 0, out.c.width, out.c.height)
 
-  const webp = await toBlob(out.c, 'image/webp', 0.9).catch(() => null)
+  return encodeCutout(out.c)
+}
+
+async function encodeCutout(c: HTMLCanvasElement): Promise<Blob> {
+  const webp = await toBlob(c, 'image/webp', 0.9).catch(() => null)
   // Older Safari can't encode WebP and silently hands back a PNG instead.
-  return webp && webp.type === 'image/webp' ? webp : toBlob(out.c, 'image/png')
+  return webp && webp.type === 'image/webp' ? webp : toBlob(c, 'image/png')
+}
+
+/**
+ * Redraw a cut-out on its category's standard canvas (see frame.ts), so
+ * pieces of a kind come out the same size. Works on any stored cut-out,
+ * framed before or not. Null if the image has no garment in it.
+ */
+export async function frameCutout(cutout: Blob, cat: Category): Promise<{ photo: Blob; frame: Frame } | null> {
+  const bmp = await createImageBitmap(cutout)
+  try {
+    const src = canvas(bmp.width, bmp.height)
+    src.ctx.drawImage(bmp, 0, 0)
+    const garment = keepGarment(pixelsOf(src))
+    const shape = measureShape(garment)
+    if (!shape) return null
+    src.ctx.putImageData(new ImageData(new Uint8ClampedArray(garment.data), garment.width, garment.height), 0, 0)
+    const p = placeGarment(cat, shape)
+    const out = canvas(p.width, p.height)
+    out.ctx.imageSmoothingQuality = 'high'
+    out.ctx.drawImage(src.c, p.dx, p.dy, bmp.width * p.scale, bmp.height * p.scale)
+    return { photo: await encodeCutout(out.c), frame: p.frame }
+  } finally {
+    bmp.close()
+  }
 }
 
 export async function analysePhoto(prepared: PreparedPhoto, onStage: (s: Stage) => void, signal?: AbortSignal): Promise<AnalysedPhoto> {

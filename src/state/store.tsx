@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { FRAME_VERSION } from '../domain/frame'
+import { frameCutout } from '../domain/photo'
 import { rate } from '../domain/scoring'
 import { lookExists } from '../domain/sync'
 import { isCategory, migrateDress } from '../domain/tags'
@@ -140,6 +142,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  /** New cut-outs, kept in memory until framed, so framing needn't wait for the IndexedDB write. */
+  const fresh = useRef(new Map<string, Blob>())
+
   /** Store images under fresh keys and return the item fields that point at them. */
   const storeImages = useCallback((id: string, images: Images): Partial<Item> => {
     const out: Partial<Item> = {}
@@ -148,6 +153,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const key = `${id}-cut-${stamp}`
       out.photoId = key
       out.cutout = true
+      // A new cut-out hasn't been framed yet.
+      out.frame = undefined
+      fresh.current.set(key, images.photo)
       void putPhoto(key, images.photo)
       const url = URL.createObjectURL(images.photo)
       setUrls((u) => ({ ...u, [key]: url }))
@@ -222,6 +230,38 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return { ...s, wearLog, items: s.items.map((i) => (i.id === t || i.id === b ? { ...i, wears: Math.max(0, i.wears + delta), updatedAt: now } : i)) }
     })
   }, [update])
+
+  // Frame cut-outs onto their category's standard canvas (domain/frame.ts), so
+  // pieces of a kind look alike: new pieces, retakes, pieces moved to another
+  // category, and pieces from before framing existed. One at a time, in the
+  // background; the framed image replaces the cut-out and syncs like a retake.
+  const framing = useRef(new Set<string>())
+  const latest = useRef(items)
+  useEffect(() => {
+    latest.current = items
+    const todo = items.filter((i) => i.cutout && i.photoId && (i.frame?.v !== FRAME_VERSION || i.frame.cat !== i.cat) && !framing.current.has(`${i.photoId}:${i.cat}`))
+    if (!todo.length) return
+    for (const i of todo) framing.current.add(`${i.photoId}:${i.cat}`)
+    void (async () => {
+      for (const it of todo) {
+        const key = it.photoId!
+        const blob = fresh.current.get(key) ?? (await getPhoto(key))
+        const out = blob ? await frameCutout(blob, it.cat).catch(() => null) : null
+        if (!out) continue
+        // The piece may have been retaken, moved or removed meanwhile.
+        const now = latest.current.find((i) => i.id === it.id)
+        if (!now || now.photoId !== key || now.cat !== it.cat) continue
+        const next = `${it.id}-cut-${Date.now().toString(36)}`
+        if (!(await putPhoto(next, out.photo))) continue
+        const url = URL.createObjectURL(out.photo)
+        setUrls((u) => ({ ...u, [next]: url }))
+        const stamp = Date.now()
+        update((s) => ({ ...s, items: s.items.map((i) => (i.id === it.id && i.photoId === key ? { ...i, photoId: next, frame: out.frame, updatedAt: stamp } : i)) }))
+        fresh.current.delete(key)
+        void deletePhotos([key])
+      }
+    })()
+  }, [items, update])
 
   const onPhoto = useCallback((key: string, blob: Blob) => {
     const url = URL.createObjectURL(blob)

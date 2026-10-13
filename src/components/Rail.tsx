@@ -15,8 +15,10 @@ interface Props {
   list: RatedItem[]
   current: RatedItem
   onPick: (id: string) => void
-  /** Garment height as a share of its width: dresses hang longer. */
+  /** Garment box height as a share of its width: the category's canvas shape (see domain/frame.ts). */
   aspect?: number
+  /** How far down its box the longest pieces reach, so the rail is tall enough for them. */
+  reach?: number
 }
 
 /**
@@ -24,7 +26,7 @@ interface Props {
  * smaller and fainter towards the ends. Tap a hanger, swipe, or use the
  * arrows; pieces slide and spring past each other.
  */
-export function Rail({ label, list, current, onPick, aspect = 1 }: Props) {
+export function Rail({ label, list, current, onPick, aspect = 1, reach = 0.94 }: Props) {
   const [glow] = useGlowPref()
   const n = list.length
   const idx = Math.max(0, list.findIndex((i) => i.id === current.id))
@@ -50,7 +52,7 @@ export function Rail({ label, list, current, onPick, aspect = 1 }: Props) {
     swiped.current = true
     select(idx + (dx < 0 ? 1 : -1))
   }
-  const centreHeight = Math.round(132 * HANGER_RATIO + 132 * aspect * 0.94)
+  const centreHeight = Math.round(132 * HANGER_RATIO + 132 * aspect * (reach - 0.06) + 12)
 
   return (
     <section className="rail">

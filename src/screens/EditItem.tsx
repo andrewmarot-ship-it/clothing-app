@@ -32,7 +32,7 @@ export function EditItem() {
       <BackRow label={item.name} onBack={back} right="Edit" />
       <div className="pad top-4 edit-head">
         <span className="w-tile edit-thumb">
-          <Garment item={item} align="center" shade={false} stroke={2} className="fill" />
+          <Garment item={item} align="center" shade={false} stroke={2} fit="tight" className="fill" />
         </span>
         <button type="button" className="btn btn-secondary" onClick={() => go('add', { retakeId: item.id })}>
           <Camera size={16} />

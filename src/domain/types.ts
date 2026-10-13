@@ -1,3 +1,5 @@
+import type { Frame } from './frame.ts'
+
 /** A dress is a whole outfit on its own; tops and bottoms pair up. */
 export type Category = 'top' | 'bottom' | 'dress'
 export type Kind = 'shirt' | 'tee' | 'tank' | 'jeans' | 'shorts' | 'skirt' | 'dress' | 'jumpsuit'
@@ -36,6 +38,8 @@ export interface Item {
   photo?: string
   /** True when `photo` is a transparent cut-out rather than a raw photo. */
   cutout?: boolean
+  /** Where the cut-out sits on its standard canvas, once framed (see domain/frame.ts). */
+  frame?: Frame
   /** The user's own call on how this piece suits them; beats the classifier. */
   matchOverride?: Match
   /** Client time (ms) of the last change, for merging across devices. */
